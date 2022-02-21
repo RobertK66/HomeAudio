@@ -3,3 +3,7 @@
 ################################################################################
 
 /.vs
+/Cli/bin/Debug/net6.0
+/Cli/obj
+/QueueCaster/bin/Debug/net6.0
+/QueueCaster/obj
