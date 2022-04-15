@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using DLNAMediaRepos;
+using Microsoft.Extensions.Configuration;
 using QueueCaster.queue.models;
 using Sharpcaster.Models.Media;
 using System;
@@ -8,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Cli {
-    public class MediaRepositiory {
+    public class MediaRepositiory :IMediaRepository<Media>  {
         List<QueueItem[]> CdQueues = new List<QueueItem[]>();
         List<Media> WebRadios = new List<Media>();
 
@@ -43,22 +44,28 @@ namespace Cli {
 
         }
 
-        public Media? GetRadioStation(int playIdx) {
+        public (string,string) GetRadioStation(int playIdx) {
             if (WebRadios.Count > 0) {
                 playIdx = playIdx % WebRadios.Count;
-                return WebRadios[playIdx];
+                return (WebRadios[playIdx].ContentUrl, WebRadios[playIdx].Metadata.Title);
             } else {
-                return null;
+                return ("", "");
             }
         }
 
-        public QueueItem[]? GetCdTracks(int playIdx) {
-            QueueItem[]? qi = null;
+        public List<(string, string)> GetCdTracks(int playIdx) {
+            List<(string, string)> qi = new List<(string, string)>();
             if (CdQueues.Count > 0) {
                 playIdx = playIdx % CdQueues.Count;
-                qi = CdQueues[playIdx];
+                var q = CdQueues[playIdx];
+                foreach (var c in q) {
+                    if (c?.Media != null) {
+                        qi.Add((c.Media.ContentUrl,c.Media.Metadata.Title));
+                    }
+                }
             }
             return qi;
         }
+
     }
 }

@@ -1,0 +1,256 @@
+{
+  "version": 3,
+  "targets": {
+    "net6.0": {
+      "HttpMachine.PCL/3.1.0": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard1.0/HttpMachine.dll": {},
+          "lib/netstandard1.0/IHttpMachine.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard1.0/HttpMachine.dll": {},
+          "lib/netstandard1.0/IHttpMachine.dll": {}
+        }
+      },
+      "NLog/4.7.13": {
+        "type": "package",
+        "compile": {
+          "lib/netstandard2.0/NLog.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/NLog.dll": {}
+        }
+      },
+      "SimpleHttpListener.Rx/6.1.0": {
+        "type": "package",
+        "dependencies": {
+          "HttpMachine.PCL": "3.1.0",
+          "System.Reactive": "4.0.0"
+        },
+        "compile": {
+          "lib/netstandard2.0/ISimpleHttpListener.Rx.dll": {},
+          "lib/netstandard2.0/SimpleHttpListener.Rx.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/ISimpleHttpListener.Rx.dll": {},
+          "lib/netstandard2.0/SimpleHttpListener.Rx.dll": {}
+        }
+      },
+      "SSDP.UPnP.PCL/6.1.0": {
+        "type": "package",
+        "dependencies": {
+          "Nlog": "4.7.13",
+          "SimpleHttpListener.Rx": "6.1.0",
+          "System.Reactive": "5.0.0"
+        },
+        "compile": {
+          "lib/netstandard2.0/ISSDP.UPnP.PCL.dll": {},
+          "lib/netstandard2.0/SSDP.UPnP.PCL.dll": {}
+        },
+        "runtime": {
+          "lib/netstandard2.0/ISSDP.UPnP.PCL.dll": {},
+          "lib/netstandard2.0/SSDP.UPnP.PCL.dll": {}
+        }
+      },
+      "System.Reactive/5.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/net5.0/System.Reactive.dll": {}
+        },
+        "runtime": {
+          "lib/net5.0/System.Reactive.dll": {}
+        },
+        "build": {
+          "buildTransitive/net5.0/_._": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "HttpMachine.PCL/3.1.0": {
+      "sha512": "RyazQUDWZHxZ+Lg2hQj4tDEKJxfyHMGeD8LgSRwsJ14ip2E0ZB+pAuEKkau975IcY5DiWysPS7Pbpx0mx7ctaw==",
+      "type": "package",
+      "path": "httpmachine.pcl/3.1.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "httpmachine.pcl.3.1.0.nupkg.sha512",
+        "httpmachine.pcl.nuspec",
+        "lib/netstandard1.0/HttpMachine.deps.json",
+        "lib/netstandard1.0/HttpMachine.dll",
+        "lib/netstandard1.0/HttpMachine.pdb",
+        "lib/netstandard1.0/IHttpMachine.dll",
+        "lib/netstandard1.0/IHttpMachine.pdb"
+      ]
+    },
+    "NLog/4.7.13": {
+      "sha512": "AvoGpCuq36B+0wY313XA6gC+YeMvk24rqF8P+HS9fInBGOjCzPjpXp2ln9ATZjPOJtXgHfc8zNmTjyswFGLxvg==",
+      "type": "package",
+      "path": "nlog/4.7.13",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/monoandroid44/NLog.dll",
+        "lib/monoandroid44/NLog.xml",
+        "lib/net35/NLog.dll",
+        "lib/net35/NLog.xml",
+        "lib/net40-client/NLog.dll",
+        "lib/net40-client/NLog.xml",
+        "lib/net45/NLog.dll",
+        "lib/net45/NLog.xml",
+        "lib/netstandard1.3/NLog.dll",
+        "lib/netstandard1.3/NLog.xml",
+        "lib/netstandard1.5/NLog.dll",
+        "lib/netstandard1.5/NLog.xml",
+        "lib/netstandard2.0/NLog.dll",
+        "lib/netstandard2.0/NLog.xml",
+        "lib/sl4/NLog.dll",
+        "lib/sl4/NLog.xml",
+        "lib/sl5/NLog.dll",
+        "lib/sl5/NLog.xml",
+        "lib/wp8/NLog.dll",
+        "lib/wp8/NLog.xml",
+        "lib/xamarinios10/NLog.dll",
+        "lib/xamarinios10/NLog.xml",
+        "nlog.4.7.13.nupkg.sha512",
+        "nlog.nuspec"
+      ]
+    },
+    "SimpleHttpListener.Rx/6.1.0": {
+      "sha512": "HF/6heXkcS2oQ/hLG8gI00z5uuPChy2jBCwVU0HZBzr2u7RxmSxzdtLxnTIQwy9rRJbSdHeEif0h7yiL+TccVA==",
+      "type": "package",
+      "path": "simplehttplistener.rx/6.1.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/netstandard2.0/ISimpleHttpListener.Rx.dll",
+        "lib/netstandard2.0/ISimpleHttpListener.Rx.pdb",
+        "lib/netstandard2.0/SimpleHttpListener.Rx.deps.json",
+        "lib/netstandard2.0/SimpleHttpListener.Rx.dll",
+        "lib/netstandard2.0/SimpleHttpListener.Rx.pdb",
+        "simplehttplistener.rx.6.1.0.nupkg.sha512",
+        "simplehttplistener.rx.nuspec"
+      ]
+    },
+    "SSDP.UPnP.PCL/6.1.0": {
+      "sha512": "jfQU2IWc8wtMBx6wCQliXyFnPYYXxs2FZOJnXbzCAuFiSRsowoExi+i8d2orQXR//3LjZ5v9813++sjzHMJBSA==",
+      "type": "package",
+      "path": "ssdp.upnp.pcl/6.1.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "images/1iveowl-logo.png",
+        "lib/netstandard2.0/ISSDP.UPnP.PCL.deps.json",
+        "lib/netstandard2.0/ISSDP.UPnP.PCL.dll",
+        "lib/netstandard2.0/ISSDP.UPnP.PCL.pdb",
+        "lib/netstandard2.0/SSDP.UPnP.PCL.deps.json",
+        "lib/netstandard2.0/SSDP.UPnP.PCL.dll",
+        "lib/netstandard2.0/SSDP.UPnP.PCL.pdb",
+        "ssdp.upnp.pcl.6.1.0.nupkg.sha512",
+        "ssdp.upnp.pcl.nuspec"
+      ]
+    },
+    "System.Reactive/5.0.0": {
+      "sha512": "erBZjkQHWL9jpasCE/0qKAryzVBJFxGHVBAvgRN1bzM0q2s1S4oYREEEL0Vb+1kA/6BKb5FjUZMp5VXmy+gzkQ==",
+      "type": "package",
+      "path": "system.reactive/5.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "build/net5.0/_._",
+        "build/netcoreapp3.1/System.Reactive.dll",
+        "build/netcoreapp3.1/System.Reactive.targets",
+        "build/netcoreapp3.1/System.Reactive.xml",
+        "buildTransitive/net5.0/_._",
+        "buildTransitive/netcoreapp3.1/System.Reactive.targets",
+        "lib/net472/System.Reactive.dll",
+        "lib/net472/System.Reactive.xml",
+        "lib/net5.0-windows10.0.19041/System.Reactive.dll",
+        "lib/net5.0-windows10.0.19041/System.Reactive.xml",
+        "lib/net5.0/System.Reactive.dll",
+        "lib/net5.0/System.Reactive.xml",
+        "lib/netcoreapp3.1/_._",
+        "lib/netstandard2.0/System.Reactive.dll",
+        "lib/netstandard2.0/System.Reactive.xml",
+        "lib/uap10.0.16299/System.Reactive.dll",
+        "lib/uap10.0.16299/System.Reactive.pri",
+        "lib/uap10.0.16299/System.Reactive.xml",
+        "system.reactive.5.0.0.nupkg.sha512",
+        "system.reactive.nuspec"
+      ]
+    }
+  },
+  "projectFileDependencyGroups": {
+    "net6.0": [
+      "SSDP.UPnP.PCL >= 6.1.0"
+    ]
+  },
+  "packageFolders": {
+    "C:\\Users\\Robert.RKOSAD\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
+  },
+  "project": {
+    "version": "1.0.0",
+    "restore": {
+      "projectUniqueName": "C:\\Users\\Robert.RKOSAD\\source\\repos\\HomeAudio\\DLNAMediaRepos\\DLNAMediaRepos.csproj",
+      "projectName": "DLNAMediaRepos",
+      "projectPath": "C:\\Users\\Robert.RKOSAD\\source\\repos\\HomeAudio\\DLNAMediaRepos\\DLNAMediaRepos.csproj",
+      "packagesPath": "C:\\Users\\Robert.RKOSAD\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\Robert.RKOSAD\\source\\repos\\HomeAudio\\DLNAMediaRepos\\obj\\",
+      "projectStyle": "PackageReference",
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
+      "configFilePaths": [
+        "C:\\Users\\Robert.RKOSAD\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+      ],
+      "originalTargetFrameworks": [
+        "net6.0"
+      ],
+      "sources": {
+        "https://api.nuget.org/v3/index.json": {}
+      },
+      "frameworks": {
+        "net6.0": {
+          "targetAlias": "net6.0",
+          "projectReferences": {}
+        }
+      },
+      "warningProperties": {
+        "warnAsError": [
+          "NU1605"
+        ]
+      }
+    },
+    "frameworks": {
+      "net6.0": {
+        "targetAlias": "net6.0",
+        "dependencies": {
+          "SSDP.UPnP.PCL": {
+            "target": "Package",
+            "version": "[6.1.0, )"
+          }
+        },
+        "imports": [
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48"
+        ],
+        "assetTargetFallback": true,
+        "warn": true,
+        "frameworkReferences": {
+          "Microsoft.NETCore.App": {
+            "privateAssets": "all"
+          }
+        },
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\6.0.202\\RuntimeIdentifierGraph.json"
+      }
+    }
+  }
+}

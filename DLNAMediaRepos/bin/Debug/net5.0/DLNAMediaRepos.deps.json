@@ -1,0 +1,122 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v5.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v5.0": {
+      "DLNAMediaRepos/1.0.0": {
+        "dependencies": {
+          "SSDP.UPnP.PCL": "6.1.0"
+        },
+        "runtime": {
+          "DLNAMediaRepos.dll": {}
+        }
+      },
+      "HttpMachine.PCL/3.1.0": {
+        "runtime": {
+          "lib/netstandard1.0/HttpMachine.dll": {
+            "assemblyVersion": "3.1.0.0",
+            "fileVersion": "3.1.0.0"
+          },
+          "lib/netstandard1.0/IHttpMachine.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "NLog/4.7.13": {
+        "runtime": {
+          "lib/netstandard2.0/NLog.dll": {
+            "assemblyVersion": "4.0.0.0",
+            "fileVersion": "4.7.13.493"
+          }
+        }
+      },
+      "SimpleHttpListener.Rx/6.1.0": {
+        "dependencies": {
+          "HttpMachine.PCL": "3.1.0",
+          "System.Reactive": "5.0.0"
+        },
+        "runtime": {
+          "lib/netstandard2.0/ISimpleHttpListener.Rx.dll": {
+            "assemblyVersion": "6.1.0.0",
+            "fileVersion": "6.1.0.0"
+          },
+          "lib/netstandard2.0/SimpleHttpListener.Rx.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "SSDP.UPnP.PCL/6.1.0": {
+        "dependencies": {
+          "NLog": "4.7.13",
+          "SimpleHttpListener.Rx": "6.1.0",
+          "System.Reactive": "5.0.0"
+        },
+        "runtime": {
+          "lib/netstandard2.0/ISSDP.UPnP.PCL.dll": {
+            "assemblyVersion": "6.1.0.0",
+            "fileVersion": "6.1.0.0"
+          },
+          "lib/netstandard2.0/SSDP.UPnP.PCL.dll": {
+            "assemblyVersion": "1.0.0.0",
+            "fileVersion": "1.0.0.0"
+          }
+        }
+      },
+      "System.Reactive/5.0.0": {
+        "runtime": {
+          "lib/net5.0/System.Reactive.dll": {
+            "assemblyVersion": "5.0.0.0",
+            "fileVersion": "5.0.0.1"
+          }
+        }
+      }
+    }
+  },
+  "libraries": {
+    "DLNAMediaRepos/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "HttpMachine.PCL/3.1.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-RyazQUDWZHxZ+Lg2hQj4tDEKJxfyHMGeD8LgSRwsJ14ip2E0ZB+pAuEKkau975IcY5DiWysPS7Pbpx0mx7ctaw==",
+      "path": "httpmachine.pcl/3.1.0",
+      "hashPath": "httpmachine.pcl.3.1.0.nupkg.sha512"
+    },
+    "NLog/4.7.13": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-AvoGpCuq36B+0wY313XA6gC+YeMvk24rqF8P+HS9fInBGOjCzPjpXp2ln9ATZjPOJtXgHfc8zNmTjyswFGLxvg==",
+      "path": "nlog/4.7.13",
+      "hashPath": "nlog.4.7.13.nupkg.sha512"
+    },
+    "SimpleHttpListener.Rx/6.1.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-HF/6heXkcS2oQ/hLG8gI00z5uuPChy2jBCwVU0HZBzr2u7RxmSxzdtLxnTIQwy9rRJbSdHeEif0h7yiL+TccVA==",
+      "path": "simplehttplistener.rx/6.1.0",
+      "hashPath": "simplehttplistener.rx.6.1.0.nupkg.sha512"
+    },
+    "SSDP.UPnP.PCL/6.1.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-jfQU2IWc8wtMBx6wCQliXyFnPYYXxs2FZOJnXbzCAuFiSRsowoExi+i8d2orQXR//3LjZ5v9813++sjzHMJBSA==",
+      "path": "ssdp.upnp.pcl/6.1.0",
+      "hashPath": "ssdp.upnp.pcl.6.1.0.nupkg.sha512"
+    },
+    "System.Reactive/5.0.0": {
+      "type": "package",
+      "serviceable": true,
+      "sha512": "sha512-erBZjkQHWL9jpasCE/0qKAryzVBJFxGHVBAvgRN1bzM0q2s1S4oYREEEL0Vb+1kA/6BKb5FjUZMp5VXmy+gzkQ==",
+      "path": "system.reactive/5.0.0",
+      "hashPath": "system.reactive.5.0.0.nupkg.sha512"
+    }
+  }
+}

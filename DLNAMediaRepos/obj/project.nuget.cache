@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "dgSpecHash": "+KVbCSkgJH7Cj4HyIS1kJReQoxfn3gpoXN6pfGn8jvEKR9EYMXndE9mwdagEVO+V/TKG8kt6u6QbhfV34rFBNg==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Robert.RKOSAD\\source\\repos\\HomeAudio\\DLNAMediaRepos\\DLNAMediaRepos.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Robert.RKOSAD\\.nuget\\packages\\httpmachine.pcl\\3.1.0\\httpmachine.pcl.3.1.0.nupkg.sha512",
+    "C:\\Users\\Robert.RKOSAD\\.nuget\\packages\\nlog\\4.7.13\\nlog.4.7.13.nupkg.sha512",
+    "C:\\Users\\Robert.RKOSAD\\.nuget\\packages\\simplehttplistener.rx\\6.1.0\\simplehttplistener.rx.6.1.0.nupkg.sha512",
+    "C:\\Users\\Robert.RKOSAD\\.nuget\\packages\\ssdp.upnp.pcl\\6.1.0\\ssdp.upnp.pcl.6.1.0.nupkg.sha512",
+    "C:\\Users\\Robert.RKOSAD\\.nuget\\packages\\system.reactive\\5.0.0\\system.reactive.5.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
