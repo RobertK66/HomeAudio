@@ -39,43 +39,49 @@ namespace Cli {
         }
 
         public async Task PlayLive(string url, string? name = null) {
-            var media = new Media {
-                ContentUrl = url,
-                StreamType = StreamType.Live,
-                ContentType = "audio/mp4",
-                Metadata = new MediaMetadata() { Title = name ?? url }
-            };
-            await Play(media);
+            if (mediaChannel != null) {
+                var media = new Media {
+                    ContentUrl = url,
+                    StreamType = StreamType.Live,
+                    ContentType = "audio/mp4",
+                    Metadata = new MediaMetadata() { Title = name ?? url }
+                };
+                await mediaChannel.LoadAsync(media);
+                //await Play(media);
+            }
         }
 
         public async Task PlayCdTracks(List<(string url, string name)> tracks) {
-            QueueItem[]? qi = new QueueItem[tracks.Count];
-            int i = 0;
-            foreach (var track in tracks) {
-                var media = new Media {
-                    ContentUrl = track.url,
-                    StreamType = StreamType.Buffered,
-                    ContentType = "audio/mp4",
-                    Metadata = new MediaMetadata() { Title = track.name }
-                };
-                qi[i] = new QueueItem() {Media = media, OrderId = i, StartTime=0 };
-                i++;
-            }
-            _ = await PlayQueue(qi);
-        }
-
-        public async Task Play(Media media) {
             if (mediaChannel != null) {
-                _ = await mediaChannel.LoadAsync(media);
+                QueueItem[]? qi = new QueueItem[tracks.Count];
+                int i = 0;
+                foreach (var track in tracks) {
+                    var media = new Media {
+                        ContentUrl = track.url,
+                        StreamType = StreamType.Buffered,
+                        ContentType = "audio/mp4",
+                        Metadata = new MediaMetadata() { Title = track.name }
+                    };
+                    qi[i] = new QueueItem() { Media = media, OrderId = i, StartTime = 0 };
+                    i++;
+                }
+                await mediaChannel.QueueLoadAsync(qi);
+                //_ = await PlayQueue(qi);
             }
         }
 
-        public async Task<MediaStatus?> PlayQueue(QueueItem[] queue) {
-            if (mediaChannel != null) {
-                return await mediaChannel.QueueLoadAsync(queue);
-            }
-            return null;
-        }
+        //public async Task Play(Media media) {
+        //    if (mediaChannel != null) {
+        //        _ = await mediaChannel.LoadAsync(media);
+        //    }
+        //}
+
+        //public async Task<MediaStatus?> PlayQueue(QueueItem[] queue) {
+        //    if (mediaChannel != null) {
+        //        return await mediaChannel.QueueLoadAsync(queue);
+        //    }
+        //    return null;
+        //}
 
         public async Task<MediaStatus?> PlayNext() {
             if (mediaChannel != null) {

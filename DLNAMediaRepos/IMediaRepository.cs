@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace DLNAMediaRepos {
-    public interface IMediaRepository<T> {
+    public interface IMediaRepository {
         (string url, string name) GetRadioStation(int playIdx);
         List<(string url, string name)> GetCdTracks(int playIdx);
     }

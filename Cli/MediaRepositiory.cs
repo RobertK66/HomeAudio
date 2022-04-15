@@ -9,7 +9,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Cli {
-    public class MediaRepositiory :IMediaRepository<Media>  {
+    public class MediaRepositiory :IMediaRepository  {
         List<QueueItem[]> CdQueues = new List<QueueItem[]>();
         List<Media> WebRadios = new List<Media>();
 

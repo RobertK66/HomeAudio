@@ -11,17 +11,14 @@ namespace DLNAMediaRepos {
     {
         //collection for founded devices
         public ObservableCollection<DLNADevice> DLNADevices = new ObservableCollection<DLNADevice>();
-        private DLNADevice? selectedDevice;
-        public DLNADevice? SelectedDevice
-        {
-            get { return selectedDevice; }
-        }
+
+        public DLNADevice SelectedDevice { get; private set; }
 
         #region HelpProps
         private UPnPDeviceFinder DeviceFinder = new UPnPDeviceFinder();
         internal static int MediaServers;
-        private DLNADeviceFinderCallback? deviceFinderCallback;
-        internal DLNADeviceFinderCallback? DeviceFinderCallBack
+        private DLNADeviceFinderCallback deviceFinderCallback;
+        internal DLNADeviceFinderCallback DeviceFinderCallBack
         {
             get { return deviceFinderCallback; }
             set
@@ -51,7 +48,7 @@ namespace DLNAMediaRepos {
         {
             if (selectedIndex >= 0)
             {
-                selectedDevice = DLNADevices[selectedIndex];
+                SelectedDevice = DLNADevices[selectedIndex];
             }
         }
 
@@ -87,15 +84,15 @@ namespace DLNAMediaRepos {
     }
     internal class DLNADeviceFinderCallback : DLNADeviceFinderCallBack
     {
-        public event DeviceFoundEventHandler? DeviceFound;
+        public event DeviceFoundEventHandler DeviceFound;
 
         public delegate void DeviceFoundEventHandler(int lFindData, IUPnPDevice pDevice);
 
-        public event DeviceLostEventHandler? DeviceLost;
+        public event DeviceLostEventHandler DeviceLost;
 
         public delegate void DeviceLostEventHandler(int lFindData, string bstrUDN);
 
-        public event SearchOperationCompletedEventHandler? SearchOperationCompleted;
+        public event SearchOperationCompletedEventHandler SearchOperationCompleted;
 
         public delegate void SearchOperationCompletedEventHandler(int lFindData);
 

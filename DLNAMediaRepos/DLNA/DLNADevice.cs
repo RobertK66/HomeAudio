@@ -8,7 +8,7 @@ namespace DLNAMediaRepos {
     //DLNA device class can browse in device content and get files metadata
     public class DLNADevice : UPnPDevice
     {
-        public DLNADevice(UPnPDevice? uPnPDevice)
+        public DLNADevice(UPnPDevice uPnPDevice)
         {
             isRootDevice = uPnPDevice?.IsRootDevice??false;
             rootDevice = uPnPDevice?.RootDevice;
@@ -44,12 +44,12 @@ namespace DLNAMediaRepos {
         }
 
         #region Properties
-        private UPnPService? ContentDirectory = null;
-        public UPnPDevice? UPnPDevice { get; set; }
+        private UPnPService ContentDirectory = null;
+        public UPnPDevice UPnPDevice { get; set; }
         private bool isRootDevice;
         public bool IsRootDevice { get { return isRootDevice; } }
-        private UPnPDevice? rootDevice;
-        public UPnPDevice? RootDevice { get { return rootDevice; } }
+        private UPnPDevice rootDevice;
+        public UPnPDevice RootDevice { get { return rootDevice; } }
         private UPnPDevice parentDevice;
         public UPnPDevice ParentDevice { get { return parentDevice; } }
         private bool hasChildren;
@@ -96,9 +96,9 @@ namespace DLNAMediaRepos {
         }
 
         //method gets file metadata for DLNA device files
-        internal DLNAFile? GetFileInfo(string Id)
+        internal DLNAFile GetFileInfo(string Id)
         {
-            DLNAFile? fileInfo = GetDLNAFileInformation(Id);
+            DLNAFile fileInfo = GetDLNAFileInformation(Id);
             return fileInfo;
         }
         private List<DLNAObject> GetContent(string parentID)
@@ -151,7 +151,7 @@ namespace DLNAMediaRepos {
             return DLNAObjects;
         }
 
-        private DLNAFile? GetDLNAFileInformation(string objectID)
+        private DLNAFile GetDLNAFileInformation(string objectID)
         {
             if (ContentDirectory == null) return null;
 

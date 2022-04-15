@@ -7,7 +7,7 @@ using System.Xml;
 
 namespace DLNAMediaRepos {
 
-    public class DLNAMediaRepository2 : IMediaRepository<string> {
+    public class DLNAMediaRepository2 : IMediaRepository {
         Dictionary<string, (string albumName, List<(string url, string title)> tracks)> CdAlbums = new Dictionary<string, (string albumName, List<(string url, string title)> tracks)>();
 
         public DLNAMediaRepository2() {
@@ -28,7 +28,7 @@ namespace DLNAMediaRepos {
             return ("https://orf-live.ors-shoutcast.at/oe1-q2a","st x");
         }
 
-        private void DLNADevices_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
+        private void DLNADevices_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
             if (e.NewItems != null) {
                 foreach (DLNADevice device in e.NewItems) {
                     DLNADevice clonedDevice = new DLNADevice(device);

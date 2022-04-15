@@ -3,14 +3,7 @@ using DLNAMediaRepos;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using QueueCaster;
-using QueueCaster.queue.models;
-using Sharpcaster;
-using Sharpcaster.Channels;
-using Sharpcaster.Interfaces;
-using Sharpcaster.Messages;
-using Sharpcaster.Models.Media;
-using System.Reflection;
+
 
 public class Program : IHostedService {
     public static async Task Main(string[] args) {
@@ -21,9 +14,9 @@ public class Program : IHostedService {
         await host.RunConsoleAsync();
     }
 
-    private IMediaRepository<Media> Repos;
+    private IMediaRepository Repos;
     //private DLNAMediaRepository DlnaRepos;
-    private DLNAMediaRepository2 DlnaRepos2;
+    private IMediaRepository DlnaRepos2;
     private string appId = "";
     private string ccName= "";
 
@@ -89,17 +82,7 @@ public class Program : IHostedService {
         Console.WriteLine("Program.StartAsync() finished.");
     }
 
-    //private void DLNADevices_CollectionChanged(object? sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
-    //    if (e.NewItems != null) {
-            
-    //        foreach (DLNADevice item in e.NewItems) {
-    //            DLNADevice clonedDevice = new DLNADevice(item);
-    //            Console.WriteLine("iiiiiii -> " + item.ModelName);
-    //            var cont  = clonedDevice.GetDeviceContent("0");
-    //            cont.ForEach(item => { Console.WriteLine("iiiiiii -> " + item.Name); });
-    //        }
-    //    }
-    //}
+  
 
     public Task StopAsync(CancellationToken cancellationToken) {
         Console.WriteLine("Program.StopAsync() called.");
@@ -107,24 +90,5 @@ public class Program : IHostedService {
     }
 
 
-
-    //static void onServiceChanged(object sender, ServiceAnnouncementEventArgs e) {
-    //    printService('~', e.Announcement);
-    //}
-
-    //static void onServiceRemoved(object sender, ServiceAnnouncementEventArgs e) {
-    //    printService('-', e.Announcement);
-    //}
-
-    //static void onServiceAdded(object sender, ServiceAnnouncementEventArgs e) {
-    //    printService('+', e.Announcement);
-    //}
-
-    //static void printService(char startChar, ServiceAnnouncement service) {
-    //    Console.WriteLine("************************************************** {0} '{1}' on {2}", startChar, service.Instance, service.NetworkInterface.Name);
-    //    Console.WriteLine("\tHost: {0} ({1})", service.Hostname, string.Join(", ", service.Addresses));
-    //    Console.WriteLine("\tPort: {0}", service.Port);
-    //    Console.WriteLine("\tTxt : [{0}]", string.Join(", ", service.Txt));
-    //}
 
 }
