@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 using System.Xml;
 using UPNPLib;
 
@@ -15,6 +16,7 @@ namespace DLNAMediaRepos {
         public DLNADevice SelectedDevice { get; private set; }
 
         #region HelpProps
+        private TaskCompletionSource<int> tcs = null;
         private UPnPDeviceFinder DeviceFinder = new UPnPDeviceFinder();
         internal static int MediaServers;
         private DLNADeviceFinderCallback deviceFinderCallback;
@@ -41,7 +43,7 @@ namespace DLNAMediaRepos {
         //commands on search completed
         internal void SearchCompleted(int IFindData)
         {
-
+            tcs?.SetResult(DLNADevices.Count);
         }
 
         public void ChooseDLNADevice(int selectedIndex)
@@ -50,6 +52,14 @@ namespace DLNAMediaRepos {
             {
                 SelectedDevice = DLNADevices[selectedIndex];
             }
+        }
+
+        // If you want to wait that the search completed
+        public async Task<int> SearchingDevicesAsync() {
+            tcs = new TaskCompletionSource<int>();
+            StartSearchingForDevices();
+            await tcs.Task;
+            return tcs.Task.Result;
         }
 
         //method which starts searching for DLNA devices asynchronously

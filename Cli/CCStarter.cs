@@ -21,7 +21,7 @@ namespace Cli {
             this.appId = appId;
         }
 
-        public async Task connect() {
+        public async Task Connect() {
             IChromecastLocator locator = new MdnsChromecastLocator();
             var chromecasts = await locator.FindReceiversAsync();
 
@@ -55,12 +55,12 @@ namespace Cli {
             if (mediaChannel != null) {
                 QueueItem[]? qi = new QueueItem[tracks.Count];
                 int i = 0;
-                foreach (var track in tracks) {
+                foreach (var (url, name) in tracks) {
                     var media = new Media {
-                        ContentUrl = track.url,
+                        ContentUrl = url,
                         StreamType = StreamType.Buffered,
                         ContentType = "audio/mp4",
-                        Metadata = new MediaMetadata() { Title = track.name }
+                        Metadata = new MediaMetadata() { Title = name }
                     };
                     qi[i] = new QueueItem() { Media = media, OrderId = i, StartTime = 0 };
                     i++;

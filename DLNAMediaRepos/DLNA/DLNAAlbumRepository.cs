@@ -7,21 +7,32 @@ using System.Xml;
 
 namespace DLNAMediaRepos {
 
-    public class DLNAMediaRepository2 : IMediaRepository {
-        Dictionary<string, (string albumName, List<(string url, string title)> tracks)> CdAlbums = new Dictionary<string, (string albumName, List<(string url, string title)> tracks)>();
+    public class DLNAAlbumRepository : IMediaRepository {
+        Dictionary<string, (string albumName, List<(string url, string title)> tracks)> CdAlbums = new();
+        DLNAClient client = new();
+        TaskCompletionSource<int> tcs;
 
-        public DLNAMediaRepository2() {
-            DLNAClient client = new DLNAClient();
+        public DLNAAlbumRepository() {
+            //DLNAClient client = new();
             client.DLNADevices.CollectionChanged += DLNADevices_CollectionChanged;
-            client.StartSearchingForDevices();
+            //client.StartSearchingForDevices();
+        }
+
+        public async Task<int> LoadAlbumsAsync() {
+            int deviceCnt = await client.SearchingDevicesAsync();
+            return CdAlbums.Count;
         }
 
         public List<(string,string)> GetCdTracks(int playIdx) {
-            List<(string, string)> trackURIs = new List<(string, string)>();
+            List<(string, string)> trackURIs = new();
+            List<(string, string)> tracks = new List<(string, string)>();
             var keys = CdAlbums.Keys.ToArray();
-            playIdx %= keys.Length;
-            var cd = CdAlbums[keys[playIdx]];
-            return (cd.tracks);
+            if (keys.Length > 0) {
+                playIdx %= keys.Length;
+                var cd = CdAlbums[keys[playIdx]];
+                tracks = cd.tracks;
+            }
+            return (tracks);
         }
 
         public (string, string) GetRadioStation(int playIdx) {
@@ -31,7 +42,7 @@ namespace DLNAMediaRepos {
         private void DLNADevices_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
             if (e.NewItems != null) {
                 foreach (DLNADevice device in e.NewItems) {
-                    DLNADevice clonedDevice = new DLNADevice(device);
+                    DLNADevice clonedDevice = new(device);
                     Console.WriteLine("Searching" + device.ModelName + " " + device.FriendlyName + " for album/track items...");
                     var rootContent = clonedDevice.GetDeviceContent("0");
                     rootContent.ForEach(item => {
@@ -42,7 +53,7 @@ namespace DLNAMediaRepos {
         }
 
         private void ParseItems(DLNADevice device, DLNAObject item) {
-            Console.WriteLine(item.ClassName + " - " + item.Name);
+            //Console.WriteLine(item.ClassName + " - " + item.Name);
             if (item.ClassName.Equals("object.container")) {
                 var children = device.GetDeviceContent(item.ID);
                 foreach (var child in children) {
@@ -58,7 +69,7 @@ namespace DLNAMediaRepos {
 
         private void AddAlbum(DLNADevice device, DLNAObject cd) {
             if (!CdAlbums.ContainsKey(cd.Name)) {
-                Console.WriteLine("Adding Album " + cd.ID);
+                Console.Write(".");
                 (string albumName, List<(string url, string title)> tracks) album = (cd.Name, new List<(string url, string title)>());
                 CdAlbums.Add(cd.Name, album);
                 var tracks = device.GetDeviceContent(cd.ID);
