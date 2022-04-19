@@ -15,8 +15,6 @@ public class Program : IHostedService {
     }
 
     private IMediaRepository Repos;
-    //private DLNAMediaRepository DlnaRepos;
-    //private DLNAAlbumRepository DlnaRepos2;
     private string appId = "";
     private string ccName= "";
 
@@ -28,9 +26,6 @@ public class Program : IHostedService {
 
         // Read apsettings.json confioguration
         Repos = new MediaRepositiory(conf.GetSection("WebRadio"), conf.GetSection("CD-Data"));
-        //DlnaRepos2 = new DLNAAlbumRepository();
-        //DlnaRepos = new DLNAMediaRepository();
-        //_ = DlnaRepos.SerarchDevices();
 
         appId = conf.GetValue<string>("CC-AppId", "CC1AD845");
         ccName = conf.GetValue<string>("CC-Name");
@@ -51,30 +46,33 @@ public class Program : IHostedService {
     //    }
     //}
 
-    //ServiceBrowser serviceBrowser;
     public async Task StartAsync(CancellationToken cancellationToken) {
         Console.WriteLine("Program.StartAsync() called.");
 
+        // Start the DLNA Search ...
         DLNAAlbumRepository DlnaRepos2 = new();
         var waitForAlbums = DlnaRepos2.LoadAlbumsAsync();
 
+        var waitForRadioStations = DlnaRepos2.LoadRadioStationsAsync();
+
+        // Start the Caster connect ...
         CCStarter ccs = new(ccName, appId);
         var waitForCaster = ccs.Connect();
-
-        //await Task.WhenAll(waitForAlbums, waitForCaster);
-
-        if (qcCommand == "playRadio") {
-            await waitForCaster;
-            var media = Repos.GetRadioStation(playIdx);
-            if (!String.IsNullOrEmpty(media.url)) {
-                await ccs.PlayLive(media.url, media.name);
-            }
-        } else if (qcCommand == "playCd") {
+        
+        if (qcCommand == "playCd") {
+            // For playing CD we have to wait for both, the DLNA Repos and the connect beeing ready.
             await Task.WhenAll(waitForCaster, waitForAlbums);
-            Console.WriteLine($"{waitForAlbums.Result} Albums found.");
+          
+
             var tracks = DlnaRepos2.GetCdTracks(playIdx);
             if (tracks != null) {
                 await ccs.PlayCdTracks(tracks);
+            }
+        } else if (qcCommand == "playRadio") {
+            await Task.WhenAll(waitForCaster, waitForRadioStations);
+            var media = DlnaRepos2.GetRadioStation(playIdx);
+            if (!String.IsNullOrEmpty(media.url)) {
+                await ccs.PlayLive(media.url, media.name);
             }
         } else if (qcCommand == "next") {
             await waitForCaster;
@@ -83,16 +81,14 @@ public class Program : IHostedService {
             await waitForCaster;
             _ = await ccs.PlayPrev();
         }
+        
         Console.WriteLine("Program.StartAsync() finished.");
     }
-
-  
 
     public Task StopAsync(CancellationToken cancellationToken) {
         Console.WriteLine("Program.StopAsync() called.");
         return Task.CompletedTask;
     }
-
 
 
 }

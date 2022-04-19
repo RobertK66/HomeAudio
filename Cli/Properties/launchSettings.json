@@ -1,9 +1,5 @@
 {
   "profiles": {
-    "Cli-Play Radio 3": {
-      "commandName": "Project",
-      "commandLineArgs": "--qcCmd playRadio --qcIdx 3"
-    },
     "Cli-Next": {
       "commandName": "Project",
       "commandLineArgs": "--qcCmd next"
@@ -15,6 +11,10 @@
     "Cli-Play Cd 23": {
       "commandName": "Project",
       "commandLineArgs": "--qcCmd playCd --qcIdx 23"
+    },
+    "Cli-Play Radio 21": {
+      "commandName": "Project",
+      "commandLineArgs": "--qcCmd playRadio --qcIdx 21"
     }
   }
 }
