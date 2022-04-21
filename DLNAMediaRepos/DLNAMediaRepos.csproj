@@ -18,10 +18,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Radio\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="RadioBrowser" Version="0.6.1" />
   </ItemGroup>
 	
