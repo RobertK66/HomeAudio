@@ -1,0 +1,17 @@
+{
+  "Logging": {
+    "ConGuiConsole": {
+      "LogLevels": {
+        "Information": "DarkGreen",
+        "Warning": "Cyan",
+        "Error": "Red"
+      }
+    },
+    "Debug": {
+      "LogLevel": {
+        "Default": "Information"
+
+      }
+    }
+  }
+}
