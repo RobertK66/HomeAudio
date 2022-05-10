@@ -9,11 +9,11 @@ using System.Threading.Tasks;
 
 namespace QueueCaster.queue.messages {
     /// <summary>
-    /// GetStatus message
-    /// </summary>
-    [DataContract]
-    class GetStatusMessage : MediaSessionMessage {
+    ///// GetStatus message
+    ///// </summary>
+    //[DataContract]
+    //class GetStatusMessage : MediaSessionMessage {
 
-    }
+    //}
 
 }

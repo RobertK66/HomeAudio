@@ -26,7 +26,7 @@ public class Program : IHostedService {
                                     cl.AddConGuiLogger((con) => {       // This adds our LogPanel as possible target (configure in appsettings.json)
                                         con.LogPanel = myLogPanel;      
                                     });
-                                    cl.AddDebug();                      // This gives Logging in the Debug Console of VS. (configure in appsettings.json)
+                                    //cl.AddDebug();                      // This gives Logging in the Debug Console of VS. (configure in appsettings.json)
                                 });
         await host.RunConsoleAsync();
     }
