@@ -9,7 +9,6 @@ namespace QueueCaster {
     /// </summary>
     [DataContract]
     [ReceptionMessage]
-    public class MediaStatusMessage : StatusMessage<IEnumerable<MediaStatus>>
-    {
+    public class MediaStatusMessage : StatusMessage<IEnumerable<MediaStatus>> {
     }
 }

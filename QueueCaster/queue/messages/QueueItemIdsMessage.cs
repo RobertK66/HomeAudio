@@ -1,4 +1,5 @@
 ﻿using Sharpcaster.Messages;
+using Sharpcaster.Messages.Media;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 
