@@ -3,6 +3,7 @@ using QueueCaster.queue.models;
 using Sharpcaster.Channels;
 using Sharpcaster.Interfaces;
 using Sharpcaster.Messages;
+using Sharpcaster;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +13,6 @@ using System.Threading.Tasks;
 
 namespace QueueCaster {
     public class ChromecastClient :Sharpcaster.ChromecastClient {
-
 
         public ChromecastClient(IServiceCollection serviceCollection) : base(serviceCollection) {
         }
@@ -24,7 +24,7 @@ namespace QueueCaster {
             serviceCollection.AddTransient<IChromecastChannel, ReceiverChannel>();
             serviceCollection.AddTransient<IChromecastChannel, QueueMediaChannel>();
             if (conWrapper == null) {
-                serviceCollection.AddTransient<IConsoleWrapper, QueueCaster.ConsoleWrapper>();
+                serviceCollection.AddTransient<IConsoleWrapper, ConsoleWrapper>();
             } else {
                 serviceCollection.AddSingleton<IConsoleWrapper>(conWrapper);
             }
