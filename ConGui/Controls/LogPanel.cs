@@ -17,7 +17,9 @@ public class LogPanel : SimpleControl, IInputListener {
 		Content = _scrollPanel;
 	}
 
+
 	public void Add(string message) {
+		Monitor.Enter(this);				// This has to be Thread Save! its used by all Logger instances!
 		_stackPanel.Add(new WrapPanel {
 			Content = new HorizontalStackPanel {
 				Children = new[]
@@ -27,7 +29,8 @@ public class LogPanel : SimpleControl, IInputListener {
 					}
 			}
 		});
-		_scrollPanel.Top = _stackPanel.Children.Count() - this.Size.Height; 
+		_scrollPanel.Top = _stackPanel.Children.Count() - this.Size.Height;
+		Monitor.Exit(this);
 	}
 
     public void OnInput(InputEvent inputEvent) {

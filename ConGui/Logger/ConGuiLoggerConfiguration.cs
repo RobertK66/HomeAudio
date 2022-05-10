@@ -9,10 +9,10 @@ namespace ConGui.Logger {
     public class ConGuiLoggerConfiguration {
 
         public LogPanel? LogPanel { get; set; } = null;
-        public int EventId { get; set; }
+        //public int EventId { get; set; }
 
-        public Dictionary<LogLevel, ConsoleColor> LogLevels { get; set; } = new() {
-            [LogLevel.Information] = ConsoleColor.Green
+        public Dictionary<string, LogLevel> LogLevel { get; set; } = new() {
+            ["Default"] = Microsoft.Extensions.Logging.LogLevel.Error
         };
     }
 }

@@ -30,7 +30,7 @@ namespace QueueCaster {
 
             foreach (var item in messageImplTypes) {
                 serviceCollection.AddTransient(typeof(IMessage), item);
-                Console.WriteLine("***** " + item.FullName);
+                //Console.WriteLine("***** " + item.FullName);
             }
             return new ChromecastClient(serviceCollection);
         }

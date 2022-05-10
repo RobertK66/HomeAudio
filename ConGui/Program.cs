@@ -8,6 +8,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using ConGui.Logger;
+using ConGui;
+using ConsoleGUI.Api;
 
 public class Program : IHostedService {
 
@@ -23,14 +25,14 @@ public class Program : IHostedService {
                                     cl.AddConGuiLogger((con) => {
                                         con.LogPanel = myLogPanel;
                                     });
-                                    cl.AddDebug();          // This gives Logging in the Debug Console of VS. (configure in appsettings.json)
+                                    // cl.AddDebug();          // This gives Logging in the Debug Console of VS. (configure in appsettings.json)
                                 });
         await host.RunConsoleAsync();
     }
 
     public Program(IConfiguration conf, ILogger<Program> logger) {
         _logger = logger;
-        _logger.LogInformation("Program() Constructor called.");
+        _logger.LogError("Program() Constructor called.");
 
         //foreach (var item in conf.GetChildren()) {
         //    PrintConf("", item);
@@ -48,6 +50,7 @@ public class Program : IHostedService {
     private IInputListener[] input;
     private static LogPanel myLogPanel = new();
     private TextBox myTextBox = new();
+    private TabPanel tabPanel = new();
 
     public async Task StartAsync(CancellationToken cancellationToken) {
         _logger.LogInformation("Program.StartAsync() called.");
@@ -58,14 +61,20 @@ public class Program : IHostedService {
 
         input = new IInputListener[] {
                 myLogPanel,
-                myTextBox
+                myTextBox,
+                tabPanel
             };
 
+        //MouseHandler.Initialize();
 
         tuiThread = new Thread(new ThreadStart(TuiThread));
 		tuiThread.Start();
 
-		_logger.LogInformation("Program.StartAsync() finished.");
+        // Start the Caster connect ...
+        CCStarter ccs = new("Büro", "9B5A75B4");
+        var waitForCaster = ccs.Connect();
+
+        _logger.LogInformation("Program.StartAsync() finished.");
     }
 
     public Task StopAsync(CancellationToken cancellationToken) {
@@ -87,13 +96,10 @@ public class Program : IHostedService {
             while (true) {
                 ConsoleManager.ReadInput(input);
                 Thread.Sleep(20);
-                if (i++ >= 100) {
-                    i = 0;
-                    myLogPanel.Add("Log it " + Random.Shared.NextDouble());
-                }
             }
         } catch (ThreadInterruptedException ex) {
             _logger.LogDebug("TUI Thread canceled by InterruptException");
+            
         }
 
 
@@ -107,7 +113,7 @@ public class Program : IHostedService {
         myTextBox = new TextBox { Text = "Hello console" };
         myLogPanel.Add("FirstLog");
 
-        var tabPanel = new TabPanel();
+        //tabPanel = new TabPanel();
         tabPanel.AddTab("game", new Box {
             HorizontalContentPlacement = Box.HorizontalPlacement.Center,
             VerticalContentPlacement = Box.VerticalPlacement.Center,

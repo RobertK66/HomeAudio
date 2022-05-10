@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "QueueCaster", "QueueCaster\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DLNAMediaRepos", "DLNAMediaRepos\DLNAMediaRepos.csproj", "{954564BB-3B7C-413D-93DC-C6B254288164}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConGui", "ConGui\ConGui.csproj", "{D1192C1A-166F-4CAA-8EE7-FFB56977D0B4}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConGui", "ConGui\ConGui.csproj", "{D1192C1A-166F-4CAA-8EE7-FFB56977D0B4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -18,7 +18,7 @@ namespace ConGui.Logger {
         public IDisposable BeginScope<TState>(TState state) => default!;
 
         public bool IsEnabled(LogLevel logLevel) =>
-            _getCurrentConfig().LogLevels.ContainsKey(logLevel);
+            true;
 
         public void Log<TState>(
             LogLevel logLevel,
@@ -31,21 +31,20 @@ namespace ConGui.Logger {
             }
 
             ConGuiLoggerConfiguration config = _getCurrentConfig();
-            //if (config.EventId == 0 || config.EventId == eventId.Id) {
+
+            //LogLevel configured = Microsoft.Extensions.Logging.LogLevel.Information;
+
+            //if (config.LogLevel.ContainsKey("Default")) {
+            //    configured = config.LogLevel["Default"];
+            //}
+            //foreach (var key in config.LogLevel.Keys) {
+            //    if (key.StartsWith(_name)) {                // TODO: make correct hirachy!!!!
+            //        configured = config.LogLevel[key];
+            //    }
+            //}    
+
+            //if (configured <= logLevel) { 
                 config.LogPanel?.Add($"[{eventId.Id,2}: {logLevel,-12}] {_name} - {formatter(state, exception)}");
-                //ConsoleColor originalColor = Console.ForegroundColor;
-
-                //Console.ForegroundColor = config.LogLevels[logLevel];
-                //Console.WriteLine($"[{eventId.Id,2}: {logLevel,-12}]");
-
-                //Console.ForegroundColor = originalColor;
-                //Console.Write($"     {_name} - ");
-
-                //Console.ForegroundColor = config.LogLevels[logLevel];
-                //Console.Write($"{formatter(state, exception)}");
-
-                //Console.ForegroundColor = originalColor;
-                //Console.WriteLine();
             //}
         }
     }
