@@ -16,15 +16,13 @@ using MediaStatus = QueueCaster.MediaStatus;
 namespace ConGui {
     public class CCStarter :IHostedService {
 
-        
+        private static ILogger? Log;
 
         private string ccName;
         private string appId;
         private QueueMediaChannel? mediaChannel;
-        private static ILogger? Log;
-        private ConsoleWrapper cw = new ConsoleWrapper((line) => Log?.LogDebug("CCTUI: " + line),
+        private IConsoleWrapper cw = new ConsoleWrapper((line) => Log?.LogTrace("CCTUI: " + line),
                                                        (line, ex, p) => Log?.LogError("CCTUI: " + line, ex, p));
-
 
         public CCStarter(IConfiguration conf, ILogger<CCStarter> logger) {
             ccName = conf.GetValue<string>("CcName", "");
@@ -35,17 +33,16 @@ namespace ConGui {
         //public CCStarter(string ccName, string appId) {
         //    this.ccName = ccName;
         //    this.appId = appId;
-            
         //}
 
         public async Task Connect() {
             IChromecastLocator locator = new MdnsChromecastLocator();
             var chromecasts = await locator.FindReceiversAsync();
 
-            Console.WriteLine("CC Cnt:" + chromecasts.Count());
+            Log?.LogDebug("CC Cnt:" + chromecasts.Count());
             var cc = chromecasts.Where(c => c.Name.StartsWith(ccName)).FirstOrDefault();
             if (cc != null) {
-                Console.WriteLine("**** Status: " + cc.Status);
+                Log?.LogDebug("**** Status: " + cc.Status);
 
                 var client = QueueCaster.ChromecastClient.CreateNewChromecastClient(cw);
                 var st = await client.ConnectChromecast(cc);
@@ -121,13 +118,13 @@ namespace ConGui {
         }
 
         public async Task StartAsync(CancellationToken cancellationToken) {
-            Log.LogDebug("SartAsync called");
+            Log?.LogDebug("SartAsync called");
             await Connect();
-            Log.LogDebug("SartAsync finished");
+            Log?.LogDebug("SartAsync finished");
         }
 
         public Task StopAsync(CancellationToken cancellationToken) {
-            Log.LogDebug("StopAsync called");
+            Log?.LogDebug("StopAsync called");
             return Task.CompletedTask;
         }
     }

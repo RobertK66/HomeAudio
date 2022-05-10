@@ -22,11 +22,11 @@ public class Program : IHostedService {
                                     services.AddHostedService<CCStarter>();
                                 })
                                 .ConfigureLogging((cl) => {
-                                    cl.ClearProviders();    // This avoids logging output to console.
-                                    cl.AddConGuiLogger((con) => {
-                                        con.LogPanel = myLogPanel;
+                                    cl.ClearProviders();                // This avoids logging output to console.
+                                    cl.AddConGuiLogger((con) => {       // This adds our LogPanel as possible target (configure in appsettings.json)
+                                        con.LogPanel = myLogPanel;      
                                     });
-                                    // cl.AddDebug();          // This gives Logging in the Debug Console of VS. (configure in appsettings.json)
+                                    cl.AddDebug();                      // This gives Logging in the Debug Console of VS. (configure in appsettings.json)
                                 });
         await host.RunConsoleAsync();
     }
@@ -47,13 +47,13 @@ public class Program : IHostedService {
     //    }
     //}
 
-    private Thread tuiThread;
-    private IInputListener[] input;
+    private Thread? tuiThread;
+    private IInputListener[]? input;
     private static LogPanel myLogPanel = new();
     private TextBox myTextBox = new();
     private TabPanel tabPanel = new();
 
-    public async Task StartAsync(CancellationToken cancellationToken) {
+    public Task StartAsync(CancellationToken cancellationToken) {
         _logger.LogInformation("Program.StartAsync() called.");
 
         ConsoleManager.Setup();
@@ -76,12 +76,13 @@ public class Program : IHostedService {
         //var waitForCaster = ccs.Connect();
 
         _logger.LogInformation("Program.StartAsync() finished.");
+        return Task.CompletedTask;
     }
 
     public Task StopAsync(CancellationToken cancellationToken) {
         _logger.LogInformation("Program.StopAsync() called.");
-        if (tuiThread.IsAlive) {
-            tuiThread.Interrupt();
+        if (tuiThread?.IsAlive??false) {
+            tuiThread?.Interrupt();
         }
         return Task.CompletedTask;
     }
@@ -91,19 +92,15 @@ public class Program : IHostedService {
 
 
     private void TuiThread() {
-        int i = 0;
         try {
             _logger.LogDebug("TUI Thread started");
             while (true) {
                 ConsoleManager.ReadInput(input);
                 Thread.Sleep(20);
             }
-        } catch (ThreadInterruptedException ex) {
+        } catch (ThreadInterruptedException) {
             _logger.LogDebug("TUI Thread canceled by InterruptException");
-            
         }
-
-
     }
 
 
@@ -112,16 +109,16 @@ public class Program : IHostedService {
     private IControl CreateMainView() {
         var myTxtBlock = new TextBlock { Text = "Hello world" };
         myTextBox = new TextBox { Text = "Hello console" };
-        myLogPanel.Add("FirstLog");
+        myLogPanel.Add("First Entry from code");
 
         //tabPanel = new TabPanel();
-        tabPanel.AddTab("game", new Box {
+        tabPanel.AddTab("Radio Stations", new Box {
             HorizontalContentPlacement = Box.HorizontalPlacement.Center,
             VerticalContentPlacement = Box.VerticalPlacement.Center,
             Content = myTxtBlock
         });
 
-        tabPanel.AddTab("leaderboard", new Box {
+        tabPanel.AddTab("My Cd Collection", new Box {
             HorizontalContentPlacement = Box.HorizontalPlacement.Center,
             VerticalContentPlacement = Box.VerticalPlacement.Center,
             Content = new Background {
