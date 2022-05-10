@@ -33,7 +33,7 @@ public class Program : IHostedService {
 
     public Program(IConfiguration conf, ILogger<Program> logger) {
         _logger = logger;
-        _logger.LogError("Program() Constructor called.");
+        _logger.LogDebug("Program() Constructor called.");
 
         //foreach (var item in conf.GetChildren()) {
         //    PrintConf("", item);
