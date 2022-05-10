@@ -44,7 +44,7 @@ namespace ConGui {
             if (cc != null) {
                 Log?.LogDebug("**** Status: " + cc.Status);
 
-                var client = QueueCaster.ChromecastClient.CreateNewChromecastClient(cw);
+                var client = QueueCaster.ChromecastClient.CreateQueueCasterClient(cw);
                 var st = await client.ConnectChromecast(cc);
                 st = await client.LaunchApplicationAsync(appId, true);
 
