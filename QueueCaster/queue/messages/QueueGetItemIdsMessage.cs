@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using Sharpcaster.Messages.Media;
+using System.Runtime.Serialization;
 
 
 namespace QueueCaster.queue.messages { 

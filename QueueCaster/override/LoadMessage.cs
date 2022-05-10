@@ -6,8 +6,7 @@ namespace QueueCaster {
     /// Load message
     /// </summary>
     [DataContract]
-    class LoadMessage : MessageWithSession
-    {
+    class LoadMessage : MessageWithSession {
         /// <summary>
         /// Gets or sets the media
         /// </summary>
