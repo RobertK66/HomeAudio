@@ -11,6 +11,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DLNAMediaRepos", "DLNAMedia
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConGui", "ConGui\ConGui.csproj", "{D1192C1A-166F-4CAA-8EE7-FFB56977D0B4}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sharpcaster", "SharpCaster\Sharpcaster\Sharpcaster.csproj", "{4CE8BCB5-D1BC-4CAD-8312-BA529938C86E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{D1192C1A-166F-4CAA-8EE7-FFB56977D0B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D1192C1A-166F-4CAA-8EE7-FFB56977D0B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D1192C1A-166F-4CAA-8EE7-FFB56977D0B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4CE8BCB5-D1BC-4CAD-8312-BA529938C86E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CE8BCB5-D1BC-4CAD-8312-BA529938C86E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CE8BCB5-D1BC-4CAD-8312-BA529938C86E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4CE8BCB5-D1BC-4CAD-8312-BA529938C86E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

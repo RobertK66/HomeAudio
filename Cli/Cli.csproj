@@ -9,12 +9,12 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
-    <PackageReference Include="Sharpcaster" Version="1.0.5" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\DLNAMediaRepos\DLNAMediaRepos.csproj" />
     <ProjectReference Include="..\QueueCaster\QueueCaster.csproj" />
+    <ProjectReference Include="..\SharpCaster\Sharpcaster\Sharpcaster.csproj" />
   </ItemGroup>
 
   <ItemGroup>
