@@ -19,6 +19,7 @@ public class Program : IHostedService {
         IHostBuilder host = Host.CreateDefaultBuilder(args)
                                 .ConfigureServices((hostContext, services) => {
                                     services.AddHostedService<Program>();
+                                    services.AddHostedService<CCStarter>();
                                 })
                                 .ConfigureLogging((cl) => {
                                     cl.ClearProviders();    // This avoids logging output to console.
@@ -71,8 +72,8 @@ public class Program : IHostedService {
 		tuiThread.Start();
 
         // Start the Caster connect ...
-        CCStarter ccs = new("Büro", "9B5A75B4");
-        var waitForCaster = ccs.Connect();
+        //CCStarter ccs = new("Büro", "9B5A75B4");
+        //var waitForCaster = ccs.Connect();
 
         _logger.LogInformation("Program.StartAsync() finished.");
     }

@@ -13,15 +13,21 @@ using System.Threading.Tasks;
 namespace QueueCaster {
     public class ChromecastClient :Sharpcaster.ChromecastClient {
 
+
         public ChromecastClient(IServiceCollection serviceCollection) : base(serviceCollection) {
         }
 
-        public static ChromecastClient CreateNewChromecastClient() {
+        public static ChromecastClient CreateNewChromecastClient(IConsoleWrapper? conWrapper = null) {
             var serviceCollection = new ServiceCollection();
             serviceCollection.AddTransient<IChromecastChannel, ConnectionChannel>();
             serviceCollection.AddTransient<IChromecastChannel, HeartbeatChannel>();
             serviceCollection.AddTransient<IChromecastChannel, ReceiverChannel>();
             serviceCollection.AddTransient<IChromecastChannel, QueueMediaChannel>();
+            if (conWrapper == null) {
+                serviceCollection.AddTransient<IConsoleWrapper, QueueCaster.ConsoleWrapper>();
+            } else {
+                serviceCollection.AddSingleton<IConsoleWrapper>(conWrapper);
+            }
 
             var customMessages = new List<Assembly>();
             customMessages.Add(typeof(QueueItem).GetTypeInfo().Assembly);
@@ -30,7 +36,6 @@ namespace QueueCaster {
 
             foreach (var item in messageImplTypes) {
                 serviceCollection.AddTransient(typeof(IMessage), item);
-                //Console.WriteLine("***** " + item.FullName);
             }
             return new ChromecastClient(serviceCollection);
         }

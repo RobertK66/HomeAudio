@@ -1,4 +1,7 @@
-﻿using QueueCaster;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using QueueCaster;
 using QueueCaster.queue.models;
 using Sharpcaster;
 using Sharpcaster.Interfaces;
@@ -11,15 +14,29 @@ using System.Threading.Tasks;
 using MediaStatus = QueueCaster.MediaStatus;
 
 namespace ConGui {
-    public class CCStarter {
+    public class CCStarter :IHostedService {
+
+        
+
         private string ccName;
         private string appId;
         private QueueMediaChannel? mediaChannel;
+        private static ILogger? Log;
+        private ConsoleWrapper cw = new ConsoleWrapper((line) => Log?.LogDebug("CCTUI: " + line),
+                                                       (line, ex, p) => Log?.LogError("CCTUI: " + line, ex, p));
 
-        public CCStarter(string ccName, string appId) {
-            this.ccName = ccName;
-            this.appId = appId;
+
+        public CCStarter(IConfiguration conf, ILogger<CCStarter> logger) {
+            ccName = conf.GetValue<string>("CcName", "");
+            appId = conf.GetValue<string>("CcAppId", "");
+            Log = logger; 
         }
+
+        //public CCStarter(string ccName, string appId) {
+        //    this.ccName = ccName;
+        //    this.appId = appId;
+            
+        //}
 
         public async Task Connect() {
             IChromecastLocator locator = new MdnsChromecastLocator();
@@ -28,9 +45,9 @@ namespace ConGui {
             Console.WriteLine("CC Cnt:" + chromecasts.Count());
             var cc = chromecasts.Where(c => c.Name.StartsWith(ccName)).FirstOrDefault();
             if (cc != null) {
-                //Console.WriteLine("**** Status: " + cc.Status);
+                Console.WriteLine("**** Status: " + cc.Status);
 
-                var client = QueueCaster.ChromecastClient.CreateNewChromecastClient();
+                var client = QueueCaster.ChromecastClient.CreateNewChromecastClient(cw);
                 var st = await client.ConnectChromecast(cc);
                 st = await client.LaunchApplicationAsync(appId, true);
 
@@ -103,5 +120,15 @@ namespace ConGui {
             return null;
         }
 
+        public async Task StartAsync(CancellationToken cancellationToken) {
+            Log.LogDebug("SartAsync called");
+            await Connect();
+            Log.LogDebug("SartAsync finished");
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken) {
+            Log.LogDebug("StopAsync called");
+            return Task.CompletedTask;
+        }
     }
 }
