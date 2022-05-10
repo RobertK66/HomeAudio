@@ -10,7 +10,7 @@
   <ItemGroup>
     <PackageReference Include="ConsoleGUI" Version="1.4.1" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="6.0.1" />
-    <PackageReference Include="Sharpcaster" Version="1.0.4" />
+    <PackageReference Include="Sharpcaster" Version="1.0.5" />
   </ItemGroup>
 
   <ItemGroup>
