@@ -10,10 +10,16 @@ using Microsoft.Extensions.Logging;
 using ConGui.Logger;
 using ConGui;
 using ConsoleGUI.Api;
+using Sharpcaster.Models.Media;
+using static System.Net.Mime.MediaTypeNames;
+using System.Threading.Tasks;
+using System.Threading;
+using System;
 
 public class Program : IHostedService {
 
     private readonly ILogger<Program> _logger;
+    private IConfiguration WebRadios;
 
     public static async Task Main(string[] args) {
         IHostBuilder host = Host.CreateDefaultBuilder(args)
@@ -35,10 +41,9 @@ public class Program : IHostedService {
         _logger = logger;
         _logger.LogDebug("*********************** Program() Constructor called.");
 
-        //foreach (var item in conf.GetChildren()) {
-        //    PrintConf("", item);
-        //}
+        WebRadios = conf.GetSection("WebRadio");
     }
+        
 
     //private void PrintConf(string pf, IConfigurationSection c) {
     //    Console.WriteLine(pf + c.Path + " " + c.Value);
@@ -47,7 +52,7 @@ public class Program : IHostedService {
     //    }
     //}
 
-    private Thread? tuiThread;
+    private System.Threading.Thread? tuiThread;
     private IInputListener[]? input;
     private static LogPanel myLogPanel = new();
     private TextBox myTextBox = new();
@@ -95,8 +100,9 @@ public class Program : IHostedService {
         try {
             _logger.LogDebug("TUI Thread started");
             while (true) {
+                ConsoleManager.AdjustBufferSize();  // Resize for Windows!
                 ConsoleManager.ReadInput(input);
-                Thread.Sleep(20);
+                Thread.Sleep(50);
             }
         } catch (ThreadInterruptedException) {
             _logger.LogDebug("TUI Thread canceled by InterruptException");
@@ -109,14 +115,24 @@ public class Program : IHostedService {
     private IControl CreateMainView() {
         var myTxtBlock = new TextBlock { Text = "Hello world" };
         myTextBox = new TextBox { Text = "Hello console" };
-        myLogPanel.Add("First Entry from code");
+
+
+        var pan = new ConsoleGUI.Controls.Canvas();
+        int l = 0;
+        int t = 10;
+        foreach (var item in WebRadios.GetChildren()) {
+            _logger.LogDebug(item.GetValue<String>("ContentUrl"));
+            var b = new Button { Content = new Button() { Content = new TextBlock() { Text = item.GetValue<String>("StationName") }, MouseOverColor = new Color(5,0,0) } };
+            pan.Add(b, new Rect(l, t, 20, 1));
+            l += 21;
+            
+        }
 
         //tabPanel = new TabPanel();
-        tabPanel.AddTab("Radio Stations", new Box {
-            HorizontalContentPlacement = Box.HorizontalPlacement.Center,
-            VerticalContentPlacement = Box.VerticalPlacement.Center,
-            Content = myTxtBlock
-        });
+        tabPanel.AddTab("Radio Stations", pan);
+
+        
+    
 
         tabPanel.AddTab("My Cd Collection", new Box {
             HorizontalContentPlacement = Box.HorizontalPlacement.Center,

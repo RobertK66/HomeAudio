@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Runtime.Versioning;
 using ConGui.Logger;
 using Microsoft.Extensions.Logging;

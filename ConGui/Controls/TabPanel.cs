@@ -4,6 +4,8 @@ using ConsoleGUI.Data;
 using ConsoleGUI.Input;
 using ConsoleGUI.Space;
 using ConsoleGUI.UserDefined;
+using System;
+using System.Collections.Generic;
 
 internal class TabPanel : SimpleControl, IInputListener {
 	private class Tab {
