@@ -20,14 +20,20 @@ public class LogPanel : SimpleControl, IInputListener {
 		Content = _scrollPanel;
 	}
 
-
 	public void ScrollToEnd() {
         _scrollPanel.Top = _stackPanel.Size.Height - this.Size.Height;  
     }
 
+	public bool IsScrolling() {
+		if (_stackPanel.Size.Height > this.Size.Height) {
+			return (_scrollPanel.Top == _stackPanel.Size.Height - this.Size.Height);
+        }
+		return true;
+	}
+
 	public void Add(string message) {
 		Monitor.Enter(this);                // This has to be Thread Save! its used by all Logger instances!
-		bool scrolling = (_scrollPanel.Top == _stackPanel.Size.Height - this.Size.Height);
+		bool scrolling = IsScrolling();
 
         _stackPanel.Add(new WrapPanel {
 			Content = new HorizontalStackPanel {
@@ -38,11 +44,10 @@ public class LogPanel : SimpleControl, IInputListener {
 					}
 			}
 		});
-		if (scrolling) {
-			ScrollToEnd();
+        if ( scrolling ) {
+            ScrollToEnd();
 		}
         Monitor.Exit(this);
-        //_scrollPanel.Top = _stackPanel.Children.Count() - this.Size.Height;  // This does not perform right -> move to input thread!?
     }
 
     public void OnInput(InputEvent inputEvent) {
