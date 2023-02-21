@@ -10,6 +10,9 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.DependencyInjection.Extensions;
+using System.ComponentModel;
 
 namespace QueueCaster {
     public class ChromecastClient :Sharpcaster.ChromecastClient {
@@ -17,21 +20,43 @@ namespace QueueCaster {
         public ChromecastClient(IServiceCollection serviceCollection) : base(serviceCollection) {
         }
 
-        public ChromecastClient(List<IChromecastChannel> channelsToUse, List<Assembly> customMessageTypeAssemblies, IConsoleWrapper? consoleWrapper) :
-            base(channelsToUse, customMessageTypeAssemblies, consoleWrapper) {
-        }
+        public static ChromecastClient CreateQueueCasterClient(ILoggerFactory? loggerFactory) {
+            IServiceCollection serviceCollection = new ServiceCollection();
+            if (loggerFactory != null) {
+                serviceCollection.AddSingleton<ILoggerFactory>(loggerFactory);
+            }
 
-        public static ChromecastClient CreateQueueCasterClient(IConsoleWrapper? conWrapper = null) {
             var customMessages      = new List<Assembly>();
             var customCcChannels    = new List<IChromecastChannel>();
-
             customMessages.Add(typeof(QueueItem).GetTypeInfo().Assembly);
-            customCcChannels.Add(new ConnectionChannel());
-            customCcChannels.Add(new HeartbeatChannel());
-            customCcChannels.Add(new ReceiverChannel());
-            customCcChannels.Add(new QueueMediaChannel());
 
-            return new ChromecastClient(customCcChannels, customMessages, conWrapper);
+            serviceCollection.AddTransient<IChromecastChannel, ConnectionChannel>();
+            serviceCollection.AddTransient<IChromecastChannel, HeartbeatChannel>();
+            serviceCollection.AddTransient<IChromecastChannel, ReceiverChannel>();
+            serviceCollection.AddTransient<IChromecastChannel, QueueMediaChannel>();
+
+            var messageInterfaceType = typeof(IMessage);
+            List<Type> messageTypes = new List<Type>();
+
+            // first add owr own IMessage classes
+            foreach (var type in (from t in typeof(QueueItem).GetTypeInfo().Assembly.GetTypes()
+                                  where t.GetTypeInfo().IsClass && !t.GetTypeInfo().IsAbstract && messageInterfaceType.IsAssignableFrom(t) && t.GetTypeInfo().GetCustomAttribute<ReceptionMessageAttribute>() != null
+                                  select t)) {
+                messageTypes.Add(type);
+            }
+            // then add all from basis impl wich are not there yet. (So you can 'overwrite existing ones!)
+            foreach (var type in (from t in typeof(IConnectionChannel).GetTypeInfo().Assembly.GetTypes()
+                                  where t.GetTypeInfo().IsClass && !t.GetTypeInfo().IsAbstract && messageInterfaceType.IsAssignableFrom(t) && t.GetTypeInfo().GetCustomAttribute<ReceptionMessageAttribute>() != null
+                                  select t)) {
+                if (messageTypes.Where(q => q.Name == type.Name).Count()==0) {
+                    messageTypes.Add(type);
+                }
+            }
+            foreach(var type in messageTypes) {
+                serviceCollection.AddTransient(messageInterfaceType, type);
+            }
+
+            return new ChromecastClient(serviceCollection);
         }
 
     }

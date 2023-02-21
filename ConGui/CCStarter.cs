@@ -17,18 +17,20 @@ using MediaStatus = QueueCaster.MediaStatus;
 namespace ConGui {
     public class CCStarter :IHostedService {
 
-        private static ILogger? Log;
+        private static ILoggerFactory LoggerFactory;
+        private static ILogger Log;
 
-        private string ccName;
-        private string appId;
+        private String ccName;
+        private String appId;
         private QueueMediaChannel? mediaChannel;
-        private IConsoleWrapper cw = new ConsoleWrapper((line) => Log?.LogTrace("CCTUI: " + line),
-                                                       (line, ex, p) => Log?.LogError("CCTUI: " + line, ex, p));
+        //private IConsoleWrapper cw = new ConsoleWrapper((line) => Log?.LogTrace("CCTUI: " + line),
+        //                                               (line, ex, p) => Log?.LogError("CCTUI: " + line, ex, p));
 
-        public CCStarter(IConfiguration conf, ILogger<CCStarter> logger) {
-            ccName = conf.GetValue<string>("CcName", "");
-            appId = conf.GetValue<string>("CcAppId", "");
-            Log = logger; 
+        public CCStarter(IConfiguration conf, ILoggerFactory loggerFac) {
+            ccName = conf.GetValue<String>("CcName", "");
+            appId = conf.GetValue<String>("CcAppId", "");
+            LoggerFactory = loggerFac; 
+            Log = loggerFac.CreateLogger<CCStarter>();
         }
 
         //public CCStarter(string ccName, string appId) {
@@ -45,7 +47,7 @@ namespace ConGui {
             if (cc != null) {
                 Log?.LogDebug("**** Status: " + cc.Status);
 
-                var client = QueueCaster.ChromecastClient.CreateQueueCasterClient(cw);
+                var client = QueueCaster.ChromecastClient.CreateQueueCasterClient(LoggerFactory);
                 var st = await client.ConnectChromecast(cc);
                 st = await client.LaunchApplicationAsync(appId, true);
 

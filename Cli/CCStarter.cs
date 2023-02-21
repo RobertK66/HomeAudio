@@ -30,7 +30,7 @@ namespace Cli {
             if (cc != null) {
                 Console.WriteLine("**** Status: " + cc.Status);
 
-                var client = QueueCaster.ChromecastClient.CreateQueueCasterClient();
+                var client = QueueCaster.ChromecastClient.CreateQueueCasterClient(null);
                 var st = await client.ConnectChromecast(cc);
                 st = await client.LaunchApplicationAsync(appId, true);
 
