@@ -72,8 +72,14 @@ public class Program : IHostedService, IInputListener {
     public void OnInput(InputEvent inputEvent) {
         if (inputEvent.Key.Key == ConsoleKey.Enter) {
             _logger.LogDebug("Play selected: " + WebRadios.GetChildren().ToList()[selected].GetValue<String>("StationName"));
-            _ = myCC.PlayLive(WebRadios.GetChildren().ToList()[selected].GetValue<String>("ContentUrl"));
+            _ = myCC.PlayLive(WebRadios.GetChildren().ToList()[selected].GetValue<String>("ContentUrl")??"",
+                              WebRadios.GetChildren().ToList()[selected].GetValue<String>("StationName"));
         
+        } else if (inputEvent.Key.Key == ConsoleKey.Add) {
+            _ = myCC.VolumeUp();
+
+        } else if (inputEvent.Key.Key == ConsoleKey.Subtract) {
+            _ = myCC.VolumeDown();
         } else if (selected >= 0) {
             Background old = stations[selected];
             if ((inputEvent.Key.Key == ConsoleKey.LeftArrow)) {

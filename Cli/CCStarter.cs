@@ -14,7 +14,7 @@ namespace Cli {
     public class CCStarter {
         private string ccName;
         private string appId;
-        private QueueMediaChannel? mediaChannel;
+        private QueueCaster.QueueMediaChannel? mediaChannel;
 
         public CCStarter(string ccName, string appId) {
             this.ccName = ccName;
@@ -34,7 +34,7 @@ namespace Cli {
                 var st = await client.ConnectChromecast(cc);
                 st = await client.LaunchApplicationAsync(appId, true);
 
-                mediaChannel = (QueueMediaChannel)client.GetChannel<IMediaChannel>();
+                mediaChannel = client.GetChannel<QueueMediaChannel>();
             }
         }
 

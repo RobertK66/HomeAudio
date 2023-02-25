@@ -3,16 +3,18 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using QueueCaster;
 using QueueCaster.queue.models;
-using Sharpcaster;
+using Sharpcaster.Channels;
+//using Sharpcaster;
 using Sharpcaster.Interfaces;
+using Sharpcaster.Messages.Receiver;
+using Sharpcaster.Models.ChromecastStatus;
 using Sharpcaster.Models.Media;
+//using Sharpcaster.Models.Media;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using MediaStatus = QueueCaster.MediaStatus;
 
 namespace ConGui {
     public class CCStarter :IHostedService {
@@ -22,13 +24,15 @@ namespace ConGui {
 
         private String ccName;
         private String appId;
-        private QueueMediaChannel? mediaChannel;
+        private QueueMediaChannel mediaChannel;
+        private ReceiverChannel rcChannel;
+        private double? currentVolume = null;
         //private IConsoleWrapper cw = new ConsoleWrapper((line) => Log?.LogTrace("CCTUI: " + line),
         //                                               (line, ex, p) => Log?.LogError("CCTUI: " + line, ex, p));
 
         public CCStarter(IConfiguration conf, ILoggerFactory loggerFac) {
-            ccName = conf.GetValue<String>("CcName", "");
-            appId = conf.GetValue<String>("CcAppId", "");
+            ccName = conf.GetValue<String>("CcName", "") ?? "";
+            appId = conf.GetValue<String>("CcAppId", "") ?? "";
             LoggerFactory = loggerFac; 
             Log = loggerFac.CreateLogger<CCStarter>();
         }
@@ -39,7 +43,7 @@ namespace ConGui {
         //}
 
         public async Task Connect() {
-            IChromecastLocator locator = new MdnsChromecastLocator();
+            IChromecastLocator locator = new Sharpcaster.MdnsChromecastLocator();
             var chromecasts = await locator.FindReceiversAsync();
 
             Log?.LogDebug("CC Cnt:" + chromecasts.Count());
@@ -51,9 +55,36 @@ namespace ConGui {
                 var st = await client.ConnectChromecast(cc);
                 st = await client.LaunchApplicationAsync(appId, true);
 
-                mediaChannel = (QueueMediaChannel)client.GetChannel<IMediaChannel>();
+                mediaChannel = client.GetChannel<QueueMediaChannel>();
+                rcChannel = client.GetChannel<ReceiverChannel>();
+                if (rcChannel != null) {
+                    StatusChannel<ReceiverStatusMessage, ChromecastStatus> sc = (StatusChannel<ReceiverStatusMessage, ChromecastStatus>)rcChannel;
+                    sc.StatusChanged += RcChannel_StatusChanged;
+                }
             }
         }
+
+        private void RcChannel_StatusChanged(object? sender, EventArgs e) {
+            StatusChannel<ReceiverStatusMessage, ChromecastStatus>? sc = sender as StatusChannel<ReceiverStatusMessage, ChromecastStatus>;
+            if (sc != null) {
+                currentVolume = sc.Status.Volume.Level;
+            }
+        }
+
+        public async Task VolumeUp() {
+            if (rcChannel != null) {
+                currentVolume = (currentVolume ?? 0.1) + 0.03;
+                await ((IReceiverChannel)rcChannel).SetVolume(currentVolume??0.1);
+            }
+        }
+        public async Task VolumeDown() {
+            if (rcChannel != null) {
+                currentVolume = (currentVolume ?? 0.2) - 0.03;
+                await ((IReceiverChannel)rcChannel).SetVolume(currentVolume??0.1);
+            }
+        }
+
+
 
         public async Task PlayLive(string url, string? name = null) {
             if (mediaChannel != null) {
@@ -100,7 +131,7 @@ namespace ConGui {
         //    return null;
         //}
 
-        public async Task<MediaStatus?> PlayNext() {
+        public async Task<QueueCaster.MediaStatus?> PlayNext() {
             if (mediaChannel != null) {
                 var st1 = await mediaChannel.GetStatusAsync();
                 if (st1 != null) {
@@ -110,7 +141,7 @@ namespace ConGui {
             return null;
         }
 
-        public async Task<MediaStatus?> PlayPrev() {
+        public async Task<QueueCaster.MediaStatus?> PlayPrev() {
             if (mediaChannel != null) {
                 var st1 = await mediaChannel.GetStatusAsync();
                 if (st1 != null) {
