@@ -4,6 +4,8 @@ using ConsoleGUI.Data;
 using ConsoleGUI.Input;
 using ConsoleGUI.Space;
 using ConsoleGUI.UserDefined;
+using System;
+using System.Collections.Generic;
 
 internal class TabPanel : SimpleControl, IInputListener {
 	private class Tab {
@@ -37,7 +39,7 @@ internal class TabPanel : SimpleControl, IInputListener {
 	private readonly DockPanel wrapper;
 	private readonly HorizontalStackPanel tabsPanel;
 
-	private Tab currentTab;
+	private Tab? currentTab;
 
 	public TabPanel() {
 		tabsPanel = new HorizontalStackPanel();
@@ -74,9 +76,10 @@ internal class TabPanel : SimpleControl, IInputListener {
 
 	public void OnInput(InputEvent inputEvent) {
 		if (inputEvent.Key.Key != ConsoleKey.Tab) return;
-
-		SelectTab((tabs.IndexOf(currentTab) + 1) % tabs.Count);
-		inputEvent.Handled = true;
+		if (currentTab != null) {
+			SelectTab((tabs.IndexOf(currentTab) + 1) % tabs.Count);
+			inputEvent.Handled = true;
+		}
 	}
 }
 

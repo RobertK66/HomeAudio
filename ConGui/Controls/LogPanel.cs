@@ -2,11 +2,14 @@
 using ConsoleGUI.Data;
 using ConsoleGUI.Input;
 using ConsoleGUI.UserDefined;
+using System;
+using System.Linq;
+using System.Threading;
 
 public class LogPanel : SimpleControl, IInputListener {
 	private readonly VerticalStackPanel _stackPanel;
 	private readonly VerticalScrollPanel _scrollPanel;
-
+	
 	public LogPanel()  {
 		_stackPanel = new VerticalStackPanel();
 		_scrollPanel = new VerticalScrollPanel() {
@@ -17,10 +20,22 @@ public class LogPanel : SimpleControl, IInputListener {
 		Content = _scrollPanel;
 	}
 
+	public void ScrollToEnd() {
+        _scrollPanel.Top = _stackPanel.Size.Height - this.Size.Height;  
+    }
+
+	public bool IsScrolling() {
+		if (_stackPanel.Size.Height > this.Size.Height) {
+			return (_scrollPanel.Top == _stackPanel.Size.Height - this.Size.Height);
+        }
+		return true;
+	}
 
 	public void Add(string message) {
-		Monitor.Enter(this);				// This has to be Thread Save! its used by all Logger instances!
-		_stackPanel.Add(new WrapPanel {
+		Monitor.Enter(this);                // This has to be Thread Save! its used by all Logger instances!
+		bool scrolling = IsScrolling();
+
+        _stackPanel.Add(new WrapPanel {
 			Content = new HorizontalStackPanel {
 				Children = new[]
 				{
@@ -29,9 +44,11 @@ public class LogPanel : SimpleControl, IInputListener {
 					}
 			}
 		});
-		_scrollPanel.Top = _stackPanel.Children.Count() - this.Size.Height;
-		Monitor.Exit(this);
-	}
+        if ( scrolling ) {
+            ScrollToEnd();
+		}
+        Monitor.Exit(this);
+    }
 
     public void OnInput(InputEvent inputEvent) {
 		if (inputEvent.Key.Key == ConsoleKey.DownArrow) {

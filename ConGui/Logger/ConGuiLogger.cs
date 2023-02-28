@@ -19,7 +19,7 @@ namespace ConGui.Logger {
 
         public bool IsEnabled(LogLevel logLevel) =>
             true;
-
+ 
         public void Log<TState>(
             LogLevel logLevel,
             EventId eventId,
@@ -31,7 +31,7 @@ namespace ConGui.Logger {
             }
 
             ConGuiLoggerConfiguration config = _getCurrentConfig();
-
+            
             //LogLevel configured = Microsoft.Extensions.Logging.LogLevel.Information;
 
             //if (config.LogLevel.ContainsKey("Default")) {
