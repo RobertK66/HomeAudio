@@ -15,7 +15,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\QueueCaster\QueueCaster.csproj" />
-    <ProjectReference Include="..\SharpCaster\Sharpcaster\Sharpcaster.csproj" />
   </ItemGroup>
 
   <ItemGroup>

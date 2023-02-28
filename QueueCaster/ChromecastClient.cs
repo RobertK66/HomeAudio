@@ -38,13 +38,13 @@ namespace QueueCaster {
             var messageInterfaceType = typeof(IMessage);
             List<Type> messageTypes = new List<Type>();
 
-            // first add owr own IMessage classes
+            // first add our own IMessage classes
             foreach (var type in (from t in typeof(QueueItem).GetTypeInfo().Assembly.GetTypes()
                                   where t.GetTypeInfo().IsClass && !t.GetTypeInfo().IsAbstract && messageInterfaceType.IsAssignableFrom(t) && t.GetTypeInfo().GetCustomAttribute<ReceptionMessageAttribute>() != null
                                   select t)) {
                 messageTypes.Add(type);
             }
-            // then add all from basis impl wich are not there yet. (So you can 'overwrite existing ones!)
+            // then add all from basis impl wich are not there yet. (So you can 'overwrite' existing ones!)
             foreach (var type in (from t in typeof(IConnectionChannel).GetTypeInfo().Assembly.GetTypes()
                                   where t.GetTypeInfo().IsClass && !t.GetTypeInfo().IsAbstract && messageInterfaceType.IsAssignableFrom(t) && t.GetTypeInfo().GetCustomAttribute<ReceptionMessageAttribute>() != null
                                   select t)) {
