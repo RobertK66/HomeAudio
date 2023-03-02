@@ -67,5 +67,12 @@ namespace Cli {
             return qi;
         }
 
+        public List<(string name, List<(string url, string name)> tracks, string artist)> GetAllAlbums() {
+            throw new NotImplementedException();
+        }
+
+        public List<(string url, string name)> GetAllStations() {
+            throw new NotImplementedException();
+        }
     }
 }

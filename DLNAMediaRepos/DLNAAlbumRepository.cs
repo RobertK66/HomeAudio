@@ -10,7 +10,7 @@ using System.Xml;
 namespace DLNAMediaRepos {
 
     public class DLNAAlbumRepository : IMediaRepository {
-        Dictionary<string, (string albumName, List<(string url, string title)> tracks)> CdAlbums = new();
+        Dictionary<string, (string albumName, List<(string url, string title)> tracks, string artist)> CdAlbums = new();
         Dictionary<string, string> RadioStations = new();
 
         DLNAClient client = new();
@@ -74,7 +74,12 @@ namespace DLNAMediaRepos {
         private void AddAlbum(DLNADevice device, DLNAObject cd) {
             if (!CdAlbums.ContainsKey(cd.Name)) {
                 Console.Write(".");
-                (string albumName, List<(string url, string title)> tracks) album = (cd.Name, new List<(string url, string title)>());
+                var cdXmlDocument = new XmlDocument();
+                cdXmlDocument.LoadXml(cd.XMLDump);
+                var artist = cdXmlDocument.GetElementsByTagName("upnp:artist").Item(0);
+                string art = artist?.InnerText ?? string.Empty;
+
+                (string albumName, List<(string url, string title)> tracks, string artist) album = (cd.Name, new List<(string url, string title)>(), art);
                 CdAlbums.Add(cd.Name, album);
                 var tracks = device.GetDeviceContent(cd.ID);
                 tracks.ForEach(track => {
@@ -111,5 +116,19 @@ namespace DLNAMediaRepos {
             }
             return webradio;
         }
+
+        public List<(string name, List<(string url, string name)> tracks, string artist)> GetAllAlbums() {
+            return CdAlbums.Values.OrderBy(a=>a.artist).ToList();
+        }
+
+        public List<(string url, string name)> GetAllStations() {
+            List< (string url, string name)> retVal = new List<(string url, string name)> ();
+            var keys = RadioStations.Keys.ToArray();
+            foreach ( var key in keys) {
+                retVal.Add((key, RadioStations[key]));
+            }
+            return retVal;
+        }
+
     }
 }

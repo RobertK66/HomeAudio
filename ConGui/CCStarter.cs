@@ -26,7 +26,7 @@ namespace ConGui {
         private String appId;
         private QueueMediaChannel mediaChannel;
         private ReceiverChannel rcChannel;
-        private double? currentVolume = null;
+        private Double? currentVolume = null;
         //private IConsoleWrapper cw = new ConsoleWrapper((line) => Log?.LogTrace("CCTUI: " + line),
         //                                               (line, ex, p) => Log?.LogError("CCTUI: " + line, ex, p));
 
@@ -74,13 +74,23 @@ namespace ConGui {
         public async Task VolumeUp() {
             if (rcChannel != null) {
                 currentVolume = (currentVolume ?? 0.1) + 0.03;
-                await ((IReceiverChannel)rcChannel).SetVolume(currentVolume??0.1);
+                if (currentVolume > 0.6) {
+                    currentVolume = 0.6;
+                }
+                Log?.LogDebug("Vol+ [" + String.Format("{0:0.000}", currentVolume) + "]");
+                var stat = await ((IReceiverChannel)rcChannel).SetVolume(currentVolume??0.1);
+                currentVolume = stat.Volume.Level;
             }
         }
         public async Task VolumeDown() {
             if (rcChannel != null) {
                 currentVolume = (currentVolume ?? 0.2) - 0.03;
-                await ((IReceiverChannel)rcChannel).SetVolume(currentVolume??0.1);
+                if (currentVolume < 0) {
+                    currentVolume = 0;
+                }
+                Log?.LogDebug("Vol- [" + String.Format("{0:0.000}", currentVolume) + "]");
+                var stat = await ((IReceiverChannel)rcChannel).SetVolume(currentVolume??0.1);
+                currentVolume = stat.Volume.Level;
             }
         }
 

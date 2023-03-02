@@ -3,7 +3,7 @@ using DLNAMediaRepos;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-
+using System.Text.Json;
 
 public class Program : IHostedService {
     public static async Task Main(string[] args) {
@@ -81,7 +81,26 @@ public class Program : IHostedService {
             await waitForCaster;
             _ = await ccs.PlayPrev();
         }
-        
+
+
+        await Task.WhenAll(waitForCaster, waitForRadioStations, waitForAlbums);
+        var aa = DlnaRepos2.GetAllAlbums();
+        foreach (var album in aa) {
+            Console.WriteLine(album.name + " [" +album.tracks.Count+"] /" + album.artist);
+        }
+
+        var options = new JsonSerializerOptions {
+            IncludeFields = true,
+        };
+        string jsonString = JsonSerializer.Serialize(aa, options);
+
+        var st = DlnaRepos2.GetAllStations();
+        foreach (var station in st) {
+            Console.WriteLine(station.name + " [" + station.url + "]");
+        }
+
+
+
         Console.WriteLine("Program.StartAsync() finished.");
     }
 
