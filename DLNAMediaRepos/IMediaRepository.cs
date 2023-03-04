@@ -13,7 +13,7 @@ namespace DLNAMediaRepos {
         (string url, string name) GetRadioStation(int playIdx);
         List<(string url, string name)> GetCdTracks(int playIdx);
 
-        List<(string name, List<(string url, string name)> tracks, string artist)> GetAllAlbums();
+        List<(string name, List<(string url, string name)> tracks, string artist, string cdid)> GetAllAlbums();
         List<(string url, string name)> GetAllStations();
     }
 

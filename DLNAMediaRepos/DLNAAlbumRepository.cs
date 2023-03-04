@@ -2,6 +2,7 @@
 using RadioBrowser.Models;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,7 +11,7 @@ using System.Xml;
 namespace DLNAMediaRepos {
 
     public class DLNAAlbumRepository : IMediaRepository {
-        Dictionary<string, (string albumName, List<(string url, string title)> tracks, string artist)> CdAlbums = new();
+        Dictionary<string, (string albumName, List<(string url, string title)> tracks, string artist, string cdid)> CdAlbums = new();
         Dictionary<string, string> RadioStations = new();
 
         DLNAClient client = new();
@@ -79,17 +80,30 @@ namespace DLNAMediaRepos {
                 var artist = cdXmlDocument.GetElementsByTagName("upnp:artist").Item(0);
                 string art = artist?.InnerText ?? string.Empty;
 
-                (string albumName, List<(string url, string title)> tracks, string artist) album = (cd.Name, new List<(string url, string title)>(), art);
-                CdAlbums.Add(cd.Name, album);
+                (string albumName, List<(string url, string title)> tracks, string artist, string cdid) album = (cd.Name, new List<(string url, string title)>(), art, "");
+               
+                int trackStart = 2;         // Starting second of track 1
+                int XX = 0;                 // Sum of starting seconds
+                int YYYY = 0;               // Totasl Sum of track length
                 var tracks = device.GetDeviceContent(cd.ID);
                 tracks.ForEach(track => {
                     var myXmlDocument = new XmlDocument();
                     myXmlDocument.LoadXml(track.XMLDump);
                     var r = myXmlDocument.GetElementsByTagName("res").Item(0);
+                    var ds = r.Attributes["duration"].Value;
+                    XX += trackStart;
                     if (r != null) {
                         album.tracks.Add((r.InnerText, track.Name));
                     }
+                    TimeSpan result;
+                    if (TimeSpan.TryParse(ds, CultureInfo.InvariantCulture, out result)) {
+                        trackStart += (int)result.TotalSeconds;             // Start second of next track
+                        YYYY += (int)result.TotalSeconds;           
+                    }
                 });
+                album.cdid = (XX % 256).ToString("x2") + YYYY.ToString("x4") + tracks.Count.ToString("d2");
+                CdAlbums.Add(cd.Name, album);
+                //                Console.WriteLine(cdid);
             }
         }
 
@@ -117,7 +131,7 @@ namespace DLNAMediaRepos {
             return webradio;
         }
 
-        public List<(string name, List<(string url, string name)> tracks, string artist)> GetAllAlbums() {
+        public List<(string name, List<(string url, string name)> tracks, string artist, string cdid)> GetAllAlbums() {
             return CdAlbums.Values.OrderBy(a=>a.artist).ToList();
         }
 

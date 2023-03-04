@@ -86,7 +86,7 @@ public class Program : IHostedService {
         await Task.WhenAll(waitForCaster, waitForRadioStations, waitForAlbums);
         var aa = DlnaRepos2.GetAllAlbums();
         foreach (var album in aa) {
-            Console.WriteLine(album.name + " [" +album.tracks.Count+"] /" + album.artist);
+            Console.WriteLine(album.cdid + ":"+ album.name + "[" +album.tracks.Count+"] / " + album.artist);
         }
 
         var options = new JsonSerializerOptions {
