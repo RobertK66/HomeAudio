@@ -102,8 +102,7 @@ namespace DLNAMediaRepos {
                     }
                 });
                 album.cdid = (XX % 256).ToString("x2") + YYYY.ToString("x4") + tracks.Count.ToString("d2");
-                CdAlbums.Add(cd.Name, album);
-                //                Console.WriteLine(cdid);
+                CdAlbums.Add(cd.Name, album);               
             }
         }
 
