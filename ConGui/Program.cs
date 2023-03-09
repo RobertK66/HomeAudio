@@ -18,11 +18,14 @@ using System;
 using System.Linq;
 using ConsoleGUI.Common;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
+using ConGui.Controls;
 
 public class Program : IHostedService, IInputListener {
 
     private readonly ILogger<Program> _logger;
     private IConfiguration WebRadios;
+    private IConfiguration Albums;
 
     public static async Task Main(string[] args) {
         IHostBuilder host = Host.CreateDefaultBuilder(args)
@@ -48,6 +51,7 @@ public class Program : IHostedService, IInputListener {
         _logger.LogDebug("*********************** Program() Constructor called.");
         myCC = cc;
         WebRadios = conf.GetSection("WebRadio");
+        Albums = conf.GetSection("CdRepos");
     }
         
 
@@ -64,35 +68,22 @@ public class Program : IHostedService, IInputListener {
     private TextBox myTextBox = new();
     private TabPanel tabPanel = new();
 
-    private int selected = -1;
-    private int count = 0;
-    List<Background> stations = new List<Background>();
+    //private int selected = -1;
+    //private int count = 0;
+    //List<Background> stations = new List<Background>();
     
 
     public void OnInput(InputEvent inputEvent) {
         if (inputEvent.Key.Key == ConsoleKey.Enter) {
-            _logger.LogDebug("Play selected: " + WebRadios.GetChildren().ToList()[selected].GetValue<String>("StationName"));
-            _ = myCC.PlayLive(WebRadios.GetChildren().ToList()[selected].GetValue<String>("ContentUrl")??"",
-                              WebRadios.GetChildren().ToList()[selected].GetValue<String>("StationName"));
-        
+            //_logger.LogDebug("Play selected: " + WebRadios.GetChildren().ToList()[selected].GetValue<String>("Name"));
+            //_ = myCC.PlayLive(WebRadios.GetChildren().ToList()[selected].GetValue<String>("ContentUrl") ?? "",
+            //                  WebRadios.GetChildren().ToList()[selected].GetValue<String>("Name"));
+
         } else if (inputEvent.Key.Key == ConsoleKey.Add) {
             _ = myCC.VolumeUp();
 
         } else if (inputEvent.Key.Key == ConsoleKey.Subtract) {
             _ = myCC.VolumeDown();
-        } else if (selected >= 0) {
-            Background old = stations[selected];
-            if ((inputEvent.Key.Key == ConsoleKey.LeftArrow)) {
-                selected -= 1;
-                if (selected < 0) { selected = count-1; }
-            } else if ((inputEvent.Key.Key == ConsoleKey.RightArrow)) {
-                selected += 1;
-                if (selected > count-1) { selected = 0; }
-            }
-
-            Background newStat = stations[selected];
-            old.Color = new Color(22, 22, 22);
-            newStat.Color = new Color(100, 0, 0);
         }
     }
 
@@ -151,40 +142,61 @@ public class Program : IHostedService, IInputListener {
         var myTxtBlock = new TextBlock { Text = "Hello world" };
         myTextBox = new TextBox { Text = "Hello console" };
 
-        var pan = new ConsoleGUI.Controls.Canvas();
-        int l = 0;
-        int t = 10;
-        
-        count = WebRadios.GetChildren().Count();
-        if (count > 0) {
-            foreach (var item in WebRadios.GetChildren()) {
-                _logger.LogDebug(item.GetValue<String>("ContentUrl"));
-                Color backgrdcol = new Color(22, 22, 22);
-                var b = new Background { Content = new TextBlock() { Text = item.GetValue<String>("StationName") }, Color = backgrdcol };
-                stations.Add(b);
-                pan.Add(b, new Rect(l, t, 20, 1));
-                l += 21;
-            }
-            selected = 0;
-            stations[0].Color = new Color(100, 0, 0); 
+        var radioGrid = new SelectableGrid(3, 4, 16);
+        foreach (var stat in WebRadios.GetChildren()) {
+            var b = new TextBlock() { Text = (stat.GetValue<String>("Name") ?? "").PadRight(15).Substring(0, 15) + " " };
+            radioGrid.Add(b, stat, this.RadioStationClicked);
+            //    (s) => {
+            //    IConfigurationSection? st = s as IConfigurationSection;
+            //    if (st != null) {
+            //        _logger.LogDebug("Play selected station: " + st.GetValue<String>("Name"));
+            //        _ = myCC.PlayLive(st.GetValue<String>("ContentUrl") ?? "",
+            //                          st.GetValue<String>("Name"));
+            //    }
+            //});
         }
 
-
-        //tabPanel = new TabPanel();
-        tabPanel.AddTab("Radio Stations", pan);
-    
-
-        tabPanel.AddTab("My Cd Collection", new Box {
+        var rad = new Box {
             HorizontalContentPlacement = Box.HorizontalPlacement.Center,
             VerticalContentPlacement = Box.VerticalPlacement.Center,
-            Content = new Background {
-                Color = new Color(45, 74, 85),
-                Content = new Border {
-                    BorderStyle = BorderStyle.Single,
-                    Content = myTextBox
-                }
+            Content = new Border {
+                BorderStyle = BorderStyle.Single,
+                Content = radioGrid //lines
             }
-        });
+        };
+
+        tabPanel.AddTab("Radio Stations", rad, radioGrid);
+
+        var albumGrid = new SelectableGrid(4, 10, 16);
+        foreach (var album in Albums.GetChildren()) {
+            var b = new TextBlock() { Text = (album.GetValue<String>("Name") ?? "").PadRight(15).Substring(0, 15) + " " };
+            albumGrid.Add(b, album, this.AlbumClicked);
+            //    (a) => {
+            //    IConfigurationSection? album = a as IConfigurationSection;
+            //    if (album != null) {
+            //        _logger.LogDebug("Play selected album: " + album.GetValue<String>("Name"));
+            //        IConfiguration? tr = album.GetSection("Tracks");
+            //        if (tr != null) {
+            //            List<(string url, string name)> tracks = new List<(string, string)>();
+            //            foreach (var t in tr.GetChildren()) {
+            //                tracks.Add(new(t.GetValue<string>("ContentUrl") ?? "url", t.GetValue<string>("Name") ?? "name"));
+            //            }
+            //            _ = myCC.PlayCdTracks(tracks);
+            //        }
+            //    }
+            //});
+        }
+
+        var cd = new Box {
+            HorizontalContentPlacement = Box.HorizontalPlacement.Center,
+            VerticalContentPlacement = Box.VerticalPlacement.Center,
+            Content = new Border {
+                BorderStyle = BorderStyle.Single,
+                Content = albumGrid //lines
+            }
+        };
+
+        tabPanel.AddTab("CdCollection", cd, albumGrid);
         tabPanel.SelectTab(1);
 
         var mainwin = new DockPanel {
@@ -197,12 +209,35 @@ public class Program : IHostedService, IInputListener {
             FillingControl = tabPanel
         };
 
-
        return mainwin;
 
 
     }
 
- 
+    void RadioStationClicked(object stationConfig) {
+        IConfigurationSection? st = stationConfig as IConfigurationSection;
+        if (st != null) {
+            _logger.LogDebug("Play selected station: " + st.GetValue<String>("Name"));
+            _ = myCC.PlayLive(st.GetValue<String>("ContentUrl") ?? "",
+                              st.GetValue<String>("Name"));
+        }
+    }
+
+
+    void AlbumClicked(object albumConfiguration) {
+        IConfigurationSection? album = albumConfiguration as IConfigurationSection;
+        if (album != null) {
+            _logger.LogDebug("Play selected album: " + album.GetValue<String>("Name"));
+            IConfiguration? tr = album.GetSection("Tracks");
+            if (tr != null) {
+                List<(string url, string name)> tracks = new List<(string, string)>();
+                foreach (var t in tr.GetChildren()) {
+                    tracks.Add(new(t.GetValue<string>("ContentUrl") ?? "url", t.GetValue<string>("Name") ?? "name"));
+                }
+                _ = myCC.PlayCdTracks(tracks);
+            }
+        }
+    }
+
 }
 

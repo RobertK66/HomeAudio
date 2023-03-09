@@ -51,11 +51,12 @@ public class LogPanel : SimpleControl, IInputListener {
     }
 
     public void OnInput(InputEvent inputEvent) {
-		if (inputEvent.Key.Key == ConsoleKey.DownArrow) {
-			_scrollPanel.Top += 1;
-		} else if (inputEvent.Key.Key == ConsoleKey.UpArrow) {
-			_scrollPanel.Top -= 1;
-		} else if (inputEvent.Key.Key == ConsoleKey.PageDown) {
+		//if (inputEvent.Key.Key == ConsoleKey.DownArrow) {
+		//	_scrollPanel.Top += 1;
+		//} else if (inputEvent.Key.Key == ConsoleKey.UpArrow) {
+		//	_scrollPanel.Top -= 1;
+		//} else
+		if (inputEvent.Key.Key == ConsoleKey.PageDown) {
 			_scrollPanel.Top += this.Size.Height;
 		} else if (inputEvent.Key.Key == ConsoleKey.PageUp) {
 			_scrollPanel.Top -= this.Size.Height;
