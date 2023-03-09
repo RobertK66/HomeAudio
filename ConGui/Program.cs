@@ -146,14 +146,6 @@ public class Program : IHostedService, IInputListener {
         foreach (var stat in WebRadios.GetChildren()) {
             var b = new TextBlock() { Text = (stat.GetValue<String>("Name") ?? "").PadRight(15).Substring(0, 15) + " " };
             radioGrid.Add(b, stat, this.RadioStationClicked);
-            //    (s) => {
-            //    IConfigurationSection? st = s as IConfigurationSection;
-            //    if (st != null) {
-            //        _logger.LogDebug("Play selected station: " + st.GetValue<String>("Name"));
-            //        _ = myCC.PlayLive(st.GetValue<String>("ContentUrl") ?? "",
-            //                          st.GetValue<String>("Name"));
-            //    }
-            //});
         }
 
         var rad = new Box {
@@ -171,20 +163,6 @@ public class Program : IHostedService, IInputListener {
         foreach (var album in Albums.GetChildren()) {
             var b = new TextBlock() { Text = (album.GetValue<String>("Name") ?? "").PadRight(15).Substring(0, 15) + " " };
             albumGrid.Add(b, album, this.AlbumClicked);
-            //    (a) => {
-            //    IConfigurationSection? album = a as IConfigurationSection;
-            //    if (album != null) {
-            //        _logger.LogDebug("Play selected album: " + album.GetValue<String>("Name"));
-            //        IConfiguration? tr = album.GetSection("Tracks");
-            //        if (tr != null) {
-            //            List<(string url, string name)> tracks = new List<(string, string)>();
-            //            foreach (var t in tr.GetChildren()) {
-            //                tracks.Add(new(t.GetValue<string>("ContentUrl") ?? "url", t.GetValue<string>("Name") ?? "name"));
-            //            }
-            //            _ = myCC.PlayCdTracks(tracks);
-            //        }
-            //    }
-            //});
         }
 
         var cd = new Box {
