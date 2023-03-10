@@ -71,19 +71,16 @@ public class Program : IHostedService, IInputListener {
     //private int selected = -1;
     //private int count = 0;
     //List<Background> stations = new List<Background>();
-    
 
     public void OnInput(InputEvent inputEvent) {
-        if (inputEvent.Key.Key == ConsoleKey.Enter) {
-            //_logger.LogDebug("Play selected: " + WebRadios.GetChildren().ToList()[selected].GetValue<String>("Name"));
-            //_ = myCC.PlayLive(WebRadios.GetChildren().ToList()[selected].GetValue<String>("ContentUrl") ?? "",
-            //                  WebRadios.GetChildren().ToList()[selected].GetValue<String>("Name"));
-
-        } else if (inputEvent.Key.Key == ConsoleKey.Add) {
+        if (inputEvent.Key.Key == ConsoleKey.Add) {
             _ = myCC.VolumeUp();
-
         } else if (inputEvent.Key.Key == ConsoleKey.Subtract) {
             _ = myCC.VolumeDown();
+        } else if (inputEvent.Key.Key == ConsoleKey.End) {
+            _ = myCC.PlayNext();
+        } else if (inputEvent.Key.Key == ConsoleKey.Home) {
+            _ = myCC.PlayPrev();
         }
     }
 
@@ -124,7 +121,6 @@ public class Program : IHostedService, IInputListener {
         return Task.CompletedTask;
     }
 
-
     private void TuiThread() {
         try {
             _logger.LogDebug("TUI Thread started");
@@ -144,8 +140,7 @@ public class Program : IHostedService, IInputListener {
 
         var radioGrid = new SelectableGrid(3, 4, 16);
         foreach (var stat in WebRadios.GetChildren()) {
-            var b = new TextBlock() { Text = (stat.GetValue<String>("Name") ?? "").PadRight(15).Substring(0, 15) + " " };
-            radioGrid.Add(b, stat, this.RadioStationClicked);
+            radioGrid.AddTextCell(stat.GetValue<String>("Name")??"", stat, this.RadioStationClicked);
         }
 
         var rad = new Box {
@@ -159,10 +154,9 @@ public class Program : IHostedService, IInputListener {
 
         tabPanel.AddTab("Radio Stations", rad, radioGrid);
 
-        var albumGrid = new SelectableGrid(4, 10, 16);
+        var albumGrid = new SelectableGrid(4, 10, 16 );
         foreach (var album in Albums.GetChildren()) {
-            var b = new TextBlock() { Text = (album.GetValue<String>("Name") ?? "").PadRight(15).Substring(0, 15) + " " };
-            albumGrid.Add(b, album, this.AlbumClicked);
+            albumGrid.AddTextCell(album.GetValue<String>("Name")??"", album, this.AlbumClicked);
         }
 
         var cd = new Box {
@@ -201,17 +195,17 @@ public class Program : IHostedService, IInputListener {
         }
     }
 
-
     void AlbumClicked(object albumConfiguration) {
         IConfigurationSection? album = albumConfiguration as IConfigurationSection;
         if (album != null) {
             _logger.LogDebug("Play selected album: " + album.GetValue<String>("Name"));
-            IConfiguration? tr = album.GetSection("Tracks");
+            IConfiguration ? tr = album.GetSection("Tracks");
             if (tr != null) {
                 List<(string url, string name)> tracks = new List<(string, string)>();
                 foreach (var t in tr.GetChildren()) {
                     tracks.Add(new(t.GetValue<string>("ContentUrl") ?? "url", t.GetValue<string>("Name") ?? "name"));
                 }
+                _logger.LogDebug("Queueing " + tracks.Count + " tracks.");
                 _ = myCC.PlayCdTracks(tracks);
             }
         }

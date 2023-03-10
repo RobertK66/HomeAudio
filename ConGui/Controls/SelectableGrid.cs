@@ -40,8 +40,11 @@ namespace ConGui.Controls {
             Content = grid;
         }
 
+        public void AddTextCell(string label, object context, Action<object> clicked) {
+            AddCell(new TextBlock() { Text = label.PadRight(ColWidth - 1).Substring(0, ColWidth - 1) + " " }, context, clicked);
+        }
 
-        public void Add(IControl control, object context, Action<object> clicked) {
+        public void AddCell(IControl control, object context, Action<object> clicked) {
             filledCellIdx++;
             var cell = new Background {
                 Content = control,
@@ -68,24 +71,26 @@ namespace ConGui.Controls {
 
         public void OnInput(InputEvent inputEvent) {
             int? oldSelected = selectedCellIdx;
+            int dx = HorizontalFill ? 1 : Rows;
+            int dy = HorizontalFill ? Cols : 1;
 
             if ((inputEvent.Key.Key == ConsoleKey.Enter)) {
                 Cells[selectedCellIdx ?? 0].callback(Cells[selectedCellIdx ?? 0].context);
             } else if ((inputEvent.Key.Key == ConsoleKey.LeftArrow)) {
-                if (selectedCellIdx - Rows >= 0) {
-                    selectedCellIdx -= Rows;
+                if (selectedCellIdx - dx >= 0) {
+                    selectedCellIdx -= dx;
                 }
             } else if ((inputEvent.Key.Key == ConsoleKey.RightArrow)) {
-                if (selectedCellIdx + Rows <= filledCellIdx) {
-                    selectedCellIdx += Rows;
+                if (selectedCellIdx + dx <= filledCellIdx) {
+                    selectedCellIdx += dx;
                 }
             } else if ((inputEvent.Key.Key == ConsoleKey.UpArrow)) {
-                if (selectedCellIdx - 1 >= 0) {
-                    selectedCellIdx -= 1;
+                if (selectedCellIdx - dy >= 0) {
+                    selectedCellIdx -= dy;
                 }
             } else if ((inputEvent.Key.Key == ConsoleKey.DownArrow)) {
-                if (selectedCellIdx + 1 <= filledCellIdx) {
-                    selectedCellIdx += 1;
+                if (selectedCellIdx + dy <= filledCellIdx) {
+                    selectedCellIdx += dy;
                 }
             }
 
