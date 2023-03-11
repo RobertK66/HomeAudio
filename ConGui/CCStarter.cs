@@ -7,6 +7,7 @@ using Sharpcaster.Channels;
 //using Sharpcaster;
 using Sharpcaster.Interfaces;
 using Sharpcaster.Messages.Receiver;
+using Sharpcaster.Models;
 using Sharpcaster.Models.ChromecastStatus;
 using Sharpcaster.Models.Media;
 //using Sharpcaster.Models.Media;
@@ -31,13 +32,15 @@ namespace ConGui {
         private static ILoggerFactory? LoggerFactory;
         private static ILogger? Log;
 
-        private String ccName;
-        private String appId;
+        private readonly String ccName;
+        private readonly String appId;
+        private ChromecastReceiver? cc;
+
         private QueueMediaChannel? mediaChannel;
         private ReceiverChannel? rcChannel;
         private Double? currentVolume = null;
 
-        public event EventHandler StatusChanged;
+        public event EventHandler? StatusChanged;
 
         public CCStarter(IConfiguration conf, ILoggerFactory loggerFac) {
             ccName = conf.GetValue<String>("CcName", "") ?? "";
@@ -55,10 +58,10 @@ namespace ConGui {
             IChromecastLocator locator = new Sharpcaster.MdnsChromecastLocator();
             var chromecasts = await locator.FindReceiversAsync();
 
-            Log?.LogDebug("CC Cnt:" + chromecasts.Count());
-            var cc = chromecasts.Where(c => c.Name.StartsWith(ccName)).FirstOrDefault();
+            Log?.LogDebug("CC Cnt: {cnt}", chromecasts.Count());
+            cc = chromecasts.Where(c => c.Name.StartsWith(ccName)).FirstOrDefault();
             if (cc != null) {
-                Log?.LogDebug("**** Status: " + cc.Status);
+                Log?.LogDebug("**** Status: {st}", cc.Status);
 
                 var client = QueueCaster.ChromecastClient.CreateQueueCasterClient(LoggerFactory);
                 var st = await client.ConnectChromecast(cc);
@@ -73,10 +76,20 @@ namespace ConGui {
         }
 
         private void RcChannel_StatusChanged(object? sender, EventArgs e) {
-            StatusChannel<ReceiverStatusMessage, ChromecastStatus>? sc = sender as StatusChannel<ReceiverStatusMessage, ChromecastStatus>;
-            if (sc != null) {
+            if (sender is StatusChannel<ReceiverStatusMessage, ChromecastStatus> sc) {
                 currentVolume = sc.Status.Volume.Level;
                 StatusChanged?.Invoke(this, new CCStatusEventArgs(sc.Status));
+
+                if (sc.Status?.Applications?.FirstOrDefault() == null) {
+                    try {
+                        // App stopped (in my case by switching of the speaker with its On/Off key)
+                        // TODO: ????????
+                        Log?.LogInformation("Close received. Not implemented yet. Restart App to rersync!");
+                    } catch (Exception ex) {
+                        Log?.LogError("Error {ex}", ex);
+                    }
+
+                }
             }
         }
 
@@ -86,7 +99,7 @@ namespace ConGui {
                 if (currentVolume > 0.6) {
                     currentVolume = 0.6;
                 }
-                Log?.LogDebug("Vol+ [" + String.Format("{0:0.000}", currentVolume) + "]");
+                Log?.LogDebug("Vol+ [{vol}]", String.Format("{0:0.000}", currentVolume));
                 var stat = await ((IReceiverChannel)rcChannel).SetVolume(currentVolume??0.1);
                 currentVolume = stat.Volume.Level;
             }
@@ -97,7 +110,7 @@ namespace ConGui {
                 if (currentVolume < 0) {
                     currentVolume = 0;
                 }
-                Log?.LogDebug("Vol- [" + String.Format("{0:0.000}", currentVolume) + "]");
+                Log?.LogDebug("Vol- [{vol}]",  String.Format("{0:0.000}", currentVolume));
                 var stat = await ((IReceiverChannel)rcChannel).SetVolume(currentVolume??0.1);
                 currentVolume = stat.Volume.Level;
             }

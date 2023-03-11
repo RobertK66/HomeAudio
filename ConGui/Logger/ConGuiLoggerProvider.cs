@@ -9,7 +9,7 @@ namespace ConGui.Logger {
     [UnsupportedOSPlatform("browser")]
     [ProviderAlias("ConGuiConsole")]
     public sealed class ConGuiLoggerProvider : ILoggerProvider {
-        private readonly IDisposable _onChangeToken;
+        private readonly IDisposable? _onChangeToken;
         private ConGuiLoggerConfiguration _currentConfig;
         private readonly ConcurrentDictionary<string, ConGuiLogger> _loggers =
             new(StringComparer.OrdinalIgnoreCase);
@@ -27,7 +27,7 @@ namespace ConGui.Logger {
 
         public void Dispose() {
             _loggers.Clear();
-            _onChangeToken.Dispose();
+            _onChangeToken?.Dispose();
         }
     }
 }

@@ -15,7 +15,7 @@ namespace ConGui.Logger {
             Func<ConGuiLoggerConfiguration> getCurrentConfig) =>
             (_name, _getCurrentConfig) = (name, getCurrentConfig);
 
-        public IDisposable BeginScope<TState>(TState state) => default!;
+        public IDisposable? BeginScope<TState>(TState? state) where TState : notnull => default!;
 
         public bool IsEnabled(LogLevel logLevel) =>
             true;

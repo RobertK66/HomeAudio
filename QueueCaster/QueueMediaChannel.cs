@@ -18,16 +18,26 @@ namespace QueueCaster {
         // overwrite the base method for Load media beacuse we have another MediaStatus class registered as is used there!
         // -> cast exception!
         public new async Task<MediaStatus?> LoadAsync(Media media, bool autoPlay = true) {
+            MediaStatus? returnVal = null;
             var status = Client.GetChromecastStatus();
-            var r =  await SendAsync<MediaStatusMessage>(new LoadMessage() { SessionId = status.Applications[0].SessionId, Media = media, AutoPlay = autoPlay }, status.Applications[0].TransportId);
-            return r?.Status?.FirstOrDefault();
+            var app = status?.Applications?.FirstOrDefault();
+            if (app != null) {
+                var r = await SendAsync<MediaStatusMessage>(new LoadMessage() { SessionId = app.SessionId, Media = media, AutoPlay = autoPlay }, app.TransportId);
+                returnVal = r?.Status?.FirstOrDefault();
+            }
+            return returnVal;
         }
 
         // Media Channel methods to handle Queue
         public async Task<MediaStatus?> GetStatusAsync() {
-            var st = this.Client.GetChromecastStatus();
-            var r = await SendAsync<MediaStatusMessage>(new GetStatusMessage(), st.Applications[0].TransportId);
-            return r?.Status?.FirstOrDefault();
+            MediaStatus? returnVal = null;
+            var status = Client.GetChromecastStatus();
+            var app = status?.Applications?.FirstOrDefault();
+            if (app != null) {
+                var r = await SendAsync<MediaStatusMessage>(new GetStatusMessage(), app.TransportId);
+                returnVal = r?.Status?.FirstOrDefault();
+            }
+            return returnVal;
         }
 
         public async Task<MediaStatus?> QueueLoadAsync(QueueItem[] items) {
