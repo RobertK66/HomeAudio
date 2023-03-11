@@ -52,8 +52,21 @@ public class Program : IHostedService, IInputListener {
         myCC = cc;
         WebRadios = conf.GetSection("WebRadio");
         Albums = conf.GetSection("CdRepos");
+
+        myCC.StatusChanged += MyCC_StatusChanged;
     }
-        
+
+    private void MyCC_StatusChanged(object? sender, EventArgs e) {
+        CCStatusEventArgs? args = e as CCStatusEventArgs;
+        if (args != null) {
+            String statusText = "";
+            if (args?.Status?.Applications?.Count > 0) {
+                statusText = $"{args.Status.Applications[0].DisplayName} {args.Status.Applications[0].StatusText}"; 
+            }
+            ccStatusText.Text = $" Vol:{String.Format("{0:0.000}", args?.Status.Volume.Level)} - {statusText}";
+        }
+    }
+
 
     //private void PrintConf(string pf, IConfigurationSection c) {
     //    Console.WriteLine(pf + c.Path + " " + c.Value);
@@ -67,6 +80,7 @@ public class Program : IHostedService, IInputListener {
     private static LogPanel myLogPanel = new();
     private TextBox myTextBox = new();
     private TabPanel tabPanel = new();
+    private TextBlock ccStatusText = new TextBlock() { Text = "Unknown" };
 
     //private int selected = -1;
     //private int count = 0;
@@ -172,13 +186,13 @@ public class Program : IHostedService, IInputListener {
         tabPanel.SelectTab(1);
 
         var mainwin = new DockPanel {
-            Placement = DockPanel.DockedControlPlacement.Bottom,
-            DockedControl = new Boundary {
-                MaxHeight = 15,
-                MinHeight = 15,
-                Content = myLogPanel
-            },
-            FillingControl = tabPanel
+            Placement = DockPanel.DockedControlPlacement.Top,
+            DockedControl = tabPanel,
+            FillingControl = new DockPanel {
+                Placement = DockPanel.DockedControlPlacement.Top,
+                DockedControl = new Border() { Content = ccStatusText, BorderStyle = BorderStyle.Single },
+                FillingControl = myLogPanel
+            }
         };
 
        return mainwin;
