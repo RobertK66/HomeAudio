@@ -1,4 +1,5 @@
-﻿using Cli;
+﻿using AudioCollection;
+using Cli;
 using DLNAMediaRepos;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -17,7 +18,7 @@ public class Program : IHostedService {
         await host.RunConsoleAsync();
     }
 
-    private IMediaRepository Repos;
+    //private IAudioCollection Repos;
     private string appId = "";
     private string ccName= "";
 
@@ -30,7 +31,7 @@ public class Program : IHostedService {
         Console.WriteLine("Program() Constructor called.");
 
         // Read apsettings.json confioguration
-        Repos = new MediaRepositiory(conf.GetSection("WebRadio"), conf.GetSection("CD-Data"));
+      //  Repos = new MediaRepositiory(conf.GetSection("WebRadio"), conf.GetSection("CD-Data"));
 
         appId = conf.GetValue<string>("CC-AppId", "CC1AD845") ?? "";
         ccName = conf.GetValue<string>("CC-Name") ?? "";

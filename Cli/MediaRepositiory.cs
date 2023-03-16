@@ -1,4 +1,5 @@
-﻿using DLNAMediaRepos;
+﻿using AudioCollection;
+using DLNAMediaRepos;
 using Microsoft.Extensions.Configuration;
 using QueueCaster.queue.models;
 using Sharpcaster.Models.Media;
@@ -9,7 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Cli {
-    public class MediaRepositiory :IMediaRepository  {
+    public class MediaRepositiory :IAudioCollection  {
         List<QueueItem[]> CdQueues = new List<QueueItem[]>();
         List<Media> WebRadios = new List<Media>();
 
@@ -71,7 +72,15 @@ namespace Cli {
             throw new NotImplementedException();
         }
 
-        public List<(string url, string name)> GetAllStations() {
+        public List<(string name, string url)> GetAllStations() {
+            throw new NotImplementedException();
+        }
+
+        public (string name, string url) GetRadioStation(string stationName) {
+            throw new NotImplementedException();
+        }
+
+        public List<(string url, string name)> GetCdTracks(string cdid) {
             throw new NotImplementedException();
         }
     }

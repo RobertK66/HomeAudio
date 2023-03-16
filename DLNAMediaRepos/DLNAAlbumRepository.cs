@@ -1,7 +1,9 @@
-﻿using RadioBrowser;
+﻿using AudioCollection;
+using RadioBrowser;
 using RadioBrowser.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Text;
@@ -10,7 +12,7 @@ using System.Xml;
 
 namespace DLNAMediaRepos {
 
-    public class DLNAAlbumRepository : IMediaRepository {
+    public class DLNAAlbumRepository : IAudioCollection {
         Dictionary<string, (string albumName, List<(string url, string title)> tracks, string artist, string cdid)> CdAlbums = new();
         Dictionary<string, string> RadioStations = new();
 
@@ -29,7 +31,7 @@ namespace DLNAMediaRepos {
 
             foreach (var st in results) {
                 if (!RadioStations.ContainsKey(st.Url.ToString())) {
-                    RadioStations.Add(st.Url.ToString(), st.Name);
+                    RadioStations.Add(st.Name, st.Url.ToString());
                 }
             }
             Console.WriteLine($"{RadioStations.Count} Stations found.");
@@ -101,8 +103,8 @@ namespace DLNAMediaRepos {
                         YYYY += (int)result.TotalSeconds;           
                     }
                 });
-                album.cdid = (XX % 256).ToString("x2") + YYYY.ToString("x4") + tracks.Count.ToString("d2");
-                CdAlbums.Add(cd.Name, album);               
+                album.cdid = (XX % 256).ToString("x2") + YYYY.ToString("x4") + tracks.Count.ToString("x2");
+                CdAlbums.Add(album.cdid, album);               
             }
         }
 
@@ -118,14 +120,14 @@ namespace DLNAMediaRepos {
             return (tracks);
         }
 
-        public (string url, string name) GetRadioStation(int playIdx) {
+        public (string name, string url) GetRadioStation(int playIdx) {
 
             (string url, string name) webradio = new("https://orf-live.ors-shoutcast.at/oe1-q2a", "st x");
             var keys = RadioStations.Keys.ToArray();
             if (keys.Length > 0) {
                 playIdx %= keys.Length;
-                webradio.url = keys[playIdx];
-                webradio.name = RadioStations[keys[playIdx]];
+                webradio.url = RadioStations[keys[playIdx]];
+                webradio.name = keys[playIdx];
             }
             return webradio;
         }
@@ -134,14 +136,32 @@ namespace DLNAMediaRepos {
             return CdAlbums.Values.OrderBy(a=>a.artist).ToList();
         }
 
-        public List<(string url, string name)> GetAllStations() {
+        public List<(string name, string url)> GetAllStations() {
             List< (string url, string name)> retVal = new List<(string url, string name)> ();
             var keys = RadioStations.Keys.ToArray();
             foreach ( var key in keys) {
-                retVal.Add((key, RadioStations[key]));
+                retVal.Add((RadioStations[key], key));
             }
             return retVal;
         }
 
+        public (string name, string url) GetRadioStation(string stationName) {
+            (string url, string name) webradio = new();
+            if (RadioStations.ContainsKey(stationName)) {
+                var st = RadioStations[stationName];
+                webradio.url = RadioStations[stationName];
+                webradio.name = stationName;
+            }
+            return webradio;
+        }
+
+        public List<(string url, string name)> GetCdTracks(string cdid) {
+            List<(string, string)> tracks = new();
+            if (CdAlbums.ContainsKey(cdid)) {
+                var cd = CdAlbums[cdid];
+                tracks = cd.tracks;
+            }
+            return tracks;
+        }
     }
 }

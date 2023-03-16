@@ -20,18 +20,31 @@ using ConsoleGUI.Common;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using ConGui.Controls;
+using AudioCollection;
+using Microsoft.VisualBasic;
 
 public class Program : IHostedService, IInputListener {
 
-    private readonly ILogger<Program> _logger;
-    private IConfiguration WebRadios;
-    private IConfiguration Albums;
+    private readonly ILogger<Program> Log;
+
+    //private CCStarter myCC;
+    private IAudioCollection MyCollection;
+    private IChromeCastWrapper MyCCW;
+
+    //private IConfiguration WebRadios;
+    //private IConfiguration Albums;
 
     public static async Task Main(string[] args) {
         IHostBuilder host = Host.CreateDefaultBuilder(args)
                                 .ConfigureServices((hostContext, services) => {
-                                    services.AddSingleton<CCStarter>();
-                                    //AddHostedService<CCStarter>();
+                                    //services.AddSingleton<CCStarter>();
+                                    services.AddSingleton<IAudioCollection, StaticAudioCollection>();
+
+                                    // In order to get a hosted service able to be injected in a constructor, we register both a singelton and a service!
+                                    services.AddSingleton<IChromeCastWrapper, ChromeCastWrapper>();
+                                    // As hosted service needs a implementing class we have to cast here to the real impl, but injection of singelton can use the Interface....
+                                    services.AddHostedService<ChromeCastWrapper>(sp=>(ChromeCastWrapper)sp.GetRequiredService<IChromeCastWrapper>());
+
                                     services.AddHostedService<Program>();
                                 })
                                 .ConfigureLogging((cl) => {
@@ -45,19 +58,18 @@ public class Program : IHostedService, IInputListener {
     }
 
 
-    private CCStarter myCC;
-    public Program(IConfiguration conf, ILogger<Program> logger, CCStarter cc) {
-        _logger = logger;
-        _logger.LogDebug("*********************** Program() Constructor called.");
-        myCC = cc;
-        WebRadios = conf.GetSection("WebRadio");
-        Albums = conf.GetSection("CdRepos");
-
-        myCC.StatusChanged += MyCC_StatusChanged;
+    
+    public Program(IConfiguration conf, ILogger<Program> logger, IAudioCollection audioCollection, IChromeCastWrapper ccw) {
+        Log = logger;
+        Log.LogDebug("Program - Constructor called.");
+        //myCC = cc;
+        MyCollection = audioCollection;
+        MyCCW = ccw;
+        MyCCW.StatusChanged += MyCC_StatusChanged;
     }
 
     private void MyCC_StatusChanged(object? sender, EventArgs e) {
-        CCStatusEventArgs? args = e as CCStatusEventArgs;
+        CCWStatusEventArgs? args = e as CCWStatusEventArgs;
         if (args != null) {
             String statusText = "";
             if (args?.Status?.Applications?.Count > 0) {
@@ -82,24 +94,20 @@ public class Program : IHostedService, IInputListener {
     private TabPanel tabPanel = new();
     private TextBlock ccStatusText = new TextBlock() { Text = "Unknown" };
 
-    //private int selected = -1;
-    //private int count = 0;
-    //List<Background> stations = new List<Background>();
-
     public void OnInput(InputEvent inputEvent) {
         if (inputEvent.Key.Key == ConsoleKey.Add) {
-            _ = myCC.VolumeUp();
+            MyCCW.VolumeUp();
         } else if (inputEvent.Key.Key == ConsoleKey.Subtract) {
-            _ = myCC.VolumeDown();
+            MyCCW.VolumeDown();
         } else if (inputEvent.Key.Key == ConsoleKey.End) {
-            _ = myCC.PlayNext();
+            MyCCW.PlayNext();
         } else if (inputEvent.Key.Key == ConsoleKey.Home) {
-            _ = myCC.PlayPrev();
+            MyCCW.PlayPrev();
         }
     }
 
     public Task StartAsync(CancellationToken cancellationToken) {
-        _logger.LogInformation("Program.StartAsync() called.");
+        Log.LogInformation("Program.StartAsync() called.");
 
         ConsoleManager.Setup();
         ConsoleManager.Resize(new Size(150, 40));
@@ -122,13 +130,13 @@ public class Program : IHostedService, IInputListener {
         //CCStarter ccs = new("Büro", "9B5A75B4");
         //var waitForCaster = ccs.Connect();
 
-        _logger.LogInformation("Program.StartAsync() finished.");
-        //return Task.CompletedTask;
-        return myCC.StartAsync(cancellationToken);
+        Log.LogInformation("Program.StartAsync() finished.");
+        return Task.CompletedTask;
+        //return myCC.StartAsync(cancellationToken);
     }
 
     public Task StopAsync(CancellationToken cancellationToken) {
-        _logger.LogInformation("Program.StopAsync() called.");
+        Log.LogInformation("Program.StopAsync() called.");
         if (tuiThread?.IsAlive??false) {
             tuiThread?.Interrupt();
         }
@@ -137,25 +145,23 @@ public class Program : IHostedService, IInputListener {
 
     private void TuiThread() {
         try {
-            _logger.LogDebug("TUI Thread started");
+            Log.LogDebug("TUI Thread started");
             while (true) {
                 ConsoleManager.AdjustBufferSize();  // Resize for Windows!
                 ConsoleManager.ReadInput(input);
                 Thread.Sleep(50);
             }
         } catch (ThreadInterruptedException) {
-            _logger.LogDebug("TUI Thread canceled by InterruptException");
+            Log.LogDebug("TUI Thread canceled by InterruptException");
         }
     }
 
     private IControl CreateMainView() {
-        var myTxtBlock = new TextBlock { Text = "Hello world" };
-        myTextBox = new TextBox { Text = "Hello console" };
 
         var radioGrid = new SelectableGrid(3, 4, 16);
-        foreach (var stat in WebRadios.GetChildren()) {
-            radioGrid.AddTextCell(stat.GetValue<String>("Name")??"", stat, this.RadioStationClicked);
-        }
+        MyCollection.GetAllStations().ForEach( st => {
+            radioGrid.AddTextCell(st.name, st, this.RadioStationClicked);
+        });
 
         var rad = new Box {
             HorizontalContentPlacement = Box.HorizontalPlacement.Center,
@@ -169,9 +175,10 @@ public class Program : IHostedService, IInputListener {
         tabPanel.AddTab("Radio Stations", rad, radioGrid);
 
         var albumGrid = new SelectableGrid(4, 10, 16 );
-        foreach (var album in Albums.GetChildren()) {
-            albumGrid.AddTextCell(album.GetValue<String>("Name")??"", album, this.AlbumClicked);
-        }
+
+        MyCollection.GetAllAlbums().ForEach(al => {
+            albumGrid.AddTextCell(al.name, al, this.AlbumClicked);
+        });
 
         var cd = new Box {
             HorizontalContentPlacement = Box.HorizontalPlacement.Center,
@@ -197,31 +204,26 @@ public class Program : IHostedService, IInputListener {
 
        return mainwin;
 
-
     }
 
-    void RadioStationClicked(object stationConfig) {
-        IConfigurationSection? st = stationConfig as IConfigurationSection;
+    void RadioStationClicked(object station) {
+        (string name, string url)? st = station as (string name, string url)?;
         if (st != null) {
-            _logger.LogDebug("Play selected station: " + st.GetValue<String>("Name"));
-            _ = myCC.PlayLive(st.GetValue<String>("ContentUrl") ?? "",
-                              st.GetValue<String>("Name"));
+            Log.LogDebug("Play selected station: " + st?.name);
+            MyCCW.PlayLive(st?.url ?? "",
+                              st?.name ?? "");
         }
     }
 
-    void AlbumClicked(object albumConfiguration) {
-        IConfigurationSection? album = albumConfiguration as IConfigurationSection;
+    void AlbumClicked(object albumContext) {
+        (string name, List<(string url, string name)> tracks, string artist, string cdid)? album = albumContext as (string name, List<(string url, string name)> tracks, string artist, string cdid)?;
         if (album != null) {
-            _logger.LogDebug("Play selected album: " + album.GetValue<String>("Name"));
-            IConfiguration ? tr = album.GetSection("Tracks");
-            if (tr != null) {
-                List<(string url, string name)> tracks = new List<(string, string)>();
-                foreach (var t in tr.GetChildren()) {
-                    tracks.Add(new(t.GetValue<string>("ContentUrl") ?? "url", t.GetValue<string>("Name") ?? "name"));
-                }
-                _logger.LogDebug("Queueing " + tracks.Count + " tracks.");
-                _ = myCC.PlayCdTracks(tracks);
+            Log.LogDebug("Play selected album: " + album?.name);
+            Log.LogDebug("Queueing " + album?.tracks.Count + " tracks.");
+            if (album?.tracks != null) {
+                MyCCW.PlayCdTracks(album?.tracks);
             }
+            
         }
     }
 

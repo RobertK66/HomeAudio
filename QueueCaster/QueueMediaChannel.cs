@@ -13,7 +13,11 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace QueueCaster {
-    public  class QueueMediaChannel : MediaChannel {
+    public  class QueueMediaChannel : MediaChannel { // StatusChannel<MediaStatusMessage, IEnumerable<MediaStatus>>, IStatusChannel<IEnumerable<MediaStatus>>, IChromecastChannel {
+       
+        //public QueueMediaChannel() : base("media") {
+
+        //}
 
         // overwrite the base method for Load media beacuse we have another MediaStatus class registered as is used there!
         // -> cast exception!
@@ -28,6 +32,7 @@ namespace QueueCaster {
             return returnVal;
         }
 
+        
         // Media Channel methods to handle Queue
         public async Task<MediaStatus?> GetStatusAsync() {
             MediaStatus? returnVal = null;
