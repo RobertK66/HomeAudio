@@ -13,11 +13,30 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace QueueCaster {
-    public  class QueueMediaChannel : MediaChannel { // StatusChannel<MediaStatusMessage, IEnumerable<MediaStatus>>, IStatusChannel<IEnumerable<MediaStatus>>, IChromecastChannel {
-       
-        //public QueueMediaChannel() : base("media") {
 
-        //}
+    public class MediaStatusChangedEventArgs : EventArgs {
+        public List<MediaStatus> Status { get; set; }
+
+        public MediaStatusChangedEventArgs(IEnumerable<MediaStatus> status) {
+            this.Status = status.ToList();
+        }
+    }
+
+    public  class QueueMediaChannel : MediaChannel {
+
+        public event EventHandler? QueueMediaStatusChanged;
+
+        // The Media Channel implements StatusChannel<MediaStatusMessage, IEnumerable<MediaStatus>>, IStatusChannel<IEnumerable<MediaStatus>>,
+        // with the original Sharpcaster.MediaStatus. In order to get the changed event of media status with our own class we have to 'translate'/overwrite the 
+        // Event Handler implemented in StatusChannel here.
+        public override Task OnMessageReceivedAsync(IMessage message) {
+            MediaStatusMessage? msm = message as MediaStatusMessage;
+            if (msm != null) {
+                QueueMediaStatusChanged?.Invoke(this, new MediaStatusChangedEventArgs(msm.Status));
+            }
+            return Task.CompletedTask;
+        }
+
 
         // overwrite the base method for Load media beacuse we have another MediaStatus class registered as is used there!
         // -> cast exception!

@@ -86,6 +86,6 @@ namespace QueueCaster {
         [DataMember(Name = "items")]
         public QueueItem[]? QueueItems { get; set; }
 
-
+     
     }
 }

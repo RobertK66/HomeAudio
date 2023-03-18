@@ -22,11 +22,13 @@ using MediaStatus = QueueCaster.MediaStatus;
 
 namespace ConGui {
     public class CCWStatusEventArgs : EventArgs {
-        public CCWStatusEventArgs(ChromecastStatus status) {
+        public CCWStatusEventArgs(ChromecastStatus? status, MediaStatus? mediaStatus) {
             Status = status;
+            MediaStatus = mediaStatus;
         }
 
-        public ChromecastStatus Status { get; set; }
+        public ChromecastStatus? Status { get; set; }
+        public MediaStatus? MediaStatus { get; set; }
     }
 
 
@@ -41,6 +43,7 @@ namespace ConGui {
         private QueueMediaChannel? mediaChannel = null;
         private StatusChannel<ReceiverStatusMessage, ChromecastStatus>? rcChannel = null;
         private Double? currentVolume = null;
+        private MediaStatus? currentMediaStatus = null;
 
         public event EventHandler? StatusChanged;
 
@@ -83,7 +86,7 @@ namespace ConGui {
                     Log.LogDebug(st.ToString());
                     mediaChannel = ConnectedClient.GetChannel<QueueMediaChannel>();
                     if (mediaChannel != null) {
-                        mediaChannel.StatusChanged += MediaChannel_StatusChanged;
+                        mediaChannel.QueueMediaStatusChanged += MediaChannel_StatusChanged;
                     }
                     rcChannel = ConnectedClient.GetChannel<StatusChannel<ReceiverStatusMessage, ChromecastStatus>>();
                     if (rcChannel != null) {
@@ -98,13 +101,26 @@ namespace ConGui {
         }
 
         private void MediaChannel_StatusChanged(object? sender, EventArgs e) {
-            Log.LogDebug(((QueueMediaChannel?)sender)?.Status.ToString());
+            MediaStatusChangedEventArgs? msm = e as MediaStatusChangedEventArgs;
+            if (msm != null) {
+                Log.LogDebug("changed event " + msm.Status.Count);
+                if (msm.Status.Count > 0) {
+                    int idx = 0;
+                    foreach (var item in msm.Status) {
+                        currentMediaStatus = item;
+                        StatusChanged?.Invoke(this, new CCWStatusEventArgs(rcChannel?.Status, item));
+                        Log.LogDebug("["+idx+"]:" + item.CurrentItemId + " " + item.PlayerState + " items:" + item?.QueueItems?.Length );
+                        idx++;
+                    }
+                    
+                }
+            }
         }
 
         private void StatusChannel_StatusChanged(object? sender, EventArgs e) {
             //Log.LogDebug(e.ToString());
             currentVolume = rcChannel?.Status.Volume.Level;
-            StatusChanged?.Invoke(this, new CCWStatusEventArgs(rcChannel?.Status??new ChromecastStatus()));
+            StatusChanged?.Invoke(this, new CCWStatusEventArgs(rcChannel?.Status, currentMediaStatus));
     }
 
         public Task StopAsync(CancellationToken cancellationToken) {
@@ -170,6 +186,7 @@ namespace ConGui {
                     i++;
                 }
                 status = await mediaChannel.QueueLoadAsync(qi).ConfigureAwait(false);
+                StatusChanged?.Invoke(this, new CCWStatusEventArgs(rcChannel?.Status, status));
             }
             return status;
         }

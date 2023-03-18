@@ -22,6 +22,7 @@ using System.Runtime.CompilerServices;
 using ConGui.Controls;
 using AudioCollection;
 using Microsoft.VisualBasic;
+using Google.Protobuf.WellKnownTypes;
 
 public class Program : IHostedService, IInputListener {
 
@@ -75,7 +76,16 @@ public class Program : IHostedService, IInputListener {
             if (args?.Status?.Applications?.Count > 0) {
                 statusText = $"{args.Status.Applications[0].DisplayName} {args.Status.Applications[0].StatusText}"; 
             }
-            ccStatusText.Text = $" Vol:{String.Format("{0:0.000}", args?.Status.Volume.Level)} - {statusText}";
+            if (args?.MediaStatus != null) {
+                long startIdx = args.MediaStatus.QueueData?.StartIndex ?? 0;
+                long curentIdx = args.MediaStatus.CurrentItemId;
+
+                statusText += $" - {System.Enum.GetName(typeof(PlayerStateType), args.MediaStatus.PlayerState)} ";
+            }
+
+
+
+            ccStatusText.Text = $" Vol:{String.Format("{0:0.000}", args?.Status?.Volume.Level)} - {statusText}";
         }
     }
 
