@@ -79,25 +79,30 @@ namespace ConGui {
 
             if (ConnectedClient == null) {
                 if (e.Name.StartsWith(ccName, StringComparison.OrdinalIgnoreCase)) {
-                    Log.LogDebug(e.Name + "["+e.Status + "] fits the filter -> connect client");
-                    ConnectedClient = QueueCaster.ChromecastClient.CreateQueueCasterClient(loggerFactory);
+                    Log.LogDebug(e.Name + "[" + e.Status + "] fits the filter -> connect client");
 
-                    var st = await ConnectedClient.ConnectChromecast(e);
-                    Log.LogDebug(st.ToString());
-                    mediaChannel = ConnectedClient.GetChannel<QueueMediaChannel>();
-                    if (mediaChannel != null) {
-                        mediaChannel.QueueMediaStatusChanged += MediaChannel_StatusChanged;
-                    }
-                    rcChannel = ConnectedClient.GetChannel<StatusChannel<ReceiverStatusMessage, ChromecastStatus>>();
-                    if (rcChannel != null) {
-                        //StatusChannel<ReceiverStatusMessage, ChromecastStatus> sc = (StatusChannel<ReceiverStatusMessage, ChromecastStatus>)rcChannel;
-                        rcChannel.StatusChanged += StatusChannel_StatusChanged; 
-                    }
-                    st = await ConnectedClient.LaunchApplicationAsync(appId, true);
-                    Log.LogDebug(st.ToString());
+                    await ConnectNewClient(e);
                 }
             }
 
+        }
+
+        private async Task ConnectNewClient(ChromecastReceiver e) {
+            ConnectedClient = QueueCaster.ChromecastClient.CreateQueueCasterClient(loggerFactory);
+
+            var st = await ConnectedClient.ConnectChromecast(e);
+            Log.LogDebug(st.ToString());
+            mediaChannel = ConnectedClient.GetChannel<QueueMediaChannel>();
+            if (mediaChannel != null) {
+                mediaChannel.QueueMediaStatusChanged += MediaChannel_StatusChanged;
+            }
+            rcChannel = ConnectedClient.GetChannel<StatusChannel<ReceiverStatusMessage, ChromecastStatus>>();
+            if (rcChannel != null) {
+                //StatusChannel<ReceiverStatusMessage, ChromecastStatus> sc = (StatusChannel<ReceiverStatusMessage, ChromecastStatus>)rcChannel;
+                rcChannel.StatusChanged += StatusChannel_StatusChanged;
+            }
+            st = await ConnectedClient.LaunchApplicationAsync(appId, true);
+            Log.LogDebug(st.ToString());
         }
 
         private void MediaChannel_StatusChanged(object? sender, EventArgs e) {
@@ -120,7 +125,24 @@ namespace ConGui {
         private void StatusChannel_StatusChanged(object? sender, EventArgs e) {
             //Log.LogDebug(e.ToString());
             currentVolume = rcChannel?.Status.Volume.Level;
-            StatusChanged?.Invoke(this, new CCWStatusEventArgs(rcChannel?.Status, currentMediaStatus));
+            if ((rcChannel?.Status.Applications != null) &&
+                (rcChannel?.Status.Applications.Count>0) ){
+                StatusChanged?.Invoke(this, new CCWStatusEventArgs(rcChannel?.Status, currentMediaStatus));
+            } else {
+                // No Application Client was closed. (In my case triggered by On/Off key on speekear)
+                try {
+                    Log.LogDebug("No Application loaded -> Trying to gracefully shutdown");
+                    var t = ConnectedClient?.DisconnectAsync();
+                    t.Wait();
+                    Log.LogDebug("After Disconnect");
+                } finally {
+                    ConnectedClient = null;
+                }
+                var receiver = Receivers.Where(r=>r.Name.StartsWith(this.ccName)).ToList().FirstOrDefault();
+                if (receiver != null) {
+                    _ = ConnectNewClient(receiver);
+                }
+            }
     }
 
         public Task StopAsync(CancellationToken cancellationToken) {
