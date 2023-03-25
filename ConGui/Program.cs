@@ -113,6 +113,8 @@ public class Program : IHostedService, IInputListener {
             MyCCW.PlayNext();
         } else if (inputEvent.Key.Key == ConsoleKey.Home) {
             MyCCW.PlayPrev();
+        } else if (inputEvent.Key.Key == ConsoleKey.Escape) {
+            MyCCW.Shutdown();
         }
     }
 

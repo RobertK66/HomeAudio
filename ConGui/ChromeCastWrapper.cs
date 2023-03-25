@@ -101,8 +101,37 @@ namespace ConGui {
                 //StatusChannel<ReceiverStatusMessage, ChromecastStatus> sc = (StatusChannel<ReceiverStatusMessage, ChromecastStatus>)rcChannel;
                 rcChannel.StatusChanged += StatusChannel_StatusChanged;
             }
+            
             st = await ConnectedClient.LaunchApplicationAsync(appId, true);
+
+            ConnectedClient.Disconnected += ConnectedClient_Disconnected;
             Log.LogDebug(st.ToString());
+        }
+
+        private void ConnectedClient_Disconnected(object? sender, EventArgs e) {
+            try {
+                Log.LogDebug("Disconnect received -> Trying to gracefully shutdown stream and reconnect a new one!");
+                //var t = ConnectedClient?.DisconnectAsync();
+                //t.Wait();
+
+                if (ConnectedClient != null) {
+                    ConnectedClient.Disconnected -= ConnectedClient_Disconnected;
+                }
+                if (rcChannel != null) {
+                    rcChannel.StatusChanged -= StatusChannel_StatusChanged;
+                }
+                if (mediaChannel != null) {
+                    mediaChannel.QueueMediaStatusChanged -= MediaChannel_StatusChanged;
+                }
+            } finally {
+                ConnectedClient = null;
+            }
+
+            // We reconnect new application in order to be operable again
+            var receiver = Receivers.Where(r => r.Name.StartsWith(this.ccName)).ToList().FirstOrDefault();
+            if (receiver != null) {
+                _ = ConnectNewClient(receiver);
+            }
         }
 
         private void MediaChannel_StatusChanged(object? sender, EventArgs e) {
@@ -130,18 +159,18 @@ namespace ConGui {
                 StatusChanged?.Invoke(this, new CCWStatusEventArgs(rcChannel?.Status, currentMediaStatus));
             } else {
                 // No Application Client was closed. (In my case triggered by On/Off key on speekear)
-                try {
-                    Log.LogDebug("No Application loaded -> Trying to gracefully shutdown");
-                    var t = ConnectedClient?.DisconnectAsync();
-                    t.Wait();
-                    Log.LogDebug("After Disconnect");
-                } finally {
-                    ConnectedClient = null;
-                }
-                var receiver = Receivers.Where(r=>r.Name.StartsWith(this.ccName)).ToList().FirstOrDefault();
-                if (receiver != null) {
-                    _ = ConnectNewClient(receiver);
-                }
+                //try {
+                //    Log.LogDebug("No Application loaded -> Trying to gracefully shutdown");
+                //    var t = ConnectedClient?.DisconnectAsync();
+                //    t.Wait();
+                //    Log.LogDebug("After Disconnect");
+                //} finally {
+                //    ConnectedClient = null;
+                //}
+                //var receiver = Receivers.Where(r=>r.Name.StartsWith(this.ccName)).ToList().FirstOrDefault();
+                //if (receiver != null) {
+                //    _ = ConnectNewClient(receiver);
+                //}
             }
     }
 
@@ -225,6 +254,12 @@ namespace ConGui {
                 status = await mediaChannel.LoadAsync(media);
             }
             return status;
+        }
+
+        public void Shutdown() {
+            var t = ConnectedClient?.DisconnectAsync();
+            t?.Wait();
+
         }
     }
 }

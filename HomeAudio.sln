@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DLNAMediaRepos", "DLNAMedia
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConGui", "ConGui\ConGui.csproj", "{D1192C1A-166F-4CAA-8EE7-FFB56977D0B4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudioCollection", "AudioCollection\AudioCollection.csproj", "{A95B95A8-7BA7-4F92-9D6C-0D24F8D1C34A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AudioCollection", "AudioCollection\AudioCollection.csproj", "{A95B95A8-7BA7-4F92-9D6C-0D24F8D1C34A}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Sharpcaster", "..\..\..\Documents\Sharpcaster\Sharpcaster\Sharpcaster.csproj", "{EDC2BAE6-6BA7-4210-A488-1F5CFA779434}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{A95B95A8-7BA7-4F92-9D6C-0D24F8D1C34A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A95B95A8-7BA7-4F92-9D6C-0D24F8D1C34A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A95B95A8-7BA7-4F92-9D6C-0D24F8D1C34A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EDC2BAE6-6BA7-4210-A488-1F5CFA779434}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EDC2BAE6-6BA7-4210-A488-1F5CFA779434}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EDC2BAE6-6BA7-4210-A488-1F5CFA779434}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EDC2BAE6-6BA7-4210-A488-1F5CFA779434}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

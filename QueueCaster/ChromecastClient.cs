@@ -30,7 +30,7 @@ namespace QueueCaster {
             var customCcChannels    = new List<IChromecastChannel>();
             customMessages.Add(typeof(QueueItem).GetTypeInfo().Assembly);
 
-            serviceCollection.AddTransient<IChromecastChannel, ConnectionChannel>();
+            serviceCollection.AddTransient<IChromecastChannel, My226ConnectionChannel>();
             serviceCollection.AddTransient<IChromecastChannel, HeartbeatChannel>();
             serviceCollection.AddTransient<IChromecastChannel, ReceiverChannel>();
             serviceCollection.AddTransient<IChromecastChannel, QueueMediaChannel>();
