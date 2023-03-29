@@ -140,7 +140,7 @@ namespace ConGui {
             st = await ConnectedClient.LaunchApplicationAsync(appId, true);
 
             ConnectedClient.Disconnected += ConnectedClient_Disconnected;
-            Log.LogDebug("Connected launched/joined App[0]: " + (((st?.Applications?.Count ?? 0) > 0) ? st.Applications[0].AppId : "<null>"));
+            Log.LogDebug("Launched/joined App[0]: " + (((st?.Applications?.Count ?? 0) > 0) ? st.Applications[0].AppId : "<null>"));
         }
 
         private void ConnectedClient_Disconnected(object? sender, EventArgs e) {
@@ -170,11 +170,10 @@ namespace ConGui {
         private void MediaChannel_StatusChanged(object? sender, EventArgs e) {
             MediaStatusChangedEventArgs? msm = e as MediaStatusChangedEventArgs;
             if (msm != null) {
-                Log.LogTrace($"{msm.Status.Count} changed event(s):");
+                Log.LogTrace($"{msm.Status.Count} changed event(s):");      // I never got more than one here.
                 if (msm.Status.Count > 0) {
                     int idx = 0;
                     foreach (var item in msm.Status) {
-                        string queueText = "";
                         currentMediaStatus = item;
                         int currentId = item.CurrentItemId;
 
@@ -192,30 +191,19 @@ namespace ConGui {
                                 currentLastTrack = false;
                             }
                         }
-
                         StatusChanged?.Invoke(this, new CCWStatusEventArgs(rcChannel?.Status, item, currentFirstTrack, currentLastTrack));
-                        //if (item?.QueueItems != null) {
-                        //    var x = item.QueueItems.Select((qi) => (qi.ItemId??0).ToString()).ToArray();
-                        //    queueText = String.Join(", ", x); 
-                        //}
-                        //if (item?.QueueData != null) {
-                        //    queueText += $" q-data: {item.QueueData.StartIndex}";  
-                        //}
-                        Log.LogDebug($"{item.MediaSessionId} {item.PlayerState} id: {item.CurrentItemId} {item.CurrentTime}" + queueText);
+                        Log.LogDebug($"Media-SessionId: {item.MediaSessionId} {item.PlayerState} id: {item.CurrentItemId} at {item.CurrentTime}");
                         idx++;
                     }
-                    
                 }
             }
         }
 
         private void StatusChannel_StatusChanged(object? sender, EventArgs e) {
-            //Log.LogDebug(e.ToString());
+
             currentVolume = rcChannel?.Status.Volume.Level;
-            if ((rcChannel?.Status.Applications != null) &&
-                (rcChannel?.Status.Applications.Count>0) ){
-                StatusChanged?.Invoke(this, new CCWStatusEventArgs(rcChannel?.Status, currentMediaStatus, currentFirstTrack, currentLastTrack));
-            } 
+            StatusChanged?.Invoke(this, new CCWStatusEventArgs(rcChannel?.Status, currentMediaStatus, currentFirstTrack, currentLastTrack));
+            Log.LogDebug($"StatusChanged Vol: {currentVolume, 3} ");
         }
 
         public Task StopAsync(CancellationToken cancellationToken) {
@@ -225,6 +213,7 @@ namespace ConGui {
 
         public async Task PlayNext() {
             if (mediaChannel != null) {
+                Log?.LogDebug("Play Next");
                 if (currentMediaStatus == null) {
                     currentMediaStatus = await mediaChannel.GetStatusAsync();
                 }
@@ -236,6 +225,7 @@ namespace ConGui {
 
         public async Task PlayPrev() {
             if (mediaChannel != null) {
+                Log?.LogDebug("Play Prev");
                 if (currentMediaStatus == null) {
                     currentMediaStatus = await mediaChannel.GetStatusAsync();
                 }
@@ -282,6 +272,7 @@ namespace ConGui {
                     qi[i] = new QueueItem() { Media = media, OrderId = i, StartTime = 0 };
                     i++;
                 }
+                Log.LogDebug("Queueing " + qi.Count() + " tracks.");
                 status = await mediaChannel.QueueLoadAsync(qi).ConfigureAwait(false);
                 StatusChanged?.Invoke(this, new CCWStatusEventArgs(rcChannel?.Status, status, currentFirstTrack, currentLastTrack));
             }
@@ -297,6 +288,7 @@ namespace ConGui {
                     ContentType = "audio/mp4",
                     Metadata = new MediaMetadata() { Title = name ?? url }
                 };
+                Log.LogDebug("Load Media.");
                 status = await mediaChannel.LoadAsync(media);
             }
             return status;

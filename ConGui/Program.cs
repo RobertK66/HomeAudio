@@ -200,7 +200,7 @@ public class Program : IHostedService, IInputListener {
         (string name, List<(string url, string name)> tracks, string artist, string cdid)? album = albumContext as (string name, List<(string url, string name)> tracks, string artist, string cdid)?;
         if (album != null) {
             Log.LogDebug("Play selected album: " + album?.name);
-            Log.LogDebug("Queueing " + album?.tracks.Count + " tracks.");
+            //Log.LogDebug("Queueing " + album?.tracks.Count + " tracks.");
             if (album?.tracks != null) {
                 MyCCW.PlayCdTracks(album?.tracks);
             }
