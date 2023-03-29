@@ -15,7 +15,7 @@ namespace QueueCaster
                     Client.DisconnectAsync();
                 });
             }
-            return Task.CompletedTask; ;
+            return Task.CompletedTask;
         }
 
     }

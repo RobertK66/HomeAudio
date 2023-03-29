@@ -32,13 +32,9 @@ public class Program : IHostedService, IInputListener {
     private IAudioCollection MyCollection;
     private IChromeCastWrapper MyCCW;
 
-    //private IConfiguration WebRadios;
-    //private IConfiguration Albums;
-
     public static async Task Main(string[] args) {
         IHostBuilder host = Host.CreateDefaultBuilder(args)
                                 .ConfigureServices((hostContext, services) => {
-                                    //services.AddSingleton<CCStarter>();
                                     services.AddSingleton<IAudioCollection, StaticAudioCollection>();
 
                                     // In order to get a hosted service able to be injected in a constructor, we register both a singelton and a service!
@@ -57,38 +53,14 @@ public class Program : IHostedService, IInputListener {
                                 });
         await host.RunConsoleAsync();
     }
-
-
     
     public Program(IConfiguration conf, ILogger<Program> logger, IAudioCollection audioCollection, IChromeCastWrapper ccw) {
         Log = logger;
         Log.LogDebug("Program - Constructor called.");
-        //myCC = cc;
         MyCollection = audioCollection;
         MyCCW = ccw;
         MyCCW.StatusChanged += MyCC_StatusChanged;
     }
-
-    private void MyCC_StatusChanged(object? sender, EventArgs e) {
-        CCWStatusEventArgs? args = e as CCWStatusEventArgs;
-        if (args != null) {
-            String statusText = "";
-            if (args?.Status?.Applications?.Count > 0) {
-                statusText = $"{args.Status.Applications[0].DisplayName} {args.Status.Applications[0].StatusText}"; 
-            }
-            if (args?.MediaStatus != null) {
-                long startIdx = args.MediaStatus.QueueData?.StartIndex ?? 0;
-                long curentIdx = args.MediaStatus.CurrentItemId;
-
-                statusText += $" - {System.Enum.GetName(typeof(PlayerStateType), args.MediaStatus.PlayerState)} ";
-            }
-
-
-
-            ccStatusText.Text = $" Vol:{String.Format("{0:0.000}", args?.Status?.Volume.Level)} - {statusText}";
-        }
-    }
-
 
     //private void PrintConf(string pf, IConfigurationSection c) {
     //    Console.WriteLine(pf + c.Path + " " + c.Value);
@@ -135,7 +107,16 @@ public class Program : IHostedService, IInputListener {
 
         //MouseHandler.Initialize();
 
-        tuiThread = new Thread(new ThreadStart(TuiThread));
+        tuiThread = new Thread(() => {
+            Log.LogDebug("TUI Thread started");
+            while (true) {
+                ConsoleManager.AdjustBufferSize();  // Resize for Windows!
+                ConsoleManager.ReadInput(input);
+                Thread.Sleep(50);
+                //await Task.Delay(50);
+            }
+        });
+        tuiThread.Name = "My-TUI";
 		tuiThread.Start();
 
         // Start the Caster connect ...
@@ -155,19 +136,7 @@ public class Program : IHostedService, IInputListener {
         return Task.CompletedTask;
     }
 
-    private void TuiThread() {
-        try {
-            Log.LogDebug("TUI Thread started");
-            while (true) {
-                ConsoleManager.AdjustBufferSize();  // Resize for Windows!
-                ConsoleManager.ReadInput(input);
-                Thread.Sleep(50);
-            }
-        } catch (ThreadInterruptedException) {
-            Log.LogDebug("TUI Thread canceled by InterruptException");
-        }
-    }
-
+  
     private IControl CreateMainView() {
 
         var radioGrid = new SelectableGrid(3, 4, 16);
@@ -236,6 +205,25 @@ public class Program : IHostedService, IInputListener {
                 MyCCW.PlayCdTracks(album?.tracks);
             }
             
+        }
+    }
+
+    private void MyCC_StatusChanged(object? sender, EventArgs e) {
+        CCWStatusEventArgs? args = e as CCWStatusEventArgs;
+        if (args != null) {
+            String statusText = "";
+            if (args.appCount > 0) {
+                statusText = $"{args.appName} {args.appStatus}";
+            }
+           
+                //long startIdx = args.MediaStatus.QueueData?.StartIndex ?? 0;
+                //long curentIdx = args.MediaStatus.CurrentItemId;
+
+            statusText += $" - {args.mediaStatus} ";
+            if (args.firstTrack) { statusText += "|"; } else { statusText += "<"; }
+            statusText += "-";
+            if (args.lastTrack) { statusText += "|"; } else { statusText += ">"; }
+            ccStatusText.Text = $" Vol:{String.Format("{0:0.000}", args.volumeLevel)} - {statusText}";
         }
     }
 

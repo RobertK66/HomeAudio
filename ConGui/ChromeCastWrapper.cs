@@ -13,6 +13,7 @@ using Sharpcaster.Models.Media;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading;
 using System.Threading.Channels;
@@ -22,15 +23,46 @@ using MediaStatus = QueueCaster.MediaStatus;
 
 namespace ConGui {
     public class CCWStatusEventArgs : EventArgs {
-        public CCWStatusEventArgs(ChromecastStatus? status, MediaStatus? mediaStatus) {
-            Status = status;
-            MediaStatus = mediaStatus;
+        public CCWStatusEventArgs(ChromecastStatus? status, MediaStatus? medStatus, bool currentFirstTrack, bool currentLastTrack) {
+            appCount = status?.Applications?.Count ?? 0;
+            if (appCount > 0) {
+                appID = status?.Applications[0].AppId ?? "";
+                appName = status?.Applications[0].DisplayName ?? "";
+                appStatus = status?.Applications[0].StatusText ?? "";
+                
+            } else {
+                appID = "";
+                appName = "";
+                appStatus = "";
+            }
+            volumeLevel = status?.Volume.Level ?? 0.0;
+            if (medStatus != null) {
+                mediaStatus = System.Enum.GetName(typeof(PlayerStateType), medStatus.PlayerState) ?? "";
+                currentId = medStatus.CurrentItemId;
+                firstTrack = currentFirstTrack;
+                lastTrack = currentLastTrack;
+            } else {
+                mediaStatus = "";
+            }
         }
 
-        public ChromecastStatus? Status { get; set; }
-        public MediaStatus? MediaStatus { get; set; }
-    }
+        public double volumeLevel { get; private set; }
 
+        public int appCount { get; private set; }
+        public string appID { get; private set; }
+        public string appName { get; private set; }
+        public string appStatus { get; private set; }
+        public string mediaStatus { get; private set; }
+
+
+        public int? currentId { get; private set; }
+        public bool firstTrack { get; private set; }
+        public bool lastTrack { get; private set; }
+
+
+        //public ChromecastStatus? Status { get; set; }
+        //public MediaStatus? MediaStatus { get; set; }
+    }
 
     public class ChromeCastWrapper : IHostedService, IChromeCastWrapper {
         private ILoggerFactory loggerFactory;
@@ -45,9 +77,12 @@ namespace ConGui {
         private Double? currentVolume = null;
         private MediaStatus? currentMediaStatus = null;
 
+        private bool currentFirstTrack = false;
+        private bool currentLastTrack = false;
+
         public event EventHandler? StatusChanged;
 
-        private StatusChannel<MediaStatusMessage, IEnumerable<MediaStatus>>? mediaStatusChannel = null;
+        //private StatusChannel<MediaStatusMessage, IEnumerable<MediaStatus>>? mediaStatusChannel = null;
 
 
         public ChromeCastWrapper(IConfiguration conf, ILoggerFactory logFactory) { 
@@ -91,7 +126,7 @@ namespace ConGui {
             ConnectedClient = QueueCaster.ChromecastClient.CreateQueueCasterClient(loggerFactory);
 
             var st = await ConnectedClient.ConnectChromecast(e);
-            Log.LogDebug(st.ToString());
+            Log.LogDebug("Connected available App[0]: " + (((st?.Applications?.Count??0) > 0)? st.Applications[0].AppId : "<null>"));
             mediaChannel = ConnectedClient.GetChannel<QueueMediaChannel>();
             if (mediaChannel != null) {
                 mediaChannel.QueueMediaStatusChanged += MediaChannel_StatusChanged;
@@ -105,15 +140,12 @@ namespace ConGui {
             st = await ConnectedClient.LaunchApplicationAsync(appId, true);
 
             ConnectedClient.Disconnected += ConnectedClient_Disconnected;
-            Log.LogDebug(st.ToString());
+            Log.LogDebug("Connected launched/joined App[0]: " + (((st?.Applications?.Count ?? 0) > 0) ? st.Applications[0].AppId : "<null>"));
         }
 
         private void ConnectedClient_Disconnected(object? sender, EventArgs e) {
             try {
-                Log.LogDebug("Disconnect received -> Trying to gracefully shutdown stream and reconnect a new one!");
-                //var t = ConnectedClient?.DisconnectAsync();
-                //t.Wait();
-
+                Log.LogDebug("Disconnect received -> Trying to gracefully shutdown client and reconnect a new one!");
                 if (ConnectedClient != null) {
                     ConnectedClient.Disconnected -= ConnectedClient_Disconnected;
                 }
@@ -127,9 +159,10 @@ namespace ConGui {
                 ConnectedClient = null;
             }
 
-            // We reconnect new application in order to be operable again
+            // We reconnect new application in order to be operable again. 
             var receiver = Receivers.Where(r => r.Name.StartsWith(this.ccName)).ToList().FirstOrDefault();
             if (receiver != null) {
+                Log.LogDebug("Reconnecting to CC '" + receiver.Name + "'.");
                 _ = ConnectNewClient(receiver);
             }
         }
@@ -137,13 +170,38 @@ namespace ConGui {
         private void MediaChannel_StatusChanged(object? sender, EventArgs e) {
             MediaStatusChangedEventArgs? msm = e as MediaStatusChangedEventArgs;
             if (msm != null) {
-                Log.LogDebug("changed event " + msm.Status.Count);
+                Log.LogTrace($"{msm.Status.Count} changed event(s):");
                 if (msm.Status.Count > 0) {
                     int idx = 0;
                     foreach (var item in msm.Status) {
+                        string queueText = "";
                         currentMediaStatus = item;
-                        StatusChanged?.Invoke(this, new CCWStatusEventArgs(rcChannel?.Status, item));
-                        Log.LogDebug("["+idx+"]:" + item.CurrentItemId + " " + item.PlayerState + " items:" + item?.QueueItems?.Length );
+                        int currentId = item.CurrentItemId;
+
+                        if (currentMediaStatus?.QueueItems != null) {
+                            if (currentMediaStatus.QueueItems.Count() == 2) {
+                                currentFirstTrack = false;
+                                currentLastTrack = false;
+                                if (currentMediaStatus.QueueItems[0].ItemId == currentId) {
+                                    currentFirstTrack = true;
+                                } else if (currentMediaStatus.QueueItems[1].ItemId == currentId) {
+                                    currentLastTrack = true;
+                                } 
+                            } else {
+                                currentFirstTrack = false;
+                                currentLastTrack = false;
+                            }
+                        }
+
+                        StatusChanged?.Invoke(this, new CCWStatusEventArgs(rcChannel?.Status, item, currentFirstTrack, currentLastTrack));
+                        //if (item?.QueueItems != null) {
+                        //    var x = item.QueueItems.Select((qi) => (qi.ItemId??0).ToString()).ToArray();
+                        //    queueText = String.Join(", ", x); 
+                        //}
+                        //if (item?.QueueData != null) {
+                        //    queueText += $" q-data: {item.QueueData.StartIndex}";  
+                        //}
+                        Log.LogDebug($"{item.MediaSessionId} {item.PlayerState} id: {item.CurrentItemId} {item.CurrentTime}" + queueText);
                         idx++;
                     }
                     
@@ -156,23 +214,9 @@ namespace ConGui {
             currentVolume = rcChannel?.Status.Volume.Level;
             if ((rcChannel?.Status.Applications != null) &&
                 (rcChannel?.Status.Applications.Count>0) ){
-                StatusChanged?.Invoke(this, new CCWStatusEventArgs(rcChannel?.Status, currentMediaStatus));
-            } else {
-                // No Application Client was closed. (In my case triggered by On/Off key on speekear)
-                //try {
-                //    Log.LogDebug("No Application loaded -> Trying to gracefully shutdown");
-                //    var t = ConnectedClient?.DisconnectAsync();
-                //    t.Wait();
-                //    Log.LogDebug("After Disconnect");
-                //} finally {
-                //    ConnectedClient = null;
-                //}
-                //var receiver = Receivers.Where(r=>r.Name.StartsWith(this.ccName)).ToList().FirstOrDefault();
-                //if (receiver != null) {
-                //    _ = ConnectNewClient(receiver);
-                //}
-            }
-    }
+                StatusChanged?.Invoke(this, new CCWStatusEventArgs(rcChannel?.Status, currentMediaStatus, currentFirstTrack, currentLastTrack));
+            } 
+        }
 
         public Task StopAsync(CancellationToken cancellationToken) {
             Log.LogDebug("CCW - StopAsync called");
@@ -181,43 +225,45 @@ namespace ConGui {
 
         public async Task PlayNext() {
             if (mediaChannel != null) {
-                var st1 = await mediaChannel.GetStatusAsync();
-                if (st1 != null) {
-                    _ = mediaChannel.QueueNextAsync(st1.MediaSessionId);
+                if (currentMediaStatus == null) {
+                    currentMediaStatus = await mediaChannel.GetStatusAsync();
+                }
+                if (currentMediaStatus != null) {
+                    await mediaChannel.QueueNextAsync(currentMediaStatus.MediaSessionId);
                 }
             }
         }
 
         public async Task PlayPrev() {
             if (mediaChannel != null) {
-                var st1 = await mediaChannel.GetStatusAsync();
-                if (st1 != null) {
-                    _ = mediaChannel.QueuePrevAsync(st1.MediaSessionId);
+                if (currentMediaStatus == null) {
+                    currentMediaStatus = await mediaChannel.GetStatusAsync();
+                }
+                if (currentMediaStatus != null) {
+                    await mediaChannel.QueuePrevAsync(currentMediaStatus.MediaSessionId);
                 }
             }
         }
 
-        public void VolumeDown() {
+        public async Task VolumeDown() {
             if (rcChannel != null) {
                 currentVolume = (currentVolume ?? 0.2) - 0.03;
                 if (currentVolume < 0) {
                     currentVolume = 0;
                 }
                 Log?.LogDebug("Vol- [{vol}]", String.Format("{0:0.000}", currentVolume));
-                _ = ((IReceiverChannel)rcChannel).SetVolume(currentVolume ?? 0.1);
-                //currentVolume = stat.Volume.Level;
+                await ((IReceiverChannel)rcChannel).SetVolume(currentVolume ?? 0.1);
             }
         }
 
-        public void VolumeUp() {
+        public async Task VolumeUp() {
             if (rcChannel != null) {
                 currentVolume = (currentVolume ?? 0.1) + 0.03;
                 if (currentVolume > 0.6) {
                     currentVolume = 0.6;
                 }
                 Log?.LogDebug("Vol+ [{vol}]", String.Format("{0:0.000}", currentVolume));
-                _ = ((IReceiverChannel)rcChannel).SetVolume(currentVolume ?? 0.1);
-                //currentVolume = stat.Volume.Level;
+                await ((IReceiverChannel)rcChannel).SetVolume(currentVolume ?? 0.1);
             }
         }
 
@@ -237,12 +283,12 @@ namespace ConGui {
                     i++;
                 }
                 status = await mediaChannel.QueueLoadAsync(qi).ConfigureAwait(false);
-                StatusChanged?.Invoke(this, new CCWStatusEventArgs(rcChannel?.Status, status));
+                StatusChanged?.Invoke(this, new CCWStatusEventArgs(rcChannel?.Status, status, currentFirstTrack, currentLastTrack));
             }
             return status;
         }
 
-        public  async Task<MediaStatus?> PlayLive(string url, string? name = null) {
+        public async Task<MediaStatus?> PlayLive(string url, string? name = null) {
             MediaStatus? status = null;
             if (mediaChannel != null) {
                 var media = new Media {
@@ -256,10 +302,10 @@ namespace ConGui {
             return status;
         }
 
-        public void Shutdown() {
-            var t = ConnectedClient?.DisconnectAsync();
-            t?.Wait();
-
+        public async Task Shutdown() {
+            if (ConnectedClient != null) {
+                await ConnectedClient.DisconnectAsync();
+            }
         }
     }
 }

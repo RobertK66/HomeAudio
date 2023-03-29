@@ -13,8 +13,8 @@ namespace ConGui {
         public Task<MediaStatus?> PlayLive(string url, string? name = null);
         Task PlayNext();
         Task PlayPrev();
-        void Shutdown();
-        void VolumeDown();
-        void VolumeUp();
+        Task Shutdown();
+        Task VolumeDown();
+        Task VolumeUp();
     }
 }

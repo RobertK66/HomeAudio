@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ConGui.Logger {
@@ -31,7 +32,7 @@ namespace ConGui.Logger {
             }
 
             ConGuiLoggerConfiguration config = _getCurrentConfig();
-            
+
             //LogLevel configured = Microsoft.Extensions.Logging.LogLevel.Information;
 
             //if (config.LogLevel.ContainsKey("Default")) {
@@ -44,7 +45,20 @@ namespace ConGui.Logger {
             //}    
 
             //if (configured <= logLevel) { 
-                config.LogPanel?.Add($"[{eventId.Id,2}: {logLevel,-12}] {_name} - {formatter(state, exception)}");
+            string? threadTxt = Thread.CurrentThread.Name;
+            if (Thread.CurrentThread.IsThreadPoolThread) {
+                threadTxt = "TP";
+            } 
+            threadTxt += "-" + Thread.CurrentThread.ManagedThreadId.ToString() + " ";
+            //threadTxt += Thread.CurrentThread.ExecutionContext?.GetType();
+
+            string eventTxt = $"[{threadTxt}, {logLevel.ToString().Substring(0,1)}]";
+            
+            if (!String.IsNullOrWhiteSpace(eventId.Name)) {
+                eventTxt += $", [{eventId.Name}]";
+            }
+            config.LogPanel?.Add($"{eventTxt}: {_name} - {formatter(state, exception)}");
+
             //}
         }
     }
