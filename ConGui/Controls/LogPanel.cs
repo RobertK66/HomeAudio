@@ -9,6 +9,7 @@ using System.Threading;
 public class LogPanel : SimpleControl, IInputListener {
 	private readonly VerticalStackPanel _stackPanel;
 	private readonly VerticalScrollPanel _scrollPanel;
+	public object _lock { get; set; } = new object();
 	
 	public LogPanel()  {
 		_stackPanel = new VerticalStackPanel();
@@ -18,7 +19,8 @@ public class LogPanel : SimpleControl, IInputListener {
 
 		};
 		Content = _scrollPanel;
-	}
+      
+    }
 
 	public void ScrollToEnd() {
         _scrollPanel.Top = _stackPanel.Size.Height - this.Size.Height;  
@@ -32,7 +34,7 @@ public class LogPanel : SimpleControl, IInputListener {
 	}
 
 	public void Add(string message) {
-		Monitor.Enter(this);                // This has to be Thread Save! its used by all Logger instances!
+		Monitor.Enter(_lock);                // This has to be Thread Save! its used by all Logger instances!
 		bool scrolling = IsScrolling();
 
         _stackPanel.Add(new WrapPanel {
@@ -47,7 +49,7 @@ public class LogPanel : SimpleControl, IInputListener {
         if ( scrolling ) {
             ScrollToEnd();
 		}
-        Monitor.Exit(this);
+        Monitor.Exit(_lock);
     }
 
     public void OnInput(InputEvent inputEvent) {

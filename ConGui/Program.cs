@@ -91,11 +91,14 @@ public class Program : IHostedService, IInputListener {
     }
 
     public Task StartAsync(CancellationToken cancellationToken) {
+        myLogPanel._lock = this;
         Log.LogInformation("Program.StartAsync() called.");
 
         ConsoleManager.Setup();
         ConsoleManager.Resize(new Size(150, 40));
+        Monitor.Enter(this);
         ConsoleManager.Content = CreateMainView();
+        Monitor.Exit(this);
 
 
         input = new IInputListener[] {
@@ -107,13 +110,23 @@ public class Program : IHostedService, IInputListener {
 
         //MouseHandler.Initialize();
 
-        tuiThread = new Thread(() => {
+        tuiThread = new Thread( () => {
             Log.LogDebug("TUI Thread started");
-            while (true) {
-                ConsoleManager.AdjustBufferSize();  // Resize for Windows!
-                ConsoleManager.ReadInput(input);
-                Thread.Sleep(50);
-                //await Task.Delay(50);
+            try {
+                while (true) {
+                    Monitor.Enter(this);
+                    ConsoleManager.AdjustBufferSize();  // Resize for Windows!
+                    ConsoleManager.ReadInput(input);
+                    Monitor.Exit(this);
+                    Thread.Sleep(50);
+                    //await Task.Delay(50);
+                }
+            } catch (Exception ex) {
+                Log.LogDebug("TUI Thread terminated with Exception: " + ex.Message);
+            } finally {
+                if (Monitor.IsEntered(this)) {
+                    Monitor.Exit(this); 
+                }
             }
         });
         tuiThread.Name = "My-TUI";
