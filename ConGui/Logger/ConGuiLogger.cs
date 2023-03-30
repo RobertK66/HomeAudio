@@ -49,15 +49,16 @@ namespace ConGui.Logger {
             if (Thread.CurrentThread.IsThreadPoolThread) {
                 threadTxt = "TP";
             } 
-            threadTxt += "-" + Thread.CurrentThread.ManagedThreadId.ToString() + " ";
+            threadTxt += "-" + Environment.CurrentManagedThreadId.ToString() + " ";
             //threadTxt += Thread.CurrentThread.ExecutionContext?.GetType();
 
-            string eventTxt = $"[{threadTxt}, {logLevel.ToString().Substring(0,1)}]";
+            string eventTxt = $"[{threadTxt}, {logLevel.ToString()[..3]}]";
             
             if (!String.IsNullOrWhiteSpace(eventId.Name)) {
                 eventTxt += $", [{eventId.Name}]";
             }
-            config.LogPanel?.Add($"{eventTxt}: {_name} - {formatter(state, exception)}");
+            var mymessage = formatter(state, exception);
+            config.LogPanel?.Add($"{eventTxt}: {_name} - {mymessage}");
 
             //}
         }

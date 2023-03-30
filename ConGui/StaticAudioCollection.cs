@@ -9,14 +9,16 @@ using System.Threading.Tasks;
 
 namespace ConGui {
     public class StaticAudioCollection : IAudioCollection {
+        private readonly ILogger Log;
 
         List<(string name, List<(string url, string name)> tracks, string artist, string cdid)> Albums = new();
         List<(string name, string url)> WebRadios = new();
 
         public StaticAudioCollection(IConfiguration conf, ILogger<StaticAudioCollection> logger) {
+            Log = logger;
             var AlbumsConf = conf.GetSection("CdRepos");
             foreach (var album in AlbumsConf.GetChildren()) {
-                List<(string url, string name)> tracks = new List<(string, string)>();
+                List<(string url, string name)> tracks = new ();
                 IConfiguration? tr = album.GetSection("Tracks");
                 if (tr != null) {
                     foreach (var t in tr.GetChildren()) {
@@ -34,6 +36,7 @@ namespace ConGui {
                 WebRadios.Add(new(station.GetValue<string>("Name") ?? "<unknown>",
                                    station.GetValue<string>("ContentUrl") ?? "<unknown>"));
             }
+            Log.LogDebug("Collection with {albumCount} Albums and {stationCount} stations created", Albums.Count, WebRadios.Count);
         }
 
         public List<(string name, List<(string url, string name)> tracks, string artist, string cdid)> GetAllAlbums() {

@@ -3,242 +3,224 @@ using ConsoleGUI.Controls;
 using ConsoleGUI.Data;
 using ConsoleGUI.Input;
 using ConsoleGUI.Space;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using ConGui.Logger;
-using ConGui;
-using ConsoleGUI.Api;
-using Sharpcaster.Models.Media;
-using static System.Net.Mime.MediaTypeNames;
 using System.Threading.Tasks;
 using System.Threading;
 using System;
-using System.Linq;
-using ConsoleGUI.Common;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
 using ConGui.Controls;
 using AudioCollection;
-using Microsoft.VisualBasic;
-using Google.Protobuf.WellKnownTypes;
 
-public class Program : IHostedService, IInputListener {
+namespace ConGui {
+    public class Program : IHostedService, IInputListener {
 
-    private readonly ILogger<Program> Log;
+        private readonly ILogger<Program> Log;
 
-    //private CCStarter myCC;
-    private IAudioCollection MyCollection;
-    private IChromeCastWrapper MyCCW;
+        //private CCStarter myCC;
+        private readonly IAudioCollection MyCollection;
+        private readonly IChromeCastWrapper MyCCW;
 
-    public static async Task Main(string[] args) {
-        IHostBuilder host = Host.CreateDefaultBuilder(args)
-                                .ConfigureServices((hostContext, services) => {
-                                    services.AddSingleton<IAudioCollection, StaticAudioCollection>();
+        public static async Task Main(string[] args) {
+            IHostBuilder host = Host.CreateDefaultBuilder(args)
+                                    .ConfigureServices((hostContext, services) => {
+                                        services.AddSingleton<IAudioCollection, StaticAudioCollection>();
 
-                                    // In order to get a hosted service able to be injected in a constructor, we register both a singelton and a service!
-                                    services.AddSingleton<IChromeCastWrapper, ChromeCastWrapper>();
-                                    // As hosted service needs a implementing class we have to cast here to the real impl, but injection of singelton can use the Interface....
-                                    services.AddHostedService<ChromeCastWrapper>(sp=>(ChromeCastWrapper)sp.GetRequiredService<IChromeCastWrapper>());
+                                        // In order to get a hosted service able to be injected in a constructor, we register both a singelton and a service!
+                                        services.AddSingleton<IChromeCastWrapper, ChromeCastWrapper>();
+                                        // As hosted service needs a implementing class we have to cast here to the real impl, but injection of singelton can use the Interface....
+                                        services.AddHostedService(sp => (ChromeCastWrapper)sp.GetRequiredService<IChromeCastWrapper>());
 
-                                    services.AddHostedService<Program>();
-                                })
-                                .ConfigureLogging((cl) => {
-                                    cl.ClearProviders();                // This avoids logging output to console.
-                                    cl.AddConGuiLogger((con) => {       // This adds our LogPanel as possible target (configure in appsettings.json)
-                                        con.LogPanel = myLogPanel;      
+                                        services.AddHostedService<Program>();
+                                    })
+                                    .ConfigureLogging((cl) => {
+                                        cl.ClearProviders();                // This avoids logging output to console.
+                                        cl.AddConGuiLogger((con) => {       // This adds our LogPanel as possible target (configure in appsettings.json)
+                                            con.LogPanel = myLogPanel;
+                                        });
+                                        cl.AddDebug();                      // This gives Logging in the Debug Console of VS. (configure in appsettings.json)
                                     });
-                                    cl.AddDebug();                      // This gives Logging in the Debug Console of VS. (configure in appsettings.json)
-                                });
-        await host.RunConsoleAsync();
-    }
-    
-    public Program(IConfiguration conf, ILogger<Program> logger, IAudioCollection audioCollection, IChromeCastWrapper ccw) {
-        Log = logger;
-        Log.LogDebug("Program - Constructor called.");
-        MyCollection = audioCollection;
-        MyCCW = ccw;
-        MyCCW.StatusChanged += MyCC_StatusChanged;
-    }
-
-    //private void PrintConf(string pf, IConfigurationSection c) {
-    //    Console.WriteLine(pf + c.Path + " " + c.Value);
-    //    foreach (var kv in c.GetChildren()) {
-    //        PrintConf(pf + "-", kv);
-    //    }
-    //}
-
-    private System.Threading.Thread? tuiThread;
-    private IInputListener[]? input;
-    private static LogPanel myLogPanel = new();
-    private TextBox myTextBox = new();
-    private TabPanel tabPanel = new();
-    private TextBlock ccStatusText = new TextBlock() { Text = "Unknown" };
-
-    public void OnInput(InputEvent inputEvent) {
-        if (inputEvent.Key.Key == ConsoleKey.Add) {
-            MyCCW.VolumeUp();
-        } else if (inputEvent.Key.Key == ConsoleKey.Subtract) {
-            MyCCW.VolumeDown();
-        } else if (inputEvent.Key.Key == ConsoleKey.End) {
-            MyCCW.PlayNext();
-        } else if (inputEvent.Key.Key == ConsoleKey.Home) {
-            MyCCW.PlayPrev();
-        } else if (inputEvent.Key.Key == ConsoleKey.Escape) {
-            MyCCW.Shutdown();
+            await host.RunConsoleAsync();
         }
-    }
 
-    public Task StartAsync(CancellationToken cancellationToken) {
-        myLogPanel._lock = this;
-        Log.LogInformation("Program.StartAsync() called.");
+        public Program(ILogger<Program> logger, IAudioCollection audioCollection, IChromeCastWrapper ccw) {
+            Log = logger;
+            Log.LogDebug("Program - Constructor called.");
+            MyCollection = audioCollection;
+            MyCCW = ccw;
+            MyCCW.StatusChanged += MyCC_StatusChanged;
+        }
 
-        ConsoleManager.Setup();
-        ConsoleManager.Resize(new Size(150, 40));
-        Monitor.Enter(this);
-        ConsoleManager.Content = CreateMainView();
-        Monitor.Exit(this);
+        //private void PrintConf(string pf, IConfigurationSection c) {
+        //    Console.WriteLine(pf + c.Path + " " + c.Value);
+        //    foreach (var kv in c.GetChildren()) {
+        //        PrintConf(pf + "-", kv);
+        //    }
+        //}
+
+        private Thread? tuiThread;
+        private IInputListener[]? input;
+        private static readonly LogPanel myLogPanel = new();
+        private readonly TabPanel tabPanel = new();
+        private readonly TextBlock ccStatusText = new() { Text = "Unknown" };
+
+        public void OnInput(InputEvent inputEvent) {
+            if (inputEvent.Key.Key == ConsoleKey.Add) {
+                MyCCW.VolumeUp();
+            } else if (inputEvent.Key.Key == ConsoleKey.Subtract) {
+                MyCCW.VolumeDown();
+            } else if (inputEvent.Key.Key == ConsoleKey.End) {
+                MyCCW.PlayNext();
+            } else if (inputEvent.Key.Key == ConsoleKey.Home) {
+                MyCCW.PlayPrev();
+            } else if (inputEvent.Key.Key == ConsoleKey.Escape) {
+                MyCCW.Shutdown();
+            }
+        }
+
+        public Task StartAsync(CancellationToken cancellationToken) {
+            myLogPanel.Lock = this;
+            Log.LogInformation("Program.StartAsync() called.");
+
+            ConsoleManager.Setup();
+            ConsoleManager.Resize(new Size(150, 40));
+            Monitor.Enter(this);
+            ConsoleManager.Content = CreateMainView();
+            Monitor.Exit(this);
 
 
-        input = new IInputListener[] {
+            input = new IInputListener[] {
                 myLogPanel,
                 //myTextBox,
                 tabPanel,
                 this
             };
 
-        //MouseHandler.Initialize();
+            //MouseHandler.Initialize();
 
-        tuiThread = new Thread( () => {
-            Log.LogDebug("TUI Thread started");
-            try {
-                while (true) {
-                    Monitor.Enter(this);
-                    ConsoleManager.AdjustBufferSize();  // Resize for Windows!
-                    ConsoleManager.ReadInput(input);
-                    Monitor.Exit(this);
-                    Thread.Sleep(50);
-                    //await Task.Delay(50);
+            tuiThread = new Thread(() => {
+                Log.LogDebug("TUI Thread started");
+                try {
+                    while (true) {
+                        Monitor.Enter(this);
+                        ConsoleManager.AdjustBufferSize();  // Resize for Windows!
+                        ConsoleManager.ReadInput(input);
+                        Monitor.Exit(this);
+                        Thread.Sleep(50);
+                        //await Task.Delay(50);
+                    }
+                } catch (Exception ex) {
+                    Log.LogDebug(ex, "TUI Thread terminated with Exception.");
+                } finally {
+                    if (Monitor.IsEntered(this)) {
+                        Monitor.Exit(this);
+                    }
                 }
-            } catch (Exception ex) {
-                Log.LogDebug("TUI Thread terminated with Exception: " + ex.Message);
-            } finally {
-                if (Monitor.IsEntered(this)) {
-                    Monitor.Exit(this); 
-                }
-            }
-        });
-        tuiThread.Name = "My-TUI";
-		tuiThread.Start();
+            }) {
+                Name = "My-TUI"
+            };
+            tuiThread.Start();
 
-        // Start the Caster connect ...
-        //CCStarter ccs = new("Büro", "9B5A75B4");
-        //var waitForCaster = ccs.Connect();
-
-        Log.LogInformation("Program.StartAsync() finished.");
-        return Task.CompletedTask;
-        //return myCC.StartAsync(cancellationToken);
-    }
-
-    public Task StopAsync(CancellationToken cancellationToken) {
-        Log.LogInformation("Program.StopAsync() called.");
-        if (tuiThread?.IsAlive??false) {
-            tuiThread?.Interrupt();
+            Log.LogInformation("Program.StartAsync() finished.");
+            return Task.CompletedTask;
         }
-        return Task.CompletedTask;
-    }
 
-  
-    private IControl CreateMainView() {
-
-        var radioGrid = new SelectableGrid(3, 4, 16);
-        MyCollection.GetAllStations().ForEach( st => {
-            radioGrid.AddTextCell(st.name, st, this.RadioStationClicked);
-        });
-
-        var rad = new Box {
-            HorizontalContentPlacement = Box.HorizontalPlacement.Center,
-            VerticalContentPlacement = Box.VerticalPlacement.Center,
-            Content = new Border {
-                BorderStyle = BorderStyle.Single,
-                Content = radioGrid //lines
+        public Task StopAsync(CancellationToken cancellationToken) {
+            Log.LogInformation("Program.StopAsync() called.");
+            if (tuiThread?.IsAlive ?? false) {
+                tuiThread?.Interrupt();
             }
-        };
+            return Task.CompletedTask;
+        }
 
-        tabPanel.AddTab("Radio Stations", rad, radioGrid);
 
-        var albumGrid = new SelectableGrid(4, 10, 16 );
+        private IControl CreateMainView() {
 
-        MyCollection.GetAllAlbums().ForEach(al => {
-            albumGrid.AddTextCell(al.name, al, this.AlbumClicked);
-        });
+            var radioGrid = new SelectableGrid(3, 4, 16);
+            MyCollection.GetAllStations().ForEach(st => {
+                radioGrid.AddTextCell(st.name, st, RadioStationClicked);
+            });
 
-        var cd = new Box {
-            HorizontalContentPlacement = Box.HorizontalPlacement.Center,
-            VerticalContentPlacement = Box.VerticalPlacement.Center,
-            Content = new Border {
-                BorderStyle = BorderStyle.Single,
-                Content = albumGrid //lines
-            }
-        };
+            var rad = new Box {
+                HorizontalContentPlacement = Box.HorizontalPlacement.Center,
+                VerticalContentPlacement = Box.VerticalPlacement.Center,
+                Content = new Border {
+                    BorderStyle = BorderStyle.Single,
+                    Content = radioGrid //lines
+                }
+            };
 
-        tabPanel.AddTab("CdCollection", cd, albumGrid);
-        tabPanel.SelectTab(1);
+            tabPanel.AddTab("Radio Stations", rad, radioGrid);
 
-        var mainwin = new DockPanel {
-            Placement = DockPanel.DockedControlPlacement.Top,
-            DockedControl = tabPanel,
-            FillingControl = new DockPanel {
+            var albumGrid = new SelectableGrid(4, 10, 16);
+
+            MyCollection.GetAllAlbums().ForEach(al => {
+                albumGrid.AddTextCell(al.name, al, AlbumClicked);
+            });
+
+            var cd = new Box {
+                HorizontalContentPlacement = Box.HorizontalPlacement.Center,
+                VerticalContentPlacement = Box.VerticalPlacement.Center,
+                Content = new Border {
+                    BorderStyle = BorderStyle.Single,
+                    Content = albumGrid //lines
+                }
+            };
+
+            tabPanel.AddTab("CdCollection", cd, albumGrid);
+            tabPanel.SelectTab(1);
+
+            var mainwin = new DockPanel {
                 Placement = DockPanel.DockedControlPlacement.Top,
-                DockedControl = new Border() { Content = ccStatusText, BorderStyle = BorderStyle.Single },
-                FillingControl = myLogPanel
-            }
-        };
+                DockedControl = tabPanel,
+                FillingControl = new DockPanel {
+                    Placement = DockPanel.DockedControlPlacement.Top,
+                    DockedControl = new Border() { Content = ccStatusText, BorderStyle = BorderStyle.Single },
+                    FillingControl = myLogPanel
+                }
+            };
 
-       return mainwin;
+            return mainwin;
 
-    }
-
-    void RadioStationClicked(object station) {
-        (string name, string url)? st = station as (string name, string url)?;
-        if (st != null) {
-            Log.LogDebug("Play selected station: " + st?.name);
-            MyCCW.PlayLive(st?.url ?? "",
-                              st?.name ?? "");
         }
-    }
 
-    void AlbumClicked(object albumContext) {
-        (string name, List<(string url, string name)> tracks, string artist, string cdid)? album = albumContext as (string name, List<(string url, string name)> tracks, string artist, string cdid)?;
-        if (album != null) {
-            Log.LogDebug("Play selected album: " + album?.name);
-            //Log.LogDebug("Queueing " + album?.tracks.Count + " tracks.");
-            if (album?.tracks != null) {
-                MyCCW.PlayCdTracks(album?.tracks);
+        void RadioStationClicked(object station) {
+            (string name, string url)? st = station as (string name, string url)?;
+            if (st != null) {
+                Log.LogDebug("Play selected station: {name}", st?.name);
+                MyCCW.PlayLive(st?.url ?? "",
+                                  st?.name ?? "");
             }
-            
         }
-    }
 
-    private void MyCC_StatusChanged(object? sender, EventArgs e) {
-        CCWStatusEventArgs? args = e as CCWStatusEventArgs;
-        if (args != null) {
-            String statusText = "";
-            if (args.appCount > 0) {
-                statusText = $"{args.appName} {args.appStatus}";
+        void AlbumClicked(object albumContext) {
+            (string name, List<(string url, string name)> tracks, string artist, string cdid)? album = albumContext as (string name, List<(string url, string name)> tracks, string artist, string cdid)?;
+            if (album != null) {
+                Log.LogDebug("Play selected album: {name}", album?.name);
+                var tracks = album?.tracks;
+                if (tracks != null) {
+                    MyCCW.PlayCdTracks(tracks);
+                }
             }
-           
-                //long startIdx = args.MediaStatus.QueueData?.StartIndex ?? 0;
-                //long curentIdx = args.MediaStatus.CurrentItemId;
-
-            statusText += $" - {args.mediaStatus} ";
-            if (args.firstTrack) { statusText += "|"; } else { statusText += "<"; }
-            statusText += "-";
-            if (args.lastTrack) { statusText += "|"; } else { statusText += ">"; }
-            ccStatusText.Text = $" Vol:{String.Format("{0:0.000}", args.volumeLevel)} - {statusText}";
         }
-    }
 
+        private void MyCC_StatusChanged(object? sender, EventArgs e) {
+            //CCWStatusEventArgs? args = e as CCWStatusEventArgs;
+            //if (args != null) {
+            if (e is CCWStatusEventArgs args) {
+                string statusText = "";
+                if (args.AppCount > 0) {
+                    statusText = $"{args.AppName} {args.AppStatus}";
+                }
+                statusText += $" - {args.MediaStatus} ";
+                if (args.FirstTrack) { statusText += "|"; } else { statusText += "<"; }
+                statusText += "-";
+                if (args.LastTrack) { statusText += "|"; } else { statusText += ">"; }
+                ccStatusText.Text = $" Vol:{string.Format("{0:0.000}", args.VolumeLevel)} - {statusText}";
+            }
+        }
+
+    }
 }
-

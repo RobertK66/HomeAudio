@@ -24,40 +24,40 @@ using MediaStatus = QueueCaster.MediaStatus;
 namespace ConGui {
     public class CCWStatusEventArgs : EventArgs {
         public CCWStatusEventArgs(ChromecastStatus? status, MediaStatus? medStatus, bool currentFirstTrack, bool currentLastTrack) {
-            appCount = status?.Applications?.Count ?? 0;
-            if (appCount > 0) {
-                appID = status?.Applications[0].AppId ?? "";
-                appName = status?.Applications[0].DisplayName ?? "";
-                appStatus = status?.Applications[0].StatusText ?? "";
+            AppCount = status?.Applications?.Count ?? 0;
+            if (AppCount > 0) {
+                AppID = status?.Applications[0].AppId ?? "";
+                AppName = status?.Applications[0].DisplayName ?? "";
+                AppStatus = status?.Applications[0].StatusText ?? "";
                 
             } else {
-                appID = "";
-                appName = "";
-                appStatus = "";
+                AppID = "";
+                AppName = "";
+                AppStatus = "";
             }
-            volumeLevel = status?.Volume.Level ?? 0.0;
+            VolumeLevel = status?.Volume.Level ?? 0.0;
             if (medStatus != null) {
-                mediaStatus = System.Enum.GetName(typeof(PlayerStateType), medStatus.PlayerState) ?? "";
-                currentId = medStatus.CurrentItemId;
-                firstTrack = currentFirstTrack;
-                lastTrack = currentLastTrack;
+                MediaStatus = System.Enum.GetName(typeof(PlayerStateType), medStatus.PlayerState) ?? "";
+                CurrentId = medStatus.CurrentItemId;
+                FirstTrack = currentFirstTrack;
+                LastTrack = currentLastTrack;
             } else {
-                mediaStatus = "";
+                MediaStatus = "";
             }
         }
 
-        public double volumeLevel { get; private set; }
+        public double VolumeLevel { get; private set; }
 
-        public int appCount { get; private set; }
-        public string appID { get; private set; }
-        public string appName { get; private set; }
-        public string appStatus { get; private set; }
-        public string mediaStatus { get; private set; }
+        public int AppCount { get; private set; }
+        public string AppID { get; private set; }
+        public string AppName { get; private set; }
+        public string AppStatus { get; private set; }
+        public string MediaStatus { get; private set; }
 
 
-        public int? currentId { get; private set; }
-        public bool firstTrack { get; private set; }
-        public bool lastTrack { get; private set; }
+        public int? CurrentId { get; private set; }
+        public bool FirstTrack { get; private set; }
+        public bool LastTrack { get; private set; }
 
 
         //public ChromecastStatus? Status { get; set; }
@@ -65,9 +65,9 @@ namespace ConGui {
     }
 
     public class ChromeCastWrapper : IHostedService, IChromeCastWrapper {
-        private ILoggerFactory loggerFactory;
-        private ILogger Log;
-        private List<ChromecastReceiver> Receivers = new List<ChromecastReceiver>();
+        private readonly ILoggerFactory loggerFactory;
+        private readonly ILogger Log;
+        private readonly List<ChromecastReceiver> Receivers = new();
         private readonly String ccName;
         private readonly String appId;
 
@@ -93,7 +93,7 @@ namespace ConGui {
             ccName = conf.GetValue<String>("CcName", "") ?? "";
             appId = conf.GetValue<String>("CcAppId", "") ?? "";
 
-            Log.LogDebug("using " + ccName + "* " + appId);
+            Log.LogDebug("using cc filter:{name}* and appId {appId}", ccName , appId);
         }
 
         public Task StartAsync(CancellationToken cancellationToken) {
@@ -101,7 +101,7 @@ namespace ConGui {
 
             IChromecastLocator locator = new Sharpcaster.MdnsChromecastLocator();
             locator.ChromecastReceivedFound += Locator_ChromecastReceivedFound;
-            _ = locator.FindReceiversAsync();       // Fire the search process and wait for receiver found events!
+            _ = locator.FindReceiversAsync(CancellationToken.None);         // Fire the search process and wait for receiver found events!
 
             //Receivers = (await locator.FindReceiversAsync()).ToList();    // This blocks for 2000ms here!
             //Log.LogDebug("found " + Receivers.Count() + " receivers.");
@@ -109,13 +109,12 @@ namespace ConGui {
         }
 
         private async void Locator_ChromecastReceivedFound(object? sender, ChromecastReceiver e) {
-            Log.LogDebug("found " + e.Name);
+            Log.LogDebug("found {name}", e.Name);
             Receivers.Add(e);
 
             if (ConnectedClient == null) {
                 if (e.Name.StartsWith(ccName, StringComparison.OrdinalIgnoreCase)) {
-                    Log.LogDebug(e.Name + "[" + e.Status + "] fits the filter -> connect client");
-
+                    Log.LogDebug("{name}[{status}] fits the filter -> connect client", e.Name, e.Status);
                     await ConnectNewClient(e);
                 }
             }
@@ -126,7 +125,7 @@ namespace ConGui {
             ConnectedClient = QueueCaster.ChromecastClient.CreateQueueCasterClient(loggerFactory);
 
             var st = await ConnectedClient.ConnectChromecast(e);
-            Log.LogDebug("Connected available App[0]: " + (((st?.Applications?.Count??0) > 0)? st.Applications[0].AppId : "<null>"));
+            Log.LogDebug("Connected available App[0]: {appid}", (((st?.Applications?.Count??0) > 0)? st?.Applications[0].AppId : "<null>"));
             mediaChannel = ConnectedClient.GetChannel<QueueMediaChannel>();
             if (mediaChannel != null) {
                 mediaChannel.QueueMediaStatusChanged += MediaChannel_StatusChanged;
@@ -140,7 +139,7 @@ namespace ConGui {
             st = await ConnectedClient.LaunchApplicationAsync(appId, true);
 
             ConnectedClient.Disconnected += ConnectedClient_Disconnected;
-            Log.LogDebug("Launched/joined App[0]: " + (((st?.Applications?.Count ?? 0) > 0) ? st.Applications[0].AppId : "<null>"));
+            Log.LogDebug("Launched/joined App[0]: {appId}",(((st?.Applications?.Count ?? 0) > 0) ? st?.Applications[0].AppId : "<null>"));
         }
 
         private void ConnectedClient_Disconnected(object? sender, EventArgs e) {
@@ -162,15 +161,14 @@ namespace ConGui {
             // We reconnect new application in order to be operable again. 
             var receiver = Receivers.Where(r => r.Name.StartsWith(this.ccName)).ToList().FirstOrDefault();
             if (receiver != null) {
-                Log.LogDebug("Reconnecting to CC '" + receiver.Name + "'.");
+                Log.LogDebug("Reconnecting to CC '{name}'.", receiver.Name);
                 _ = ConnectNewClient(receiver);
             }
         }
 
         private void MediaChannel_StatusChanged(object? sender, EventArgs e) {
-            MediaStatusChangedEventArgs? msm = e as MediaStatusChangedEventArgs;
-            if (msm != null) {
-                Log.LogTrace($"{msm.Status.Count} changed event(s):");      // I never got more than one here.
+            if (e is MediaStatusChangedEventArgs msm) { 
+                Log.LogTrace("{cnt} changed event(s):", msm.Status.Count);      // I never got more than one here.
                 if (msm.Status.Count > 0) {
                     int idx = 0;
                     foreach (var item in msm.Status) {
@@ -178,7 +176,7 @@ namespace ConGui {
                         int currentId = item.CurrentItemId;
 
                         if (currentMediaStatus?.QueueItems != null) {
-                            if (currentMediaStatus.QueueItems.Count() == 2) {
+                            if (currentMediaStatus.QueueItems.Length == 2) {
                                 currentFirstTrack = false;
                                 currentLastTrack = false;
                                 if (currentMediaStatus.QueueItems[0].ItemId == currentId) {
@@ -192,7 +190,11 @@ namespace ConGui {
                             }
                         }
                         StatusChanged?.Invoke(this, new CCWStatusEventArgs(rcChannel?.Status, item, currentFirstTrack, currentLastTrack));
-                        Log.LogDebug($"Media-SessionId: {item.MediaSessionId} {item.PlayerState} id: {item.CurrentItemId} at {item.CurrentTime}");
+                        Log.LogDebug("Media-SessionId: {MediaSessionId} {PlayerState} id: {CurrentItemId} at {CurrentTime}",
+                                     item.MediaSessionId,
+                                     item.PlayerState,
+                                     item.CurrentItemId,
+                                     item.CurrentTime);
                         idx++;
                     }
                 }
@@ -203,7 +205,7 @@ namespace ConGui {
 
             currentVolume = rcChannel?.Status.Volume.Level;
             StatusChanged?.Invoke(this, new CCWStatusEventArgs(rcChannel?.Status, currentMediaStatus, currentFirstTrack, currentLastTrack));
-            Log.LogDebug($"StatusChanged Vol: {currentVolume, 3} ");
+            Log.LogDebug("StatusChanged Vol: {volume}", currentVolume);
         }
 
         public Task StopAsync(CancellationToken cancellationToken) {
@@ -214,9 +216,7 @@ namespace ConGui {
         public async Task PlayNext() {
             if (mediaChannel != null) {
                 Log?.LogDebug("Play Next");
-                if (currentMediaStatus == null) {
-                    currentMediaStatus = await mediaChannel.GetStatusAsync();
-                }
+                currentMediaStatus ??= await mediaChannel.GetStatusAsync();
                 if (currentMediaStatus != null) {
                     await mediaChannel.QueueNextAsync(currentMediaStatus.MediaSessionId);
                 }
@@ -226,9 +226,7 @@ namespace ConGui {
         public async Task PlayPrev() {
             if (mediaChannel != null) {
                 Log?.LogDebug("Play Prev");
-                if (currentMediaStatus == null) {
-                    currentMediaStatus = await mediaChannel.GetStatusAsync();
-                }
+                currentMediaStatus ??= await mediaChannel.GetStatusAsync();
                 if (currentMediaStatus != null) {
                     await mediaChannel.QueuePrevAsync(currentMediaStatus.MediaSessionId);
                 }
@@ -272,7 +270,7 @@ namespace ConGui {
                     qi[i] = new QueueItem() { Media = media, OrderId = i, StartTime = 0 };
                     i++;
                 }
-                Log.LogDebug("Queueing " + qi.Count() + " tracks.");
+                Log.LogDebug("Queueing {trackCnt} tracks.", qi.Length);
                 status = await mediaChannel.QueueLoadAsync(qi).ConfigureAwait(false);
                 StatusChanged?.Invoke(this, new CCWStatusEventArgs(rcChannel?.Status, status, currentFirstTrack, currentLastTrack));
             }
