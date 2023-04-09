@@ -49,7 +49,7 @@ namespace ConGui.Logger {
             if (Thread.CurrentThread.IsThreadPoolThread) {
                 threadTxt = "TP";
             } 
-            threadTxt += "-" + Environment.CurrentManagedThreadId.ToString() + " ";
+            threadTxt += "-" + Environment.CurrentManagedThreadId.ToString() + " '" + Thread.CurrentThread.GetHashCode() + "' ";
             //threadTxt += Thread.CurrentThread.ExecutionContext?.GetType();
 
             string eventTxt = $"[{threadTxt}, {logLevel.ToString()[..3]}]";

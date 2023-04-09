@@ -14,6 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection.Metadata.Ecma335;
+using System.Security;
 using System.Text;
 using System.Threading;
 using System.Threading.Channels;
@@ -206,6 +207,11 @@ namespace ConGui {
             currentVolume = rcChannel?.Status.Volume.Level;
             StatusChanged?.Invoke(this, new CCWStatusEventArgs(rcChannel?.Status, currentMediaStatus, currentFirstTrack, currentLastTrack));
             Log.LogDebug("StatusChanged Vol: {volume}", currentVolume);
+            //if (currentVolume > 0.20) {
+            //    while (true) {
+            //        Thread.Sleep(50);
+            //    }
+            //}
         }
 
         public Task StopAsync(CancellationToken cancellationToken) {
@@ -239,11 +245,32 @@ namespace ConGui {
                 if (currentVolume < 0) {
                     currentVolume = 0;
                 }
+                
                 Log?.LogDebug("Vol- [{vol}]", String.Format("{0:0.000}", currentVolume));
                 await ((IReceiverChannel)rcChannel).SetVolume(currentVolume ?? 0.1);
+
+                var thr = new Thread(() => {
+                    Log?.LogDebug("-");
+                    while (true) {
+                        Thread.Sleep(500);
+                    }
+                }) { Name = "minus" + uname++ };
+                thr.Start();
+
+                //_ = Task.Run(() => {
+                //    while (true) {
+                //        Thread.CurrentThread.Name = "minus" + uname++;
+                //        Log?.LogDebug("-");
+                //        Thread.Sleep(500);
+                //        //await Task.Delay(500);
+                //    }
+                //});
+                
             }
         }
 
+
+        private static int uname = 0;
         public async Task VolumeUp() {
             if (rcChannel != null) {
                 currentVolume = (currentVolume ?? 0.1) + 0.03;
@@ -252,6 +279,24 @@ namespace ConGui {
                 }
                 Log?.LogDebug("Vol+ [{vol}]", String.Format("{0:0.000}", currentVolume));
                 await ((IReceiverChannel)rcChannel).SetVolume(currentVolume ?? 0.1);
+                var thr = new Thread(async () => {
+                    Log?.LogDebug("+");
+                    while (true) {
+                        
+                        await Task.Delay(500);
+                    }
+                }) { Name = "plus" + uname++ };
+                thr.Start();
+
+                //_ = Task.Run(async () => {
+                //    while (true) {
+                //        //Thread.Sleep(500);
+                //        Thread.CurrentThread.Name = "plus" + uname++;
+                //        Log?.LogDebug("+");
+                //        await Task.Delay(500);
+
+                //    }
+                //});
             }
         }
 

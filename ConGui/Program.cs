@@ -100,7 +100,8 @@ namespace ConGui {
 
             //MouseHandler.Initialize();
 
-            tuiThread = new Thread(() => {
+            
+            tuiThread = new Thread(async () => {
                 Log.LogDebug("TUI Thread started");
                 try {
                     while (true) {
@@ -108,8 +109,8 @@ namespace ConGui {
                         ConsoleManager.AdjustBufferSize();  // Resize for Windows!
                         ConsoleManager.ReadInput(input);
                         Monitor.Exit(this);
-                        Thread.Sleep(50);
-                        //await Task.Delay(50);
+                        //Thread.Sleep(50);
+                        await Task.Delay(50);
                     }
                 } catch (Exception ex) {
                     Log.LogDebug(ex, "TUI Thread terminated with Exception.");
@@ -118,9 +119,8 @@ namespace ConGui {
                         Monitor.Exit(this);
                     }
                 }
-            }) {
-                Name = "My-TUI"
-            };
+            });
+            tuiThread.Name = "My-TUI";  // ASYNC tasks kommen immer aus dem Threadpool und können daher nicht benamst werden!!!!
             tuiThread.Start();
 
             Log.LogInformation("Program.StartAsync() finished.");
