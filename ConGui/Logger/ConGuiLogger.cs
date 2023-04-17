@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -46,12 +47,19 @@ namespace ConGui.Logger {
 
             //if (configured <= logLevel) { 
             string? threadTxt = Thread.CurrentThread.Name;
-            if (Thread.CurrentThread.IsThreadPoolThread) {
-                threadTxt = "TP";
-            } 
-            threadTxt += "-" + Environment.CurrentManagedThreadId.ToString() + " ";
-            //threadTxt += Thread.CurrentThread.ExecutionContext?.GetType();
+            //if (Thread.CurrentThread.IsThreadPoolThread) {
+            //    threadTxt = "TP";
+            //} 
+            //int unmanagedId = AppDomain.GetCurrentThreadId();
+            //ProcessThread? myThread = (from ProcessThread entry in Process.GetCurrentProcess().Threads
+            //                          where entry.Id == unmanagedId
+            //                          select entry).FirstOrDefault();
+            // threadTxt += "-" + Environment.CurrentManagedThreadId.ToString() + " " + unmanagedId.ToString() + ((myThread?.ToString())??"u")  + " ";
 
+            threadTxt += "-" + Environment.CurrentManagedThreadId.ToString() + " ";
+
+            // threadTxt += Thread.CurrentThread.ExecutionContext?.GetType();
+            // threadTxt += "xx";
             string eventTxt = $"[{threadTxt}, {logLevel.ToString()[..3]}]";
             
             if (!String.IsNullOrWhiteSpace(eventId.Name)) {

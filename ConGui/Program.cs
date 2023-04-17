@@ -13,6 +13,7 @@ using System;
 using System.Collections.Generic;
 using ConGui.Controls;
 using AudioCollection;
+using System.Xml.Linq;
 
 namespace ConGui {
     public class Program : IHostedService, IInputListener {
@@ -100,7 +101,7 @@ namespace ConGui {
 
             //MouseHandler.Initialize();
 
-            tuiThread = new Thread(() => {
+            tuiThread = new Thread(async () => {
                 Log.LogDebug("TUI Thread started");
                 try {
                     while (true) {
@@ -108,8 +109,8 @@ namespace ConGui {
                         ConsoleManager.AdjustBufferSize();  // Resize for Windows!
                         ConsoleManager.ReadInput(input);
                         Monitor.Exit(this);
-                        Thread.Sleep(50);
-                        //await Task.Delay(50);
+                        //Thread.Sleep(50);
+                        await Task.Delay(50);
                     }
                 } catch (Exception ex) {
                     Log.LogDebug(ex, "TUI Thread terminated with Exception.");
@@ -119,7 +120,7 @@ namespace ConGui {
                     }
                 }
             }) {
-                Name = "My-TUI"
+                Name = "My-TUI"     // This name servives only for 'non async' tasks. if async used then Name is always 'threadpool'
             };
             tuiThread.Start();
 
