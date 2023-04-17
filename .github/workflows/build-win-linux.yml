@@ -50,6 +50,6 @@ jobs:
           rm -r "$release_name"
     - uses: actions/upload-artifact@v3
       with:
-        name: my-artifact
-        path: A*
+        name: dev-build
+        path: App*
     
