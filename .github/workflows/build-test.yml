@@ -22,7 +22,7 @@ jobs:
             - kind: windows
               os: windows-latest
               target: win-x64
-              options: //p:PublishSingleFile=true
+              options: ''
 
     steps:
     - uses: actions/checkout@v3
