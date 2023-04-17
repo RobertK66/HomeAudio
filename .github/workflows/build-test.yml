@@ -48,11 +48,8 @@ jobs:
           fi
           # Delete output directory
           rm -r "$release_name"
-    - name: Publish
-      uses: softprops/action-gh-release@v1
+    - uses: actions/upload-artifact@v3
       with:
-          files: "App*"
-      env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-    
+        name: my-artifact
+        path: C*
     
