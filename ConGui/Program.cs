@@ -85,9 +85,9 @@ namespace ConGui {
             myLogPanel.Lock = this;
             Log.LogInformation("Program.StartAsync() called.");
 
-            ConsoleManager.Setup();
-            ConsoleManager.Resize(new Size(150, 40));
             Monitor.Enter(this);
+            ConsoleManager.Setup();
+            //ConsoleManager.Resize(new Size(150, 40));     //This does not work in new Windows Console....
             ConsoleManager.Content = CreateMainView();
             Monitor.Exit(this);
 

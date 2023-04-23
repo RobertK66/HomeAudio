@@ -60,7 +60,7 @@ namespace ConGui.Logger {
 
             // threadTxt += Thread.CurrentThread.ExecutionContext?.GetType();
             // threadTxt += "xx";
-            string eventTxt = $"[{threadTxt}, {logLevel.ToString()[..3]}]";
+            string eventTxt = $"[{logLevel.ToString()}]";
             
             if (!String.IsNullOrWhiteSpace(eventId.Name)) {
                 eventTxt += $", [{eventId.Name}]";
