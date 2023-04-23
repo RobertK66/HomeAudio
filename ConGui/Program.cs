@@ -14,6 +14,8 @@ using System.Collections.Generic;
 using ConGui.Controls;
 using AudioCollection;
 using System.Xml.Linq;
+using System.Diagnostics;
+using static ConGui.StaticAudioCollection;
 
 namespace ConGui {
     public class Program : IHostedService, IInputListener {
@@ -21,13 +23,13 @@ namespace ConGui {
         private readonly ILogger<Program> Log;
 
         //private CCStarter myCC;
-        private readonly IAudioCollection MyCollection;
+        private readonly ITabedAudioCollection MyCollection;
         private readonly IChromeCastWrapper MyCCW;
 
         public static async Task Main(string[] args) {
             IHostBuilder host = Host.CreateDefaultBuilder(args)
                                     .ConfigureServices((hostContext, services) => {
-                                        services.AddSingleton<IAudioCollection, StaticAudioCollection>();
+                                        services.AddSingleton<ITabedAudioCollection, StaticAudioCollection>();
 
                                         // In order to get a hosted service able to be injected in a constructor, we register both a singelton and a service!
                                         services.AddSingleton<IChromeCastWrapper, ChromeCastWrapper>();
@@ -46,7 +48,7 @@ namespace ConGui {
             await host.RunConsoleAsync();
         }
 
-        public Program(ILogger<Program> logger, IAudioCollection audioCollection, IChromeCastWrapper ccw) {
+        public Program(ILogger<Program> logger, ITabedAudioCollection audioCollection, IChromeCastWrapper ccw) {
             Log = logger;
             Log.LogDebug("Program - Constructor called.");
             MyCollection = audioCollection;
@@ -139,38 +141,58 @@ namespace ConGui {
 
         private IControl CreateMainView() {
 
-            var radioGrid = new SelectableGrid(3, 4, 16);
-            MyCollection.GetAllStations().ForEach(st => {
-                radioGrid.AddTextCell(st.name, st, RadioStationClicked);
-            });
+            //var radioGrid = new SelectableGrid(3, 4, 16);
+            //MyCollection.GetAllStations().ForEach(e => {
+            //    radioGrid.AddTextCell(e.name, e, RadioStationClicked);
+            //});
 
-            var rad = new Box {
-                HorizontalContentPlacement = Box.HorizontalPlacement.Center,
-                VerticalContentPlacement = Box.VerticalPlacement.Center,
-                Content = new Border {
-                    BorderStyle = BorderStyle.Single,
-                    Content = radioGrid //lines
+            //var rad = new Box {
+            //    HorizontalContentPlacement = Box.HorizontalPlacement.Center,
+            //    VerticalContentPlacement = Box.VerticalPlacement.Center,
+            //    Content = new Border {
+            //        BorderStyle = BorderStyle.Single,
+            //        Content = radioGrid //lines
+            //    }
+            //};
+
+            //tabPanel.AddTab("Radio Stations", rad, radioGrid);
+
+            //var albumGrid = new SelectableGrid(7, 23, 16);
+            //MyCollection.GetAllAlbums().ForEach(al => {
+            //    albumGrid.AddTextCell(al.name, al, AlbumClicked);
+            //});
+
+            //var cd = new Box {
+            //    HorizontalContentPlacement = Box.HorizontalPlacement.Center,
+            //    VerticalContentPlacement = Box.VerticalPlacement.Center,
+            //    Content = new Border {
+            //        BorderStyle = BorderStyle.Single,
+            //        Content = albumGrid //lines
+            //    }
+            //};
+
+            //tabPanel.AddTab("CdCollection", cd, albumGrid);
+
+            foreach (var tab in ((ITabedAudioCollection)MyCollection).GetAllTabs()) {
+                var grid = new SelectableGrid(tab.Cols, tab.Rows, tab.CellSize);
+                foreach(var entry in tab.GetAudioEntries()) {
+                    if (entry is AudioEntry ent) {
+                        grid.AddTextCell(ent.Name ?? "???", entry, EntryClicked);
+                    }
                 }
-            };
 
-            tabPanel.AddTab("Radio Stations", rad, radioGrid);
+                var cd1 = new Box {
+                    HorizontalContentPlacement = Box.HorizontalPlacement.Center,
+                    VerticalContentPlacement = Box.VerticalPlacement.Center,
+                    Content = new Border {
+                        BorderStyle = BorderStyle.Single,
+                        Content = grid //lines
+                    }
+                };
+                tabPanel.AddTab(tab.TabName, cd1, grid);
+            }
 
-            var albumGrid = new SelectableGrid(4, 10, 16);
 
-            MyCollection.GetAllAlbums().ForEach(al => {
-                albumGrid.AddTextCell(al.name, al, AlbumClicked);
-            });
-
-            var cd = new Box {
-                HorizontalContentPlacement = Box.HorizontalPlacement.Center,
-                VerticalContentPlacement = Box.VerticalPlacement.Center,
-                Content = new Border {
-                    BorderStyle = BorderStyle.Single,
-                    Content = albumGrid //lines
-                }
-            };
-
-            tabPanel.AddTab("CdCollection", cd, albumGrid);
             tabPanel.SelectTab(1);
 
             var mainwin = new DockPanel {
@@ -187,25 +209,45 @@ namespace ConGui {
 
         }
 
-        void RadioStationClicked(object station) {
-            (string name, string url)? st = station as (string name, string url)?;
-            if (st != null) {
-                Log.LogDebug("Play selected station: {name}", st?.name);
-                MyCCW.PlayLive(st?.url ?? "",
-                                  st?.name ?? "");
-            }
-        }
 
-        void AlbumClicked(object albumContext) {
-            (string name, List<(string url, string name)> tracks, string artist, string cdid)? album = albumContext as (string name, List<(string url, string name)> tracks, string artist, string cdid)?;
-            if (album != null) {
-                Log.LogDebug("Play selected album: {name}", album?.name);
-                var tracks = album?.tracks;
-                if (tracks != null) {
-                    MyCCW.PlayCdTracks(tracks);
+
+        void EntryClicked(object entry) {
+            if (entry is AudioEntry e) {
+                Log.LogDebug("Play selected entry: {name}", e?.Name);
+                if (e?.ContentUrl != null) {
+                    MyCCW.PlayLive(e?.ContentUrl ?? "",
+                                   e?.Name ?? "");
+                } else {
+                    List<(string url, string name)> tr = new();
+                    if (e?.Tracks != null && e.Tracks.Count > 0) {
+                        foreach (var t in e.Tracks) {
+                            tr.Add(new(t.ContentUrl ?? "", t.Name));
+                        }
+                        MyCCW.PlayCdTracks(tr);
+                    }
                 }
             }
         }
+
+        //void RadioStationClicked(object station) {
+        //    (string name, string url)? st = station as (string name, string url)?;
+        //    if (st != null) {
+        //        Log.LogDebug("Play selected station: {name}", st?.name);
+        //        MyCCW.PlayLive(st?.url ?? "",
+        //                          st?.name ?? "");
+        //    }
+        //}
+
+        //void AlbumClicked(object albumContext) {
+        //    (string name, List<(string url, string name)> tracks, string artist, string cdid)? album = albumContext as (string name, List<(string url, string name)> tracks, string artist, string cdid)?;
+        //    if (album != null) {
+        //        Log.LogDebug("Play selected album: {name}", album?.name);
+        //        var tracks = album?.tracks;
+        //        if (tracks != null) {
+        //            MyCCW.PlayCdTracks(tracks);
+        //        }
+        //    }
+        //}
 
         private void MyCC_StatusChanged(object? sender, EventArgs e) {
             //CCWStatusEventArgs? args = e as CCWStatusEventArgs;
