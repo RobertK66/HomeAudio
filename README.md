@@ -4,7 +4,7 @@ Simple WebRadio/CD-Player based on [Sharpcaster](https://github.com/Tapanila/Sha
 Usage:
 * Download latest release
 * Extract version for Windows or Linux to your working dir.
-  * Change the "CcName" entry in appsettings.json to give the name of the chromecast device you want to use for playback (if not sure what the name is look for '... ChromeCastWrapper - found \<xyz\>' messages in log panel).
+  * Change the "CcName" entry in appsettings.json to give the name of the chromecast device you want to use for playback (if not sure what the name is, look for '... ChromeCastWrapper - found \<xyz\>' messages in log panel).
   * Edit the files 'Cds.json' and 'WebRadios.json' to your needs.
   * If needed adapt the Section "MediaTabs" in appsettings.json (Resize Cols, Rows and CellSize or add/remove more Tabs)
 * Execute ConGui(.exe) application and have fun.
