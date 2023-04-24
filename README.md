@@ -1,10 +1,10 @@
 # HomeAudio
-Simple WebRadio/CD-Player based on [Sharpcaster](https://www.nuget.org/packages/Sharpcaster/) and [ConsoleGUI](https://github.com/TomaszRewak/C-sharp-console-gui-framework)
+Simple WebRadio/CD-Player based on [Sharpcaster](https://github.com/Tapanila/SharpCaster/) and [ConsoleGUI](https://github.com/TomaszRewak/C-sharp-console-gui-framework)
 
 Usage:
 * Download latest release
 * Extract version for Windows or Linux to your working dir.
-  * Change the "CcName" entry to give the Name of the Chrome cast device you want to use for playback (if not sure what the name is look for '... ChromeCastWrapper - found \<xyz\>' messages in Log Panel).
+  * Change the "CcName" entry in appsettings.json to give the name of the chromecast device you want to use for playback (if not sure what the name is look for '... ChromeCastWrapper - found \<xyz\>' messages in log panel).
   * Edit the files 'Cds.json' and 'WebRadios.json' to your needs.
   * If needed adapt the Section "MediaTabs" in appsettings.json (Resize Cols, Rows and CellSize or add/remove more Tabs)
   * Execute ConGui(.exe) application and have fun.
