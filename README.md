@@ -23,7 +23,7 @@ Key | Function
 \<End\> | Next Track (CDs only)
 \<Pos1\> | Previous Track (CDs only)
 \<PgUp\> | Scroll in Log-Panel (stop live scroll)
-\<PgDown\> | Scroll in Log-Panel (start live scrolll if End is reached)
+\<PgDown\> | Scroll in Log-Panel (start live scroll if End is reached)
  
   
   
