@@ -19,6 +19,7 @@ using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using static Google.Protobuf.Reflection.SourceCodeInfo.Types;
 using MediaStatus = QueueCaster.MediaStatus;
 
 namespace ConGui {
@@ -95,6 +96,8 @@ namespace ConGui {
 
             Log.LogDebug("using cc filter:{name}* and appId {appId}", ccName , appId);
         }
+
+        //private IChromecastLocator locator = new Sharpcaster.MdnsChromecastLocator();
 
         public Task StartAsync(CancellationToken cancellationToken) {
             Log.LogDebug("StartAsync called");

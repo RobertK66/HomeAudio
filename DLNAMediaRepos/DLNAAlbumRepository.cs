@@ -12,7 +12,7 @@ using System.Xml;
 
 namespace DLNAMediaRepos {
 
-    public class DLNAAlbumRepository : IAudioCollection {
+    public class DLNAAlbumRepository  {
         Dictionary<string, (string albumName, List<(string url, string title)> tracks, string artist, string cdid)> CdAlbums = new();
         Dictionary<string, string> RadioStations = new();
 
@@ -60,7 +60,7 @@ namespace DLNAMediaRepos {
         }
 
         private void ParseItems(DLNADevice device, DLNAObject item) {
-            //Console.WriteLine(item.ClassName + " - " + item.Name);
+            Console.WriteLine(item.ClassName + " - " + item.Name);
             if (item.ClassName.Equals("object.container")) {
                 var children = device.GetDeviceContent(item.ID);
                 foreach (var child in children) {
@@ -104,7 +104,13 @@ namespace DLNAMediaRepos {
                     }
                 });
                 album.cdid = (XX % 256).ToString("x2") + YYYY.ToString("x4") + tracks.Count.ToString("x2");
-                CdAlbums.Add(album.cdid, album);               
+                //Console.Write(album.cdid);
+                //if (!CdAlbums.ContainsKey(album.cdid)) {
+                    CdAlbums.Add(album.albumName, album);
+                    //Console.WriteLine();
+                //} else {
+                //    //Console.WriteLine(" !!!");
+                //}
             }
         }
 

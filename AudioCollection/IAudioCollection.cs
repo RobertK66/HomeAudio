@@ -22,8 +22,8 @@ namespace AudioCollection {
 
     public interface IAudioEntry {
         String Name { get; set; }
-        String? ContentUrl { get; set; }            // If this is not null -> its a webradio
-        List<IAudioEntry>? AudioTracks { get; }     // if Content Url is null this contains the Tracks of a named CD.
+        String? ContentUrl { get; set; }            // If this is not null -> its a webradio, or track
+        List<IAudioEntry>? AudioTracks { get; }     // if Content Url is null this contains the Tracks of a named CD (container).
     }
 
 

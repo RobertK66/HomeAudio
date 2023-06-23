@@ -10,7 +10,7 @@ namespace DLNAMediaRepos {
     //DLNAClient can start/stop searching for DLNA devices in local network and add founded devices to DLNADevices observable collection
     public class DLNAClient
     {
-        //collection for founded devices
+        //collection for found devices
         public ObservableCollection<DLNADevice> DLNADevices = new ObservableCollection<DLNADevice>();
 
         public DLNADevice SelectedDevice { get; private set; }
