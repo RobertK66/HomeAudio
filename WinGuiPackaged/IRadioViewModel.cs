@@ -13,6 +13,7 @@ namespace WinGuiPackaged {
 
         public NamedUrl SelectedRadio { get; set; }
         public ObservableCollection<NamedUrl> WebRadios { get; }
-    
+
+        void PlayRadio(NamedUrl selectedRadio);
     }
 }

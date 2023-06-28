@@ -7,13 +7,19 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
+    x:DefaultBindMode="TwoWay"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    
-        <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <ComboBox PlaceholderText="Pick a receiver" ItemsSource="{x:Bind myModel.Receiver}" DisplayMemberPath="Name" SelectedItem="{x:Bind myModel.SelectedReceiver, Mode=TwoWay}"></ComboBox>
-            <ListView ItemsSource="{x:Bind myModel.LogWindowViewModel.Entries}"></ListView>
-        </StackPanel>
-       
-    
+    <Grid RowDefinitions ="50, *">
+        <ComboBox  Grid.Row="0"
+            PlaceholderText="Pick a receiver" ItemsSource="{x:Bind myModel.Receiver, Mode=OneWay}" DisplayMemberPath="Name" SelectedItem="{x:Bind myModel.SelectedReceiver}"></ComboBox>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollMode="Enabled">
+            <TextBlock Text="{x:Bind myModel.LogWindowViewModel.ContentText}"></TextBlock>
+        
+        </ScrollViewer>
+        
+    </Grid>
+
+
 </Page>

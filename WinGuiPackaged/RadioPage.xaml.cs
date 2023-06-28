@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 
@@ -45,8 +46,8 @@ namespace WinGuiPackaged {
 
         private void ListView_ItemClick(object sender, ItemClickEventArgs e) {
             //myButton.Content = AnyViewModel.SelectedRadio?.Name;
-            Logger.LogInformation("Play " + AnyViewModel.SelectedRadio?.Name);
-
+            Logger.LogInformation("Clicked " + AnyViewModel.SelectedRadio?.Name);
+            AnyViewModel.PlayRadio(AnyViewModel.SelectedRadio);
         }
 
         private void ListView_AccessKeyDisplayDismissed(UIElement sender, AccessKeyDisplayDismissedEventArgs args) {
@@ -55,6 +56,8 @@ namespace WinGuiPackaged {
 
         private void ListView_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e) {
             Logger.LogInformation("Double tapped");
+            //Logger.LogInformation("Play " + AnyViewModel.SelectedRadio?.Name);
+            //_ = AnyViewModel.PlayRadio(AnyViewModel.SelectedRadio);
         }
     }
 }

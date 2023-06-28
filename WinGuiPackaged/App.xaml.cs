@@ -18,6 +18,7 @@ using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Microsoft.UI.Dispatching;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -30,33 +31,41 @@ namespace WinGuiPackaged {
 
         private ILoggerFactory loggerFactory;
         private LoggerVm logVm = new LoggerVm();
+        private ILogger<App> Log;
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
         /// executed, and as such is the logical equivalent of main() or WinMain().
         /// </summary>
         public App() {
+            this.UnhandledException += App_UnhandledException;
+
             this.InitializeComponent();
 
             logVm = new LoggerVm();
+            logVm.dq = DispatcherQueue.GetForCurrentThread();
 
             loggerFactory = LoggerFactory.Create(builder =>
             {
                 builder
                     //.AddFilter("Microsoft", LogLevel.Warning)
                     //.AddFilter("System", LogLevel.Warning)
-                    //.AddFilter("WinGuiPackaged.App", LogLevel.Debug)
+                    .AddFilter("Sharpcaster", LogLevel.Trace)
+                    .AddFilter("QueueCaster", LogLevel.Trace)
                     .AddConsole()
                     .AddWinUiLogger((con) => {       // This adds our LogPanel as possible target (configure in appsettings.json)
                         con.LoggerVm = logVm;
                      })
                     .AddDebug();
-
-
             });
 
-            ILogger logger = loggerFactory.CreateLogger<App>();
-            logger.LogInformation("Example log message ************************************************");
+            Log = loggerFactory.CreateLogger<App>();
+            Log.LogInformation("Example log message ************************************************");
+        }
+
+        private void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e) {
+            e.Handled = true;
+            Log.LogCritical("Unhadeled Exception from " + sender.GetType().Name + " " + e.Message);
         }
 
         /// <summary>
