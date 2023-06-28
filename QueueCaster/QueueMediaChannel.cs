@@ -24,7 +24,7 @@ namespace QueueCaster {
 
     public  class QueueMediaChannel : MediaChannel {
 
-        public event EventHandler? QueueMediaStatusChanged;
+        public event EventHandler<MediaStatusChangedEventArgs>? QueueMediaStatusChanged;
 
         // The Media Channel implements StatusChannel<MediaStatusMessage, IEnumerable<MediaStatus>>, IStatusChannel<IEnumerable<MediaStatus>>,
         // with the original Sharpcaster.MediaStatus. In order to get the changed event of media status with our own class we have to 'translate'/overwrite the 

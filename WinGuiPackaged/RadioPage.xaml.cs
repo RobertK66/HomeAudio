@@ -40,14 +40,14 @@ namespace WinGuiPackaged {
 
         private void ListView_SelectionChanged(object sender, SelectionChangedEventArgs e) {
             //myButton.Content = "....";
-            Logger.LogInformation("Selection changed");
+            Logger.LogInformation("Selection changed " + AnyViewModel.SelectedRadio?.Name);
 
         }
 
         private void ListView_ItemClick(object sender, ItemClickEventArgs e) {
             //myButton.Content = AnyViewModel.SelectedRadio?.Name;
-            Logger.LogInformation("Clicked " + AnyViewModel.SelectedRadio?.Name);
-            AnyViewModel.PlayRadio(AnyViewModel.SelectedRadio);
+            Logger.LogInformation("Clicked " + AnyViewModel.SelectedRadio?.Name + " / " + (e.ClickedItem as model.NamedUrl)?.Name);
+            //AnyViewModel.PlayRadio(AnyViewModel.SelectedRadio);
         }
 
         private void ListView_AccessKeyDisplayDismissed(UIElement sender, AccessKeyDisplayDismissedEventArgs args) {
@@ -55,9 +55,8 @@ namespace WinGuiPackaged {
         }
 
         private void ListView_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e) {
-            Logger.LogInformation("Double tapped");
-            //Logger.LogInformation("Play " + AnyViewModel.SelectedRadio?.Name);
-            //_ = AnyViewModel.PlayRadio(AnyViewModel.SelectedRadio);
+            Logger.LogInformation("Double tapped " + AnyViewModel.SelectedRadio?.Name);
+            AnyViewModel.PlayRadio(AnyViewModel.SelectedRadio);
         }
     }
 }

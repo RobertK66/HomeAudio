@@ -29,7 +29,6 @@ namespace WinGuiPackaged {
 
     public class MainViewModel : IRadioViewModel, ICdViewModel {
 
-
         public ILoggerFactory LoggerFactory { get; set; }
 
         private logger.LoggerVm _loggerVM;
@@ -37,12 +36,10 @@ namespace WinGuiPackaged {
             get { return _loggerVM; }
             set {
                 _loggerVM = value;
-        } }
-
-        
+            }
+        }
 
         private ILogger Log;
-
 
         private ObservableCollection<Cd> cds = new();
         public ObservableCollection<Cd> Cds { get { return cds; } }
@@ -85,8 +82,7 @@ namespace WinGuiPackaged {
 
                 IChromecastLocator locator = new Sharpcaster.MdnsChromecastLocator();
                 locator.ChromecastReceivedFound += Locator_ChromecastReceivedFound;
-                _ = locator.FindReceiversAsync(CancellationToken.None);         // Fire the search process and wait for receiver found events!
-
+                _ = locator.FindReceiversAsync(CancellationToken.None);         // Fire the search process and wait for receiver found events in the handler. No await here!
 
             } catch (Exception ex) {
                 // Log Error -> in GUI 
@@ -116,13 +112,14 @@ namespace WinGuiPackaged {
             try {
                 if (radio != null) {
                     if (SelectedReceiver != null) {
+                        await ConnectChromecast();
                         ChromecastClient cc = null;
-                        if (!CastClients.ContainsKey(SelectedReceiver.Name)) {
-                            cc = await ConnectNewClient(SelectedReceiver);
-                            if (cc != null) {
-                                CastClients.Add(SelectedReceiver.Name, cc);
-                            }
-                        }
+                        //if (!CastClients.ContainsKey(SelectedReceiver.Name)) {
+                        //    cc = await ConnectNewClient(SelectedReceiver);
+                        //    if (cc != null) {
+                        //        CastClients.Add(SelectedReceiver.Name, cc);
+                        //    }
+                        //}
                         if (CastClients.ContainsKey(SelectedReceiver.Name)) {
                             cc = CastClients[SelectedReceiver.Name];
                             var mediaChannel = cc.GetChannel<QueueMediaChannel>();
@@ -156,7 +153,6 @@ namespace WinGuiPackaged {
                 mediaChannel.QueueMediaStatusChanged += MediaChannel_QueueMediaStatusChanged;
                 var rcChannel = ConnectedClient.GetChannel<StatusChannel<ReceiverStatusMessage, ChromecastStatus>>();
                 if (rcChannel != null) {
-                    //StatusChannel<ReceiverStatusMessage, ChromecastStatus> sc = (StatusChannel<ReceiverStatusMessage, ChromecastStatus>)rcChannel;
                     rcChannel.StatusChanged += RcChannel_StatusChanged;
                 }
 
@@ -168,16 +164,41 @@ namespace WinGuiPackaged {
             return ConnectedClient;
         }
 
-        private void MediaChannel_QueueMediaStatusChanged(object sender, EventArgs e) {
-
+        private void MediaChannel_QueueMediaStatusChanged(object sender, MediaStatusChangedEventArgs e) {
+            QueueMediaChannel mc = sender as QueueMediaChannel;
+            if (mc != null) {
+                Log.LogTrace("MediaChanel Status changed: " + e.Status.FirstOrDefault()?.CurrentTime.ToString() ?? "<->");
+            }
         }
 
         private void ConnectedClient_Disconnected(object sender, EventArgs e) {
+            ChromecastClient cc = sender as ChromecastClient;
+            if (cc != null) {
+                Log.LogTrace("Disconnect received.");
 
+                this.CastClients.Remove(SelectedReceiver.Name); //TODO: unsafe - kann ganz ein anderer sein !!!!!
+                this.CastClients.Clear(); // Overkill, aber sicher ;-) - wenn man n cc connected hat muss man nach einem Disconnect alle neu connecten.....
+            }
         }
 
         private void RcChannel_StatusChanged(object sender, EventArgs e) {
+            StatusChannel<ReceiverStatusMessage, ChromecastStatus> sc = sender as StatusChannel<ReceiverStatusMessage, ChromecastStatus>;
+            if (sc != null) {
+                Log.LogTrace("Status changed: " + sc.Status.Volume.Level.ToString());
+            }
 
+        }
+
+        public async Task ConnectChromecast() {
+            if (SelectedReceiver != null) {
+                ChromecastClient cc = null;
+                if (!CastClients.ContainsKey(SelectedReceiver.Name)) {
+                    cc = await ConnectNewClient(SelectedReceiver);
+                    if (cc != null) {
+                        CastClients.Add(SelectedReceiver.Name, cc);
+                    }
+                }
+            }
         }
     }
 }

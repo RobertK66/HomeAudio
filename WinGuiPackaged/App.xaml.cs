@@ -52,6 +52,7 @@ namespace WinGuiPackaged {
                     //.AddFilter("System", LogLevel.Warning)
                     .AddFilter("Sharpcaster", LogLevel.Trace)
                     .AddFilter("QueueCaster", LogLevel.Trace)
+                    .AddFilter("WinGuiPackaged", LogLevel.Trace)
                     .AddConsole()
                     .AddWinUiLogger((con) => {       // This adds our LogPanel as possible target (configure in appsettings.json)
                         con.LoggerVm = logVm;
