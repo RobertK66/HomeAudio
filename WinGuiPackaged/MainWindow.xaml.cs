@@ -1,5 +1,6 @@
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
@@ -28,9 +29,7 @@ namespace WinGuiPackaged {
             //AnyViewModel = new MainViewModel();
         }
 
-        private void myButton_Click(object sender, RoutedEventArgs e) {
-            myButton.Content = "Clicked";
-        }
+     
 
 
         private void NavigationView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args)
@@ -56,6 +55,13 @@ namespace WinGuiPackaged {
                 }
                 //}
             }
-            }
+        }
+
+        private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+            _ = AnyViewModel.CheckAndConnectChromecast();
+        }
+
     }
+
+    
 }

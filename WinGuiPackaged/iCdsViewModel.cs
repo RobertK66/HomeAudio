@@ -11,6 +11,8 @@ namespace WinGuiPackaged {
 
         public Cd SelectedCd { get; set; }
         public ObservableCollection<Cd> Cds { get; }
+
+        public void PlayCd(Cd cd);
     
     }
 }

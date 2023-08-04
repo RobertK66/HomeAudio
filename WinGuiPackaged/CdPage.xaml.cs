@@ -42,5 +42,8 @@ namespace WinGuiPackaged {
             //myButton.Content = AnyViewModel.SelectedRadio?.Name;
         }
 
+        private void ListView_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e) {
+            AnyViewModel.PlayCd(AnyViewModel.SelectedCd);
+        }
     }
 }

@@ -28,6 +28,7 @@ namespace WinGuiPackaged {
     /// Provides application-specific behavior to supplement the default Application class.
     /// </summary>
     public partial class App : Application {
+        private Window m_window;
 
         private ILoggerFactory loggerFactory;
         private LoggerVm logVm = new LoggerVm();
@@ -39,12 +40,10 @@ namespace WinGuiPackaged {
         /// </summary>
         public App() {
             this.UnhandledException += App_UnhandledException;
-
             this.InitializeComponent();
 
             logVm = new LoggerVm();
             logVm.dq = DispatcherQueue.GetForCurrentThread();
-
             loggerFactory = LoggerFactory.Create(builder =>
             {
                 builder
@@ -61,7 +60,7 @@ namespace WinGuiPackaged {
             });
 
             Log = loggerFactory.CreateLogger<App>();
-            Log.LogInformation("Example log message ************************************************");
+            Log.LogInformation("Application started.");
         }
 
         private void App_UnhandledException(object sender, Microsoft.UI.Xaml.UnhandledExceptionEventArgs e) {
@@ -74,13 +73,14 @@ namespace WinGuiPackaged {
         /// </summary>
         /// <param name="args">Details about the launch request and process.</param>
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args) {
-         
 
-            m_window = new MainWindow() { AnyViewModel = new MainViewModel(loggerFactory, logVm) };
-           
+            var mvm = new MainViewModel(loggerFactory, logVm);
+            m_window = new MainWindow() { AnyViewModel = mvm };
             m_window.Activate();
+
+            
         }
 
-        private Window m_window;
+        
     }
 }

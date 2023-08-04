@@ -1,5 +1,9 @@
 ﻿using Microsoft.Extensions.Logging;
+using Microsoft.UI.Dispatching;
+using Microsoft.UI.Xaml;
 using QueueCaster;
+using QueueCaster.queue.models;
+using Sharpcaster;
 using Sharpcaster.Channels;
 using Sharpcaster.Interfaces;
 using Sharpcaster.Messages.Media;
@@ -15,21 +19,35 @@ using System.ComponentModel;
 using System.Configuration;
 using System.IO;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
+using System.Runtime.CompilerServices;
 using System.Security.Policy;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml.Linq;
+using Windows.ApplicationModel.Core;
+using Windows.Devices.Radios;
+using Windows.System;
+using Windows.UI.Core;
 using Windows.Web.UI;
 using WinGuiPackaged.logger;
 using WinGuiPackaged.model;
+using ChromecastClient = QueueCaster.ChromecastClient;
+using DispatcherQueue = Microsoft.UI.Dispatching.DispatcherQueue;
 
 namespace WinGuiPackaged {
 
-    public class MainViewModel : IRadioViewModel, ICdViewModel {
+    public class MainViewModel : IRadioViewModel, ICdViewModel, IPlayerViewModel, INotifyPropertyChanged {
 
         public ILoggerFactory LoggerFactory { get; set; }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void NotifyPropertyChanged([CallerMemberName] String propertyName = "") {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
 
         private logger.LoggerVm _loggerVM;
         public logger.LoggerVm LogWindowViewModel {
@@ -53,16 +71,42 @@ namespace WinGuiPackaged {
 
         private ObservableCollection<ChromecastReceiver> receiver = new();
         public ObservableCollection<ChromecastReceiver> Receiver { get { return receiver; } }
-        public ChromecastReceiver SelectedReceiver { get; set; } = null;
 
+        private ChromecastReceiver _selectedReceiver = null;
+        public ChromecastReceiver SelectedReceiver {
+            get { return _selectedReceiver; }
+            set {
+                if (value != this.SelectedReceiver) {
+                    _selectedReceiver = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
+
+
+        private int volume = 49;
+        public int Volume {
+            get { return volume; }
+            set {
+                if (value != this.Volume) {
+                    volume = value;
+                    NotifyPropertyChanged();
+                }
+            }
+        }
 
         private Dictionary<String, ChromecastClient> CastClients = new Dictionary<String, ChromecastClient>();
+
+        private DispatcherQueue dispatcherQueue { get; }
 
         public MainViewModel(ILoggerFactory loggerFactory, logger.LoggerVm logVm) {
             try {
                 LoggerFactory = loggerFactory;
                 Log = LoggerFactory.CreateLogger<MainViewModel>();
                 LogWindowViewModel = logVm;
+
+                dispatcherQueue = logVm.dq;
+
                 receiver.CollectionChanged += Receiver_CollectionChanged;
 
                 var path = AppDomain.CurrentDomain.BaseDirectory + ConfigurationManager.AppSettings["radioRepos"];
@@ -84,6 +128,9 @@ namespace WinGuiPackaged {
                 locator.ChromecastReceivedFound += Locator_ChromecastReceivedFound;
                 _ = locator.FindReceiversAsync(CancellationToken.None);         // Fire the search process and wait for receiver found events in the handler. No await here!
 
+
+                
+
             } catch (Exception ex) {
                 // Log Error -> in GUI 
                 radios.Add(new NamedUrl() { Name = "Init Error", ContentUrl = ex.Message });
@@ -94,6 +141,7 @@ namespace WinGuiPackaged {
             foreach (var item in e.NewItems) {
                 var rec = item as ChromecastReceiver;
                 if (rec != null) {
+                    // Autoselect -> TODO make pattern configurable
                     if (rec.Name.StartsWith("Bü")) {
                         SelectedReceiver = rec;
                     }
@@ -104,43 +152,6 @@ namespace WinGuiPackaged {
         private void Locator_ChromecastReceivedFound(object sender, Sharpcaster.Models.ChromecastReceiver e) {
             Receiver.Add(e);
         }
-
-        static SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
-
-        public async void PlayRadio(NamedUrl radio) {
-            await semaphoreSlim.WaitAsync();
-            try {
-                if (radio != null) {
-                    if (SelectedReceiver != null) {
-                        await ConnectChromecast();
-                        ChromecastClient cc = null;
-                        //if (!CastClients.ContainsKey(SelectedReceiver.Name)) {
-                        //    cc = await ConnectNewClient(SelectedReceiver);
-                        //    if (cc != null) {
-                        //        CastClients.Add(SelectedReceiver.Name, cc);
-                        //    }
-                        //}
-                        if (CastClients.ContainsKey(SelectedReceiver.Name)) {
-                            cc = CastClients[SelectedReceiver.Name];
-                            var mediaChannel = cc.GetChannel<QueueMediaChannel>();
-                            if (mediaChannel != null) {
-                                var media = new Media {
-                                    ContentUrl = radio.ContentUrl,
-                                    StreamType = StreamType.Live,
-                                    ContentType = "audio/mp4",
-                                    Metadata = new MediaMetadata() { Title = radio.Name ?? radio.ContentUrl }
-                                };
-                                Log.LogDebug("Load Media.");
-                                _ = await mediaChannel.LoadAsync(media);
-                            }
-                        }
-                    }
-                }
-            } finally {
-                semaphoreSlim?.Release();
-            }
-        }
-
 
 
         private async Task<QueueCaster.ChromecastClient> ConnectNewClient(ChromecastReceiver e) {
@@ -155,8 +166,8 @@ namespace WinGuiPackaged {
                 if (rcChannel != null) {
                     rcChannel.StatusChanged += RcChannel_StatusChanged;
                 }
-
-                st = await ConnectedClient.LaunchApplicationAsync("9B5A75B4", true);
+    
+                st = await ConnectedClient.LaunchApplicationAsync("9B5A75B4", true);    // TODO: APPID from config!
 
                 ConnectedClient.Disconnected += ConnectedClient_Disconnected;
                 Log.LogDebug("Launched/joined App[0]: {appId}", (((st?.Applications?.Count ?? 0) > 0) ? st?.Applications[0].AppId : "<null>"));
@@ -181,15 +192,24 @@ namespace WinGuiPackaged {
             }
         }
 
+
+        
+
         private void RcChannel_StatusChanged(object sender, EventArgs e) {
             StatusChannel<ReceiverStatusMessage, ChromecastStatus> sc = sender as StatusChannel<ReceiverStatusMessage, ChromecastStatus>;
             if (sc != null) {
                 Log.LogTrace("Status changed: " + sc.Status.Volume.Level.ToString());
+
+                dispatcherQueue.TryEnqueue(() => {
+                    Volume = (int)(sc.Status.Volume.Level * 200);
+                }); 
+        
+               
             }
 
         }
 
-        public async Task ConnectChromecast() {
+        public async Task CheckAndConnectChromecast() {
             if (SelectedReceiver != null) {
                 ChromecastClient cc = null;
                 if (!CastClients.ContainsKey(SelectedReceiver.Name)) {
@@ -198,6 +218,74 @@ namespace WinGuiPackaged {
                         CastClients.Add(SelectedReceiver.Name, cc);
                     }
                 }
+            }
+        }
+
+
+
+        static SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
+
+        
+        public async void PlayRadio(NamedUrl radio) {
+            await semaphoreSlim.WaitAsync();    // Only one Play at once is routet to LoadAsync!
+            try {
+                if (radio != null) {
+                    if (SelectedReceiver != null) {
+                        await CheckAndConnectChromecast();
+                        if (CastClients.ContainsKey(SelectedReceiver.Name)) {
+                            ChromecastClient cc = CastClients[SelectedReceiver.Name];
+                            var mediaChannel = cc.GetChannel<QueueMediaChannel>();
+                            if (mediaChannel != null) {
+                                var media = new Media {
+                                    ContentUrl = radio.ContentUrl,
+                                    StreamType = StreamType.Live,
+                                    ContentType = "audio/mp4",
+                                    Metadata = new MediaMetadata() { Title = radio.Name ?? radio.ContentUrl }
+                                };
+                                Log.LogDebug("Load Media.");
+                                await mediaChannel.LoadAsync(media);
+                            }
+                        }
+                    }
+                }
+            } finally {
+                semaphoreSlim?.Release();
+            }
+        }
+
+
+
+
+        public async void PlayCd(Cd cd) {
+            await semaphoreSlim.WaitAsync();    // Only one Play at once is routet to LoadAsync!
+            try {
+                if (cd != null) {
+                    if (SelectedReceiver != null) {
+                        await CheckAndConnectChromecast();
+                        if (CastClients.ContainsKey(SelectedReceiver.Name)) {
+                            ChromecastClient cc = CastClients[SelectedReceiver.Name];
+                            var mediaChannel = cc.GetChannel<QueueMediaChannel>();
+                            if (mediaChannel != null) {
+                                List<QueueItem> media = new List<QueueItem>();
+                                foreach (var t in cd.Tracks) {
+                                    var qi = new QueueItem() {
+                                        Media = new Media {
+                                            ContentUrl = t.ContentUrl,
+                                            StreamType = StreamType.Buffered,
+                                            ContentType = "audio/mp4",
+                                            Metadata = new MediaMetadata() { Title = t.Name ?? t.ContentUrl }
+                                        }
+                                    };
+                                    media.Add(qi);
+                                }
+                                Log.LogDebug("Load Cd with " + media.Count + " tracks.");
+                                await mediaChannel.QueueLoadAsync(media.ToArray());
+                            }
+                        }
+                    }
+                }
+            } finally {
+                semaphoreSlim?.Release();
             }
         }
     }

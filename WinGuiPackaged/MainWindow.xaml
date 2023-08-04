@@ -8,7 +8,6 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
     
-
     <NavigationView ItemInvoked="NavigationView_ItemInvoked">
         <NavigationView.MenuItems>
             <NavigationViewItem Content="Radios" Icon="Library" />
@@ -16,10 +15,17 @@
             <NavigationViewItem Content="CDs - 2" Icon="AddFriend" />
         </NavigationView.MenuItems>
 
-        <Frame x:Name="ContentFrame" >
-            <Button x:Name="myButton" Click="myButton_Click" Content="Click Me" />
-        </Frame>
+        <StackPanel>
+            <ComboBox  Grid.Row="0"
+            PlaceholderText="Pick a receiver" ItemsSource="{x:Bind AnyViewModel.Receiver, Mode=OneWay}" DisplayMemberPath="Name" SelectedItem="{x:Bind AnyViewModel.SelectedReceiver, Mode=TwoWay}" SelectionChanged="ComboBox_SelectionChanged"></ComboBox>
 
+            <ProgressRing Width="60" Height="60" Value="{x:Bind AnyViewModel.Volume, Mode=TwoWay}"
+              IsIndeterminate="False"
+              Background="LightGray" HorizontalAlignment="Left"/>
+        
+            <Frame x:Name="ContentFrame" >
+            </Frame>
+        </StackPanel>
     </NavigationView>
 
  <!--   <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">

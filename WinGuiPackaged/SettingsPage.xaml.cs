@@ -38,7 +38,7 @@ namespace WinGuiPackaged {
         }
 
         private void ComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e) {
-            _ = myModel.ConnectChromecast();
+            _ = myModel.CheckAndConnectChromecast();
         }
     }
 }

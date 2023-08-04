@@ -13,7 +13,7 @@
     <Grid>
         <ListView ItemsSource="{x:Bind AnyViewModel.Cds}"
                   HorizontalAlignment="Center" VerticalAlignment="Center" SelectedItem="{x:Bind AnyViewModel.SelectedCd, Mode=TwoWay}" 
-                  SelectionChanged="ListView_SelectionChanged" ItemClick="ListView_ItemClick" IsItemClickEnabled="True" >
+                  SelectionChanged="ListView_SelectionChanged" ItemClick="ListView_ItemClick" DoubleTapped="ListView_DoubleTapped"  IsItemClickEnabled="True" >
             <ListView.ItemTemplate>
                 <DataTemplate x:DataType="localm:Cd">
                     <StackPanel Orientation="Horizontal">

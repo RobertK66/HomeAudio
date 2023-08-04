@@ -16,7 +16,6 @@
 
         <ScrollViewer Grid.Row="1" VerticalScrollMode="Enabled">
             <TextBlock Text="{x:Bind myModel.LogWindowViewModel.ContentText}"></TextBlock>
-        
         </ScrollViewer>
         
     </Grid>
