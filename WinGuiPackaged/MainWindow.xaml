@@ -25,6 +25,17 @@
         
             <Frame x:Name="ContentFrame" >
             </Frame>
+
+            <Expander HorizontalAlignment="Stretch"
+                IsExpanded="False"
+                ExpandDirection="Down"
+                VerticalAlignment="Top"
+                Header="Application Log">
+                <ScrollViewer Height="150" VerticalScrollBarVisibility="Visible" VerticalScrollMode="Enabled" >
+                    <TextBlock Text="{x:Bind AnyViewModel.LogWindowViewModel.ContentText, Mode=TwoWay}" TextWrapping="Wrap"></TextBlock>
+                </ScrollViewer>
+
+            </Expander>
         </StackPanel>
     </NavigationView>
 

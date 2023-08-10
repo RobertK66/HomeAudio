@@ -10,15 +10,12 @@
     x:DefaultBindMode="TwoWay"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <Grid RowDefinitions ="50, *">
-        <ComboBox  Grid.Row="0"
-            PlaceholderText="Pick a receiver" ItemsSource="{x:Bind myModel.Receiver, Mode=OneWay}" DisplayMemberPath="Name" SelectedItem="{x:Bind myModel.SelectedReceiver}" SelectionChanged="ComboBox_SelectionChanged"></ComboBox>
-
-        <ScrollViewer Grid.Row="1" VerticalScrollMode="Enabled">
-            <TextBlock Text="{x:Bind myModel.LogWindowViewModel.ContentText}"></TextBlock>
+    
+      <!--
+        <ScrollViewer Height="100" VerticalScrollBarVisibility="Visible" VerticalScrollMode="Enabled" >
+            <TextBlock Text="{x:Bind myModel.LogWindowViewModel.ContentText}" TextWrapping="Wrap"></TextBlock>
         </ScrollViewer>
-        
-    </Grid>
-
+        -->
+    
 
 </Page>

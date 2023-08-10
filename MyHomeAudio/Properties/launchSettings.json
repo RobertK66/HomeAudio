@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "MyHomeAudio (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "MyHomeAudio (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
