@@ -27,8 +27,8 @@ jobs:
 
     steps:
     - name: Check Release Condition
-      run:  exhp "Check Step succeeded !!!!"
-      if: ${{ vars.REL_VERSION }} != ""
+      run:  echo "Check Step succeeded (${{ vars.REL_VERSION }})!!!!"
+      if:   ${{ vars.REL_VERSION }} != 0
     
     - name: Checkout
       uses: actions/checkout@v2
