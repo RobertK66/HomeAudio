@@ -83,6 +83,18 @@ jobs:
         name: MSIX Package
         path: MyHomeAudio\\Packages\MyHomeAudio_*\*.msix
 
+    - name: Create tag
+      uses: actions/github-script@v5
+      with:
+        script: |
+          github.rest.git.createRef({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            ref: 'refs/tags/${{ vars.REL_VERSION }}',
+            sha: context.sha
+          })
+      if:   ${{ vars.REL_VERSION }} != ''
+
     - name: Make Release
       uses: softprops/action-gh-release@v1
       with:
