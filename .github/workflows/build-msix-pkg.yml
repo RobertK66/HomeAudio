@@ -53,14 +53,14 @@ jobs:
         $pfx_cert_byte = [System.Convert]::FromBase64String("${{ secrets.RKOS_SW_CERT }}")
         $certificatePath = "MyHomeAudio/GitHubActionsWorkflow.pfx"
         [IO.File]::WriteAllBytes("$certificatePath", $pfx_cert_byte)
-        $pwd = ConvertTo-SecureString "test" -AsPlainText -Force
+        $pwd = ConvertTo-SecureString ${{ secrets.MY_PWD }} -AsPlainText -Force
         Import-PfxCertificate -CertStoreLocation Cert:\CurrentUser\My -FilePath $certificatePath -Password $pwd
-
+        Remove-Item -path $certificatePath
         
 
     # Create the app package by building and packaging the project
     - name: Create the app package
-      run: msbuild $env:Solution_Name /p:Configuration=$env:Configuration /p:Platform=$env:Platform /p:PublishReadyToRun=false /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:PackageCertificateKeyFile=GitHubActionsWorkflow.pfx /p:AppxPackageDir="$env:Appx_Package_Dir" /p:GenerateAppxPackageOnBuild=true 
+      run: msbuild $env:Solution_Name /p:Configuration=$env:Configuration /p:Platform=$env:Platform /p:PublishReadyToRun=false /p:UapAppxPackageBuildMode=$env:Appx_Package_Build_Mode /p:AppxBundle=$env:Appx_Bundle /p:AppxPackageDir="$env:Appx_Package_Dir" /p:GenerateAppxPackageOnBuild=true 
       env:
         Appx_Bundle: Never
         Appx_Package_Build_Mode: SideloadOnly
@@ -69,8 +69,8 @@ jobs:
         Platform: ${{ matrix.platform }}
 
     # Remove the pfx
-    - name: Remove the pfx
-      run: Remove-Item -path GitHubActionsWorkflow.pfx
+    #- name: Remove the pfx
+    #  run: Remove-Item -path GitHubActionsWorkflow.pfx
 
     # Upload the MSIX package: https://github.com/marketplace/actions/upload-a-build-artifact
     - name: Upload MSIX package
