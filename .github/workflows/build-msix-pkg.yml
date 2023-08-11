@@ -96,10 +96,10 @@ jobs:
       if:   ${{ vars.REL_VERSION }} != ''
 
     - name: Make Release
-      uses: softprops/action-gh-release@v1
-      with:
-        files: "*.msix"
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      uses: ncipollo/release-action@v1
       if:   ${{ vars.REL_VERSION }} != ''
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        tag: ${{ vars.REL_VERSION  }}
+        draft: false
             
