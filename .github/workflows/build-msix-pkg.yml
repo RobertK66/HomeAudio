@@ -27,7 +27,7 @@ jobs:
 
     steps:
     - name: Check Release Condition
-      if:   contains('${{vars.REL_VERSION}}', 'VER')
+      if:   1==2
       run:  echo "This build will be released as '${{vars.REL_VERSION}}'."
     
     - name: Checkout
