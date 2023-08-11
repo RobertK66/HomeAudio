@@ -27,7 +27,7 @@ jobs:
 
     steps:
     - name: Check Release Condition
-      run:  echo "Check Step succeeded (${{ vars.REL_VERSION }})!!!!"
+      run:  echo "This build will be released as '${{ vars.REL_VERSION }}'."
       if:   ${{ vars.REL_VERSION }} != ''
     
     - name: Checkout
@@ -82,3 +82,12 @@ jobs:
       with:
         name: MSIX Package
         path: MyHomeAudio\\Packages\MyHomeAudio_*\*.msix
+
+    - name: Make Release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: "*.msix"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      if:   ${{ vars.REL_VERSION }} != ''
+            
