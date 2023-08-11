@@ -7,9 +7,25 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
-    
-    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-        <Button x:Name="myButton" Click="myButton_Click">Click Me</Button>
-        <AppBarButton x:Name="myIconButton" Icon="Like" Label="Like"/>
-    </StackPanel>
+    <NavigationView ItemInvoked="NavigationView_ItemInvoked" IsBackButtonVisible="Collapsed" Header="This is Header Text"  >
+        <NavigationView.MenuItems>
+            <NavigationViewItem Icon="Play" Content="Menu Item1" Tag="SamplePage1" />
+            <NavigationViewItem Icon="Save" Content="Menu Item2" Tag="SamplePage2" >
+                <NavigationViewItem.MenuItems>
+                    <NavigationViewItem Content="Mail" Icon="Mail" Tag="SamplePage2.1"/>
+                    <NavigationViewItem Content="Calendar" Icon="Calendar" Tag="SamplePage2.2">
+                        <NavigationViewItem.MenuItems>
+                            <NavigationViewItem Content="Mail" Icon="Manage" Tag="SamplePage2.2.1"/>
+                            <NavigationViewItem Content="Calendar" Icon="Camera" Tag="SamplePage2.2.2"/>
+                        </NavigationViewItem.MenuItems>
+                    </NavigationViewItem>
+                </NavigationViewItem.MenuItems>
+            </NavigationViewItem>
+            <NavigationViewItem Icon="Refresh" Content="Menu Item3" Tag="SamplePage3" />
+            <NavigationViewItem Icon="Download" Content="Menu Item4" Tag="SamplePage4" />
+        </NavigationView.MenuItems>
+
+        <Frame x:Name="ContentFrame" />
+
+    </NavigationView>
 </Window>

@@ -76,6 +76,7 @@ namespace WinGuiPackaged {
 
             var mvm = new MainViewModel(loggerFactory, logVm);
             m_window = new MainWindow() { AnyViewModel = mvm };
+            //m_window.ExtendsContentIntoTitleBar = true;
             m_window.Activate();
 
             

@@ -16,6 +16,22 @@ using Microsoft.UI;           // Needed for WindowId.
 using Microsoft.UI.Windowing; // Needed for AppWindow.
 using WinRT.Interop;          // Needed for XAML/HWND interop.
 using Windows.UI;
+using System.Net.NetworkInformation;
+using MyHomeAudio.pages;
+
+//using AppUIBasics.Common;
+//using AppUIBasics.Data;
+//using AppUIBasics.Helper;
+//using System.Text.RegularExpressions;
+//using System.Threading.Tasks;
+//using Windows.ApplicationModel;
+//using Windows.ApplicationModel.Activation;
+//using Windows.ApplicationModel.Core;
+//using Windows.Foundation.Metadata;
+//using Windows.System.Profile;
+//using WinUIGallery.DesktopWap.DataModel;
+//using WASDK = Microsoft.WindowsAppSDK;
+
 
 
 // To learn more about WinUI, the WinUI project structure,
@@ -25,21 +41,35 @@ namespace MyHomeAudio {
     /// <summary>
     /// An empty window that can be used on its own or navigated to within a Frame.
     /// </summary>
-   
+
 
     public sealed partial class MainWindow : Window {
 
-        private AppWindow m_AppWindow;
         public MainWindow() {
             this.InitializeComponent();
             AppWindow.Title = "My Audio - Cast Application";
             AppWindow.TitleBar.IconShowOptions = IconShowOptions.HideIconAndSystemMenu;
             AppWindow.TitleBar.BackgroundColor = Colors.Bisque;
             AppWindow.TitleBar.ButtonBackgroundColor = Colors.Bisque;
+
         }
 
-        private void myButton_Click(object sender, RoutedEventArgs e) {
-            myButton.Content = "Clicked";
+        private void NavigationView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args) {
+            if (args.IsSettingsInvoked) {
+                sender.AlwaysShowHeader = false;
+                //ContentFrame.Navigate(typeof(SettingsPage));
+                ContentFrame.Content = new SettingsPage();
+            } else {
+                sender.AlwaysShowHeader = true;
+                string selectedItemTag = (String)args.InvokedItem;
+                sender.Header = "Sample Page " + selectedItemTag;
+                //ContentFrame.Navigate(typeof(ContentPage));
+                ContentFrame.Content = new ContentPage();
+            }
+        }
+
+        private void NavigationView_BackRequested(NavigationView sender, NavigationViewBackRequestedEventArgs args) {
+            ContentFrame.GoBack();
         }
     }
 }
