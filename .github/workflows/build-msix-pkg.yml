@@ -53,7 +53,8 @@ jobs:
         $pfx_cert_byte = [System.Convert]::FromBase64String("${{ secrets.RKOS_SW_CERT }}")
         $certificatePath = "MyHomeAudio/GitHubActionsWorkflow.pfx"
         [IO.File]::WriteAllBytes("$certificatePath", $pfx_cert_byte)
-        Import-PfxCertificate -CertStoreLocation Cert:\CurrentUser\My -FilePath $certificatePath -Password test
+        $pwd = ConvertTo-SecureString "test" -AsPlainText -Force
+        Import-PfxCertificate -CertStoreLocation Cert:\CurrentUser\My -FilePath $certificatePath -Password $pwd
 
         
 
