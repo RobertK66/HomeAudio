@@ -77,4 +77,4 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: MSIX Package
-        path: MyHomeAudio\\Packages
+        path: MyHomeAudio\\Packages\MyHomeAudio_*\*.msix
