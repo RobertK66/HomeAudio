@@ -26,6 +26,10 @@ jobs:
       Solution_Name: MyHomeAudio/MyHomeAudio.csproj
 
     steps:
+    - name: Check Release Condition
+      run:  exhp "Check Step succeeded !!!!"
+      if: ${{ vars.REL_VERSION }} != ""
+    
     - name: Checkout
       uses: actions/checkout@v2
       with:
