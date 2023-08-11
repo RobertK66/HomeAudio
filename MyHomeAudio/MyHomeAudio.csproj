@@ -24,7 +24,7 @@
 
   
     <PropertyGroup>
-        <PublishReadyToRun>true</PublishReadyToRun>
+        <PublishReadyToRun>false</PublishReadyToRun>
     </PropertyGroup>
 
 
