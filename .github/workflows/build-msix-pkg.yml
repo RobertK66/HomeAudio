@@ -90,7 +90,7 @@ jobs:
           github.rest.git.createRef({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            ref: 'refs/tags/${{ vars.REL_VERSION }}',
+            ref: 'refs/tags/${{ vars.REL_VERSION }}${{ matrix.platform }}',
             sha: context.sha
           })
       if:   ${{ vars.REL_VERSION }} != ''
@@ -100,6 +100,6 @@ jobs:
       if:   ${{ vars.REL_VERSION }} != ''
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
-        tag: ${{ vars.REL_VERSION  }}
+        tag: ${{ vars.REL_VERSION  }}${{ matrix.platform }}
         draft: false
             
