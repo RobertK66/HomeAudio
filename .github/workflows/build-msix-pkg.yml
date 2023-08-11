@@ -28,7 +28,7 @@ jobs:
     steps:
     - name: Check Release Condition
       run:  echo "Check Step succeeded (${{ vars.REL_VERSION }})!!!!"
-      if:   ${{ vars.REL_VERSION }} != 0
+      if:   ${{ vars.REL_VERSION }} != ''
     
     - name: Checkout
       uses: actions/checkout@v2
