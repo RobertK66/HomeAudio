@@ -108,8 +108,11 @@ jobs:
 
   make_combined_release:
     needs: build
-    runs-on: window-latest
+    runs-on: windows-latest
     steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        
       - name: list
         run: dir -s
               
