@@ -81,21 +81,17 @@ jobs:
         path: MyHomeAudio\\Packages\MyHomeAudio_*\*.msix
 
 
-    - name: Check Release Condition3
-      if: ${{ vars.REL_VERSION == ''}}
-      run:  dir -s
-
-    - name: Create tag
-      uses: actions/github-script@v5
-      with:
-        script: |
-          github.rest.git.createRef({
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            ref: 'refs/tags/${{ vars.REL_VERSION }}',
-            sha: context.sha
-          })
-      if: ${{ vars.REL_VERSION != '' }}
+    #- name: Create tag
+    #  uses: actions/github-script@v5
+    #  with:
+    #    script: |
+    #      github.rest.git.createRef({
+    #        owner: context.repo.owner,
+    #        repo: context.repo.repo,
+    #        ref: 'refs/tags/${{ vars.REL_VERSION }}',
+    #        sha: context.sha
+    #      })
+    #  if: ${{ vars.REL_VERSION != '' }}
 
   make_combined_release:
     needs: build
