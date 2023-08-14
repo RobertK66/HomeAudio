@@ -28,10 +28,8 @@ jobs:
     steps:
     - name: Check Release Condition1
       if: ${{ vars.REL_VERSION != '' }}
-      run:  echo "This line is printet because '${{vars.REL_VERSION}}' != ''"
-    - name: Check Release Condition2
-      if: ${{ vars.REL_VERSION == ''}}
-      run:  echo "This line is printet because '${{vars.REL_VERSION}}' == ''"
+      run:  echo "This will be released as ${{vars.REL_VERSION}}${{ matrix.platform }}"
+
       
     - name: Checkout
       uses: actions/checkout@v2
