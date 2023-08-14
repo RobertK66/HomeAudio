@@ -27,10 +27,10 @@ jobs:
 
     steps:
     - name: Check Release Condition1
-      if:   ${{vars.REL_VERSION}}!='X'
+      if: ${{ vars.REL_VERSION !='X' }}
       run:  echo "This line is printet because '${{vars.REL_VERSION}}' != 'X'"
     - name: Check Release Condition2
-      if:   ${{vars.REL_VERSION}}=='X'
+      if: ${{ vars.REL_VERSION == 'X'}}
       run:  echo "This line is printet because '${{vars.REL_VERSION}}' == 'X'"
       
     - name: Checkout
