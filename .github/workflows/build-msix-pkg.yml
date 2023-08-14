@@ -26,6 +26,10 @@ jobs:
       Solution_Name: MyHomeAudio/MyHomeAudio.csproj
 
     steps:
+    - name: Check Release Condition
+      if:   1==2
+      run:  echo "This build will be released as '${{vars.REL_VERSION}}'."
+    
     - name: Checkout
       uses: actions/checkout@v2
       with:
@@ -78,3 +82,24 @@ jobs:
       with:
         name: MSIX Package
         path: MyHomeAudio\\Packages\MyHomeAudio_*\*.msix
+
+    - name: Create tag
+      uses: actions/github-script@v5
+      with:
+        script: |
+          github.rest.git.createRef({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            ref: 'refs/tags/${{ vars.REL_VERSION }}${{ matrix.platform }}',
+            sha: context.sha
+          })
+      if:   ${{ vars.REL_VERSION }} != ''
+
+    - name: Make Release
+      uses: ncipollo/release-action@v1
+      if:   ${{ vars.REL_VERSION }} != ''
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        tag: ${{ vars.REL_VERSION  }}${{ matrix.platform }}
+        draft: false
+            
