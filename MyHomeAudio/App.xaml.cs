@@ -11,11 +11,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Foundation.Metadata;
+using WASDK = Microsoft.WindowsAppSDK;
+
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -44,5 +47,11 @@ namespace MyHomeAudio {
         }
 
         private Window m_window;
+
+        public static string WinAppSdkDetails {
+            get => string.Format("Windows App SDK {0}.{1}.{2}{3}",
+            WASDK.Release.Major, WASDK.Release.Minor, WASDK.Release.Patch, WASDK.Release.VersionTag);
+        }
+
     }
 }

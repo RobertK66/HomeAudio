@@ -9,8 +9,184 @@
     mc:Ignorable="d"
       NavigationCacheMode="Enabled"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Page.Resources>
+        <!--  These styles can be referenced to create a consistent SettingsPage layout  -->
 
-    <Grid>
-        <TextBlock>Hi Page AStting</TextBlock>
+        <!--  Spacing between cards  -->
+        <x:Double x:Key="SettingsCardSpacing">3</x:Double>
+
+        <!--  Style (inc. the correct spacing) of a section header  -->
+        <!--<Style
+           x:Key="SettingsSectionHeaderTextBlockStyle"
+           BasedOn="{StaticResource BodyStrongTextBlockStyle}"
+           TargetType="TextBlock">
+            <Style.Setters>
+                <Setter Property="Margin" Value="1,29,0,5" />
+            </Style.Setters>
+        </Style>-->
+    </Page.Resources>
+    <Grid x:Name="RootGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <!--<VisualStateManager.VisualStateGroups>
+            <VisualStateGroup>
+                --><!--<VisualState x:Name="WideLayout">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="{StaticResource Breakpoint640Plus}" />
+                    </VisualState.StateTriggers>
+                </VisualState>
+                <VisualState x:Name="NarrowLayout">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="0" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="contentSV.Padding" Value="16,0" />
+                        <Setter Target="PageHeader.Margin" Value="16,48,0,0" />
+                    </VisualState.Setters>
+                </VisualState>--><!--
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>-->
+        <TextBlock
+           x:Name="PageHeader"
+           Margin="36,24,36,0"
+           Text="Settings" />
+        <ScrollViewer
+           x:Name="contentSV"
+           Grid.Row="1"
+           Padding="36,0,36,0"
+           IsTabStop="False"
+           UseSystemFocusVisuals="False"
+           VerticalScrollBarVisibility="Auto"
+           VerticalScrollMode="Auto">
+            <StackPanel Spacing="22">
+                
+                <ComboBox x:Name="themeMode"  SelectionChanged="themeMode_SelectionChanged">
+                    <ComboBoxItem Content="Light" Tag="Light" />
+                    <ComboBoxItem Content="Dark" Tag="Dark" />
+                    <ComboBoxItem Content="Use system setting" Tag="Default" IsSelected="True"/>
+                </ComboBox>
+
+                <ComboBox x:Name="navigationLocation" SelectionChanged="navigationLocation_SelectionChanged">
+                    <ComboBoxItem Content="Left" IsSelected="True"/>
+                    <ComboBoxItem Content="Top" />
+                </ComboBox>
+
+                <!--<labs:SettingsCard Description="Select which app theme to display" Header="App theme">
+                    <labs:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE790;" />
+                    </labs:SettingsCard.HeaderIcon>
+                    <ComboBox x:Name="themeMode" AutomationProperties.AutomationId="themeModeComboBox" SelectionChanged="themeMode_SelectionChanged">
+                        <ComboBoxItem Content="Light" Tag="Light" />
+                        <ComboBoxItem Content="Dark" Tag="Dark" />
+                        <ComboBoxItem Content="Use system setting" Tag="Default" />
+                    </ComboBox>
+                </labs:SettingsCard>
+
+                <labs:SettingsCard Header="Navigation style">
+                    <labs:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xF594;" />
+                    </labs:SettingsCard.HeaderIcon>
+                    <ComboBox x:Name="navigationLocation" SelectionChanged="navigationLocation_SelectionChanged">
+                        <ComboBoxItem Content="Left" />
+                        <ComboBoxItem Content="Top" />
+                    </ComboBox>
+                </labs:SettingsCard>
+
+                <labs:SettingsExpander Description="Controls provide audible feedback" Header="Sound">
+                    <labs:SettingsExpander.HeaderIcon>
+                        <FontIcon Glyph="&#xEC4F;" />
+                    </labs:SettingsExpander.HeaderIcon>
+                    <ToggleSwitch x:Name="soundToggle" Toggled="soundToggle_Toggled" />
+                    <labs:SettingsExpander.Items>
+                        <labs:SettingsCard
+                           x:Name="SpatialAudioCard"
+                           Header="Enable Spatial Audio"
+                           IsEnabled="False">
+                            <labs:SettingsCard.Description>
+                                <HyperlinkButton Click="soundPageHyperlink_Click" Content="Learn more about enabling sounds in your app" />
+                            </labs:SettingsCard.Description>
+                            <ToggleSwitch x:Name="spatialSoundBox" Toggled="spatialSoundBox_Toggled" />
+                        </labs:SettingsCard>
+                    </labs:SettingsExpander.Items>
+                </labs:SettingsExpander>
+
+                <labs:SettingsExpander x:Name="ScreenshotCard" Header="Screenshot mode">
+                    <labs:SettingsExpander.HeaderIcon>
+                        <FontIcon Glyph="&#xEC4F;" />
+                    </labs:SettingsExpander.HeaderIcon>
+                    <ToggleSwitch x:Name="screenshotModeToggle" Toggled="screenshotModeToggle_Toggled" />
+                    <labs:SettingsExpander.Items>
+                        <labs:SettingsCard x:Name="ScreenshotFolderCard" Header="Screenshot folder">
+                            <labs:SettingsCard.Description>
+                                <HyperlinkButton x:Name="screenshotFolderLink" Click="screenshotFolderLink_Click" />
+                            </labs:SettingsCard.Description>
+                            <Button Click="FolderButton_Click" Content="Browse" />
+                        </labs:SettingsCard>
+                    </labs:SettingsExpander.Items>
+                </labs:SettingsExpander>-->
+
+                <!--  About  -->
+                <TextBlock Text="About" />
+
+                <Expander Header="{x:Bind WinAppSdkDetails}">
+                    <StackPanel Margin="-12,0,0,0" Orientation="Vertical">
+                    <TextBlock
+                        Foreground="Black"
+                        IsTextSelectionEnabled="True"
+                        Text="{x:Bind WinAppSdkRuntimeDetails}" />
+                    </StackPanel>
+                </Expander>
+                <!--<labs:SettingsExpander Description="© 2023 Microsoft. All rights reserved." Header="{StaticResource AppTitleName}">
+                    <labs:SettingsExpander.HeaderIcon>
+                        <BitmapIcon ShowAsMonochrome="False" UriSource="/Assets/Tiles/SmallTile-sdk.png" />
+                    </labs:SettingsExpander.HeaderIcon>
+                    <TextBlock
+                       Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                       IsTextSelectionEnabled="True"
+                       Text="{x:Bind Version}" />
+                    <labs:SettingsExpander.Items>
+                        <labs:SettingsCard Header="To clone this repository">
+                            <TextBlock
+                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                               IsTextSelectionEnabled="True"
+                               Text="git clone https://github.com/microsoft/WinUI-Gallery" />
+                        </labs:SettingsCard>
+                        <labs:SettingsCard
+                           x:Name="bugRequestCard"
+                           Click="bugRequestCard_Click"
+                           Header="File a bug or request new sample"
+                           IsClickEnabled="True">
+                            <labs:SettingsCard.ActionIcon>
+                                <FontIcon Glyph="&#xE8A7;" />
+                            </labs:SettingsCard.ActionIcon>
+                        </labs:SettingsCard>
+                        <labs:SettingsCard
+                           HorizontalContentAlignment="Left"
+                           ContentAlignment="Vertical"
+                           Header="Dependencies &amp; references">
+                            <StackPanel Margin="-12,0,0,0" Orientation="Vertical">
+                                <HyperlinkButton Content="{x:Bind WinAppSdkRuntimeDetails}" NavigateUri="https://aka.ms/windowsappsdk" />
+                                <HyperlinkButton Content="Windows UI Library" NavigateUri="https://aka.ms/winui" />
+                                <HyperlinkButton Content="Windows Community Toolkit" NavigateUri="https://github.com/CommunityToolkit/WindowsCommunityToolkit" />
+                                <HyperlinkButton Content="ColorCode-Universal" NavigateUri="https://github.com/WilliamABradley/ColorCode-Universal" />
+                                <HyperlinkButton Content="Win2D" NavigateUri="https://github.com/Microsoft/Win2D" />
+                            </StackPanel>
+                        </labs:SettingsCard>
+                        <labs:SettingsCard
+                           HorizontalContentAlignment="Left"
+                           ContentAlignment="Vertical"
+                           Header="THIS CODE AND INFORMATION IS PROVIDED ‘AS IS’ WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.">
+                            <StackPanel Margin="-12,0,0,0" Orientation="Vertical">
+                                <HyperlinkButton Content="Microsoft Services Agreement" NavigateUri="https://go.microsoft.com/fwlink/?LinkId=822631" />
+                                <HyperlinkButton Content="Microsoft Privacy Statement" NavigateUri="https://go.microsoft.com/fwlink/?LinkId=521839" />
+                            </StackPanel>
+                        </labs:SettingsCard>
+                    </labs:SettingsExpander.Items>
+                </labs:SettingsExpander>
+                -->
+            </StackPanel>
+        </ScrollViewer>
     </Grid>
 </Page>
