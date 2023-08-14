@@ -89,7 +89,7 @@ jobs:
 
     - name: Check Release Condition3
       if: ${{ vars.REL_VERSION == ''}}
-      run:  dir /s
+      run:  dir -s
 
     - name: Create tag
       uses: actions/github-script@v5
@@ -110,4 +110,4 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         tag: ${{ vars.REL_VERSION  }}${{ matrix.platform }}
         draft: false
-            
+        artifacts: MyHomeAudio\\Packages\MyHomeAudio_*\*.msix            
