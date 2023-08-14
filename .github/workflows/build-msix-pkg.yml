@@ -117,5 +117,5 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           tag: ${{ vars.REL_VERSION  }}
           draft: false
-          artifacts: \\*.msix
+          artifacts: artefacts/*/*.msix
               
