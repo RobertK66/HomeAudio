@@ -26,10 +26,13 @@ jobs:
       Solution_Name: MyHomeAudio/MyHomeAudio.csproj
 
     steps:
-    - name: Check Release Condition
-      if:   ${{vars.REL_VERSION}}!=' '
-      run:  echo "This build will be released as '${{vars.REL_VERSION}}'."
-    
+    - name: Check Release Condition1
+      if:   ${{vars.REL_VERSION}}!='X'
+      run:  echo "This line is printet because '${{vars.REL_VERSION}}' != 'X'"
+    - name: Check Release Condition2
+      if:   ${{vars.REL_VERSION}}=='X'
+      run:  echo "This line is printet because '${{vars.REL_VERSION}}' == 'X'"
+      
     - name: Checkout
       uses: actions/checkout@v2
       with:
