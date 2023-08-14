@@ -11,17 +11,13 @@ on:
   workflow_dispatch:
 
 jobs:
-
   build:
-
     strategy:
       matrix:
         configuration: [Release]
         platform: [x64, x86]
-
     runs-on: windows-latest  # For a list of available runner types, refer to
                              # https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions#jobsjob_idruns-on
-
     env:
       Solution_Name: MyHomeAudio/MyHomeAudio.csproj
 
@@ -108,4 +104,12 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         tag: ${{ vars.REL_VERSION  }}${{ matrix.platform }}
         draft: false
-        artifacts: MyHomeAudio\\Packages\MyHomeAudio_*\*.msix            
+        artifacts: MyHomeAudio\\Packages\MyHomeAudio_*\*.msix     
+
+  make_combined_release:
+    needs: build
+    runs-on: window-latest
+    steps:
+      - name: list
+        run: dir -s
+              
