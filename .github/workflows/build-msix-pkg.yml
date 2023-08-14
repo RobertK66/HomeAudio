@@ -92,7 +92,7 @@ jobs:
           github.rest.git.createRef({
             owner: context.repo.owner,
             repo: context.repo.repo,
-            ref: 'refs/tags/${{ vars.REL_VERSION }}${{ matrix.platform }}',
+            ref: 'refs/tags/${{ vars.REL_VERSION }}',
             sha: context.sha
           })
       if: ${{ vars.REL_VERSION != '' }}
