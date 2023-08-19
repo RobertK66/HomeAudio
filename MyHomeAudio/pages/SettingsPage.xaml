@@ -4,6 +4,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:MyHomeAudio.pages"
+    xmlns:labs="using:CommunityToolkit.Labs.WinUI"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -16,14 +17,14 @@
         <x:Double x:Key="SettingsCardSpacing">3</x:Double>
 
         <!--  Style (inc. the correct spacing) of a section header  -->
-        <!--<Style
+        <Style
            x:Key="SettingsSectionHeaderTextBlockStyle"
            BasedOn="{StaticResource BodyStrongTextBlockStyle}"
            TargetType="TextBlock">
             <Style.Setters>
                 <Setter Property="Margin" Value="1,29,0,5" />
             </Style.Setters>
-        </Style>-->
+        </Style>
     </Page.Resources>
     <Grid x:Name="RootGrid">
         <Grid.RowDefinitions>
@@ -51,6 +52,7 @@
         <TextBlock
            x:Name="PageHeader"
            Margin="36,24,36,0"
+           Style="{StaticResource TitleTextBlockStyle}"
            Text="Settings" />
         <ScrollViewer
            x:Name="contentSV"
@@ -62,22 +64,12 @@
            VerticalScrollMode="Auto">
             <StackPanel Spacing="22">
                 
-                <ComboBox x:Name="themeMode"  SelectionChanged="themeMode_SelectionChanged">
-                    <ComboBoxItem Content="Light" Tag="Light" />
-                    <ComboBoxItem Content="Dark" Tag="Dark" />
-                    <ComboBoxItem Content="Use system setting" Tag="Default" IsSelected="True"/>
-                </ComboBox>
-
-                <ComboBox x:Name="navigationLocation" SelectionChanged="navigationLocation_SelectionChanged">
-                    <ComboBoxItem Content="Left" IsSelected="True"/>
-                    <ComboBoxItem Content="Top" />
-                </ComboBox>
-
-                <!--<labs:SettingsCard Description="Select which app theme to display" Header="App theme">
+             
+                <labs:SettingsCard Description="Select which app theme to display" Header="App theme">
                     <labs:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE790;" />
                     </labs:SettingsCard.HeaderIcon>
-                    <ComboBox x:Name="themeMode" AutomationProperties.AutomationId="themeModeComboBox" SelectionChanged="themeMode_SelectionChanged">
+                    <ComboBox x:Name="themeMode" AutomationProperties.AutomationId="themeModeComboBox" SelectionChanged="themeMode_SelectionChanged_1">
                         <ComboBoxItem Content="Light" Tag="Light" />
                         <ComboBoxItem Content="Dark" Tag="Dark" />
                         <ComboBoxItem Content="Use system setting" Tag="Default" />
@@ -88,7 +80,7 @@
                     <labs:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xF594;" />
                     </labs:SettingsCard.HeaderIcon>
-                    <ComboBox x:Name="navigationLocation" SelectionChanged="navigationLocation_SelectionChanged">
+                    <ComboBox x:Name="navigationLocation" SelectionChanged="navigationLocation_SelectionChanged_1">
                         <ComboBoxItem Content="Left" />
                         <ComboBoxItem Content="Top" />
                     </ComboBox>
@@ -105,7 +97,7 @@
                            Header="Enable Spatial Audio"
                            IsEnabled="False">
                             <labs:SettingsCard.Description>
-                                <HyperlinkButton Click="soundPageHyperlink_Click" Content="Learn more about enabling sounds in your app" />
+                                <HyperlinkButton Click="HyperlinkButton_Click"  Content="Learn more about enabling sounds in your app" />
                             </labs:SettingsCard.Description>
                             <ToggleSwitch x:Name="spatialSoundBox" Toggled="spatialSoundBox_Toggled" />
                         </labs:SettingsCard>
@@ -122,36 +114,26 @@
                             <labs:SettingsCard.Description>
                                 <HyperlinkButton x:Name="screenshotFolderLink" Click="screenshotFolderLink_Click" />
                             </labs:SettingsCard.Description>
-                            <Button Click="FolderButton_Click" Content="Browse" />
+                            <Button Click="Button_Click"  Content="Browse" />
                         </labs:SettingsCard>
                     </labs:SettingsExpander.Items>
-                </labs:SettingsExpander>-->
+                </labs:SettingsExpander>
 
                 <!--  About  -->
-                <TextBlock Text="About" />
+                <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" Text="About" />
 
-                <Expander Header="{x:Bind WinAppSdkDetails}">
-                    <StackPanel Margin="-12,0,0,0" Orientation="Vertical">
-                    <TextBlock
-                        Foreground="Black"
-                        IsTextSelectionEnabled="True"
-                        Text="{x:Bind WinAppSdkRuntimeDetails}" />
-                    </StackPanel>
-                </Expander>
-                <!--<labs:SettingsExpander Description="© 2023 Microsoft. All rights reserved." Header="{StaticResource AppTitleName}">
-                    <labs:SettingsExpander.HeaderIcon>
-                        <BitmapIcon ShowAsMonochrome="False" UriSource="/Assets/Tiles/SmallTile-sdk.png" />
-                    </labs:SettingsExpander.HeaderIcon>
+
+                <labs:SettingsExpander Description="© 2023 Robert'sw" Header="{StaticResource AppTitleName}" HeaderIcon="PreviewLink">
                     <TextBlock
                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                        IsTextSelectionEnabled="True"
-                       Text="{x:Bind Version}" />
+                       Text="{x:Bind PackageVersion}" />
                     <labs:SettingsExpander.Items>
                         <labs:SettingsCard Header="To clone this repository">
                             <TextBlock
                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                IsTextSelectionEnabled="True"
-                               Text="git clone https://github.com/microsoft/WinUI-Gallery" />
+                               Text="git clone https://github.com/microsoft/...." />
                         </labs:SettingsCard>
                         <labs:SettingsCard
                            x:Name="bugRequestCard"
@@ -162,30 +144,16 @@
                                 <FontIcon Glyph="&#xE8A7;" />
                             </labs:SettingsCard.ActionIcon>
                         </labs:SettingsCard>
-                        <labs:SettingsCard
-                           HorizontalContentAlignment="Left"
-                           ContentAlignment="Vertical"
-                           Header="Dependencies &amp; references">
-                            <StackPanel Margin="-12,0,0,0" Orientation="Vertical">
-                                <HyperlinkButton Content="{x:Bind WinAppSdkRuntimeDetails}" NavigateUri="https://aka.ms/windowsappsdk" />
-                                <HyperlinkButton Content="Windows UI Library" NavigateUri="https://aka.ms/winui" />
-                                <HyperlinkButton Content="Windows Community Toolkit" NavigateUri="https://github.com/CommunityToolkit/WindowsCommunityToolkit" />
-                                <HyperlinkButton Content="ColorCode-Universal" NavigateUri="https://github.com/WilliamABradley/ColorCode-Universal" />
-                                <HyperlinkButton Content="Win2D" NavigateUri="https://github.com/Microsoft/Win2D" />
-                            </StackPanel>
-                        </labs:SettingsCard>
-                        <labs:SettingsCard
-                           HorizontalContentAlignment="Left"
-                           ContentAlignment="Vertical"
-                           Header="THIS CODE AND INFORMATION IS PROVIDED ‘AS IS’ WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR PURPOSE.">
-                            <StackPanel Margin="-12,0,0,0" Orientation="Vertical">
-                                <HyperlinkButton Content="Microsoft Services Agreement" NavigateUri="https://go.microsoft.com/fwlink/?LinkId=822631" />
-                                <HyperlinkButton Content="Microsoft Privacy Statement" NavigateUri="https://go.microsoft.com/fwlink/?LinkId=521839" />
-                            </StackPanel>
-                        </labs:SettingsCard>
+                        <labs:SettingsExpander x:Name="DllVersionsExpander" Header="{x:Bind EaName}" Description="{x:Bind EaDecription}" HeaderIcon="Library">
+                            <TextBlock 
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                IsTextSelectionEnabled="True"
+                                Text="{x:Bind EaVersion}" />
+                            <labs:SettingsExpander.Items >
+                            </labs:SettingsExpander.Items>
+                        </labs:SettingsExpander>
                     </labs:SettingsExpander.Items>
                 </labs:SettingsExpander>
-                -->
             </StackPanel>
         </ScrollViewer>
     </Grid>

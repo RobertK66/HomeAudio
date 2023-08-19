@@ -53,5 +53,12 @@ namespace MyHomeAudio {
             WASDK.Release.Major, WASDK.Release.Minor, WASDK.Release.Patch, WASDK.Release.VersionTag);
         }
 
+        public static string WinAppSdkRuntimeDetails {
+            get {
+                var details = WinAppSdkDetails + WASDK.Runtime.Version.DotQuadString;
+                return details;
+            }
+        }
+
     }
 }
