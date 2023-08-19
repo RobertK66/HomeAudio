@@ -45,7 +45,7 @@ namespace MyHomeAudio.pages {
 
         public string EaDecription {
             get {
-                return System.Reflection.Assembly.GetEntryAssembly().Location;
+                return "System.Reflection.Assembly.GetEntryAssembly().Location";
             }
         }
 
@@ -71,10 +71,10 @@ namespace MyHomeAudio.pages {
             this.InitializeComponent();
 
             foreach(var a in System.Reflection.Assembly.GetEntryAssembly().GetReferencedAssemblies()) {
-                var asm = Assembly.Load(a);
+                //var asm = Assembly.Load(a);
                 this.DllVersionsExpander.Items.Add(new SettingsCard() { Header = a.FullName, 
                      Content = string.Format("{0}.{1}.{2}.{3} ", a.Version.Major, a.Version.Minor, a.Version.Build, a.Version.Revision),
-                     Description = asm.Location});
+                     Description = "asm.Location"});
             }
         }
 
