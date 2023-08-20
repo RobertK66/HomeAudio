@@ -32,20 +32,20 @@ namespace MyHomeAudio.pages {
 
         public string EaVersion {
             get {
-                //var version = System.Reflection.Assembly.GetEntryAssembly().GetName().Version;
-                return "string.Format({0}.{1}.{2}.{3}  , version.Major, version.Minor, version.Build, version.Revision)";
+                var version = System.Reflection.Assembly.GetEntryAssembly().GetName().Version;
+                return string.Format("{0}.{1}.{2}.{3}", version.Major, version.Minor, version.Build, version.Revision);
             }
         }
 
         public string EaName {
             get {
-                return "System.Reflection.Assembly.GetEntryAssembly().FullName";
+                return System.Reflection.Assembly.GetEntryAssembly().FullName;
             }
         }
 
         public string EaDecription {
             get {
-                return "System.Reflection.Assembly.GetEntryAssembly().Location";
+                return System.Reflection.Assembly.GetEntryAssembly().Location;
             }
         }
 
@@ -70,6 +70,7 @@ namespace MyHomeAudio.pages {
         public SettingsPage() {
             this.InitializeComponent();
 
+            this.VersionExpander.Items.Add(new SettingsCard() { Header = "a.FullName" });
             //foreach(var a in System.Reflection.Assembly.GetEntryAssembly().GetReferencedAssemblies()) {
             //    //var asm = Assembly.Load(a);
             //    this.DllVersionsExpander.Items.Add(new SettingsCard() { Header = a.FullName, 
