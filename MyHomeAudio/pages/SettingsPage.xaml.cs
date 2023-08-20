@@ -70,13 +70,14 @@ namespace MyHomeAudio.pages {
         public SettingsPage() {
             this.InitializeComponent();
 
-            this.VersionExpander.Items.Add(new SettingsCard() { Header = "a.FullName" });
-            //foreach(var a in System.Reflection.Assembly.GetEntryAssembly().GetReferencedAssemblies()) {
-            //    //var asm = Assembly.Load(a);
-            //    this.DllVersionsExpander.Items.Add(new SettingsCard() { Header = a.FullName, 
-            //         Content = string.Format("{0}.{1}.{2}.{3} ", a.Version.Major, a.Version.Minor, a.Version.Build, a.Version.Revision),
-            //         Description = "asm.Location"});
-            //}
+            foreach(var a in System.Reflection.Assembly.GetEntryAssembly().GetReferencedAssemblies()) {
+                var asm = Assembly.Load(a);
+                this.VersionExpander.Items.Add(new SettingsCard() {
+                    Header = a.FullName,
+                    Content = string.Format("{0}.{1}.{2}.{3} ", a.Version.Major, a.Version.Minor, a.Version.Build, a.Version.Revision),
+                    Description = asm.Location
+                }); ;
+            }
         }
 
         //< labs:SettingsCard Header = "Dll 1" >
@@ -84,8 +85,8 @@ namespace MyHomeAudio.pages {
         //                    </ labs:SettingsCard >
 
 
-        
-    private void themeMode_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+
+        private void themeMode_SelectionChanged(object sender, SelectionChangedEventArgs e) {
     }
     private void navigationLocation_SelectionChanged(object sender, SelectionChangedEventArgs e) {
     }

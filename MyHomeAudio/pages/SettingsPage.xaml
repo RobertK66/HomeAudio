@@ -129,29 +129,18 @@
                        IsTextSelectionEnabled="True"
                        Text="{x:Bind PackageVersion}" />
                     <labs:SettingsExpander.Items>
-                        <labs:SettingsCard Header="To clone this repository">
-                            <TextBlock
-                               Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                               IsTextSelectionEnabled="True"
-                               Text="git clone https://github.com/microsoft/...." />
-                        </labs:SettingsCard>
-                        <labs:SettingsCard
-                           x:Name="bugRequestCard"
-                           Click="bugRequestCard_Click"
-                           Header="File a bug or request new sample"
-                           IsClickEnabled="True">
-                            <labs:SettingsCard.ActionIcon>
-                                <FontIcon Glyph="&#xE8A7;" />
-                            </labs:SettingsCard.ActionIcon>
-                        </labs:SettingsCard>
                         <labs:SettingsCard
                             x:Name="versioncard"
                             Header="{x:Bind EaName}"
-                            Description="{x:Bind EaDecription}"                            
-                            IsClickEnabled="True">      
+                            Description="{x:Bind EaDecription}"  
+                            >      
                             <labs:SettingsCard.ActionIcon>
                                 <FontIcon Glyph="&#xE8A7;" />
                             </labs:SettingsCard.ActionIcon>
+                            <TextBlock
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                IsTextSelectionEnabled="True"
+                                Text="{x:Bind EaVersion}" />
                         </labs:SettingsCard>
                         <!--<labs:SettingsExpander x:Name="DllVersionsExpander" Header="{x:Bind EaName}" Description="{x:Bind EaDecription}" HeaderIcon="Library">
                             <TextBlock 
