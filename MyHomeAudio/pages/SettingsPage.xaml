@@ -8,7 +8,9 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-      NavigationCacheMode="Enabled"
+      NavigationCacheMode="Required"
+    Loaded="Page_Loaded"
+    
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
     <Page.Resources>
         <!--  These styles can be referenced to create a consistent SettingsPage layout  -->
@@ -53,7 +55,7 @@
            x:Name="PageHeader"
            Margin="36,24,36,0"
            Style="{StaticResource TitleTextBlockStyle}"
-           Text="Settings" />
+           Text="{x:Bind SettingsTitleString, Mode=TwoWay}" />
         <ScrollViewer
            x:Name="contentSV"
            Grid.Row="1"
@@ -63,7 +65,6 @@
            VerticalScrollBarVisibility="Auto"
            VerticalScrollMode="Auto">
             <StackPanel Spacing="22">
-                
              
                 <labs:SettingsCard Description="Select which app theme to display" Header="App theme">
                     <labs:SettingsCard.HeaderIcon>
@@ -81,47 +82,13 @@
                         <FontIcon Glyph="&#xF594;" />
                     </labs:SettingsCard.HeaderIcon>
                     <ComboBox x:Name="navigationLocation" SelectionChanged="navigationLocation_SelectionChanged_1">
-                        <ComboBoxItem Content="Left" />
+                        <ComboBoxItem Content="Left (Auto)" />
                         <ComboBoxItem Content="Top" />
                     </ComboBox>
                 </labs:SettingsCard>
-
-                <labs:SettingsExpander Description="Controls provide audible feedback" Header="Sound">
-                    <labs:SettingsExpander.HeaderIcon>
-                        <FontIcon Glyph="&#xEC4F;" />
-                    </labs:SettingsExpander.HeaderIcon>
-                    <ToggleSwitch x:Name="soundToggle" Toggled="soundToggle_Toggled" />
-                    <labs:SettingsExpander.Items>
-                        <labs:SettingsCard
-                           x:Name="SpatialAudioCard"
-                           Header="Enable Spatial Audio"
-                           IsEnabled="False">
-                            <labs:SettingsCard.Description>
-                                <HyperlinkButton Click="HyperlinkButton_Click"  Content="Learn more about enabling sounds in your app" />
-                            </labs:SettingsCard.Description>
-                            <ToggleSwitch x:Name="spatialSoundBox" Toggled="spatialSoundBox_Toggled" />
-                        </labs:SettingsCard>
-                    </labs:SettingsExpander.Items>
-                </labs:SettingsExpander>
-
-                <labs:SettingsExpander x:Name="ScreenshotCard" Header="Screenshot mode">
-                    <labs:SettingsExpander.HeaderIcon>
-                        <FontIcon Glyph="&#xEC4F;" />
-                    </labs:SettingsExpander.HeaderIcon>
-                    <ToggleSwitch x:Name="screenshotModeToggle" Toggled="screenshotModeToggle_Toggled" />
-                    <labs:SettingsExpander.Items>
-                        <labs:SettingsCard x:Name="ScreenshotFolderCard" Header="Screenshot folder">
-                            <labs:SettingsCard.Description>
-                                <HyperlinkButton x:Name="screenshotFolderLink" Click="screenshotFolderLink_Click" />
-                            </labs:SettingsCard.Description>
-                            <Button Click="Button_Click"  Content="Browse" />
-                        </labs:SettingsCard>
-                    </labs:SettingsExpander.Items>
-                </labs:SettingsExpander>
-
+               
                 <!--  About  -->
                 <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" Text="About" />
-
 
                 <labs:SettingsExpander x:Name="VersionExpander" Description="© 2023 Robert'sw" Header="{StaticResource AppTitleName}" HeaderIcon="PreviewLink">
                     <TextBlock
@@ -142,14 +109,6 @@
                                 IsTextSelectionEnabled="True"
                                 Text="{x:Bind EaVersion}" />
                         </labs:SettingsCard>
-                        <!--<labs:SettingsExpander x:Name="DllVersionsExpander" Header="{x:Bind EaName}" Description="{x:Bind EaDecription}" HeaderIcon="Library">
-                            <TextBlock 
-                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
-                                IsTextSelectionEnabled="True"
-                                Text="{x:Bind EaVersion}" />
-                            <labs:SettingsExpander.Items >
-                            </labs:SettingsExpander.Items>
-                        </labs:SettingsExpander> -->
                     </labs:SettingsExpander.Items>
                 </labs:SettingsExpander>
             </StackPanel>

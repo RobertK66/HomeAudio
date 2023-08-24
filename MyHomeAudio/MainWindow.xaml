@@ -7,25 +7,27 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d">
-    <NavigationView ItemInvoked="NavigationView_ItemInvoked" IsBackButtonVisible="Collapsed" Header="This is Header Text"  >
-        <NavigationView.MenuItems>
-            <NavigationViewItem Icon="Play" Content="Menu Item1" Tag="SamplePage1" />
-            <NavigationViewItem Icon="Save" Content="Menu Item2" Tag="SamplePage2" >
-                <NavigationViewItem.MenuItems>
-                    <NavigationViewItem Content="Mail" Icon="Mail" Tag="SamplePage2.1"/>
-                    <NavigationViewItem Content="Calendar" Icon="Calendar" Tag="SamplePage2.2">
-                        <NavigationViewItem.MenuItems>
-                            <NavigationViewItem Content="Mail" Icon="Manage" Tag="SamplePage2.2.1"/>
-                            <NavigationViewItem Content="Calendar" Icon="Camera" Tag="SamplePage2.2.2"/>
-                        </NavigationViewItem.MenuItems>
-                    </NavigationViewItem>
-                </NavigationViewItem.MenuItems>
-            </NavigationViewItem>
-            <NavigationViewItem Icon="Refresh" Content="Menu Item3" Tag="SamplePage3" />
-            <NavigationViewItem Icon="Download" Content="Menu Item4" Tag="SamplePage4" />
-        </NavigationView.MenuItems>
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <NavigationView x:Name="MainNavView" ItemInvoked="NavigationView_ItemInvoked" IsBackButtonVisible="Collapsed" Header="This is Header Text">
+            <NavigationView.MenuItems>
+                <NavigationViewItem Icon="Play" Content="Menu Item1" Tag="SamplePage1" />
+                <NavigationViewItem Icon="Save" Content="Menu Item2" Tag="SamplePage2" >
+                    <NavigationViewItem.MenuItems>
+                        <NavigationViewItem Content="Mail" Icon="Mail" Tag="SamplePage2.1"/>
+                        <NavigationViewItem Content="Calendar" Icon="Calendar" Tag="SamplePage2.2">
+                            <NavigationViewItem.MenuItems>
+                                <NavigationViewItem Content="Mail" Icon="Manage" Tag="SamplePage2.2.1"/>
+                                <NavigationViewItem Content="Calendar" Icon="Camera" Tag="SamplePage2.2.2"/>
+                            </NavigationViewItem.MenuItems>
+                        </NavigationViewItem>
+                    </NavigationViewItem.MenuItems>
+                </NavigationViewItem>
+                <NavigationViewItem Icon="Refresh" Content="Menu Item3" Tag="SamplePage3" />
+                <NavigationViewItem Icon="Download" Content="Menu Item4" Tag="SamplePage4" />
+            </NavigationView.MenuItems>
 
-        <Frame x:Name="ContentFrame" />
+            <Frame x:Name="ContentFrame" />
 
-    </NavigationView>
+        </NavigationView>
+    </Grid>
 </Window>

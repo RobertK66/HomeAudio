@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
@@ -46,7 +47,10 @@ namespace MyHomeAudio {
             m_window.Activate();
         }
 
-        private Window m_window;
+        public MainWindow m_window;
+
+
+        public new static App Current => (App)Application.Current;
 
         public static string WinAppSdkDetails {
             get => string.Format("Windows App SDK {0}.{1}.{2}{3}",
@@ -58,6 +62,13 @@ namespace MyHomeAudio {
                 var details = WinAppSdkDetails + WASDK.Runtime.Version.DotQuadString;
                 return details;
             }
+        }
+
+        public static TEnum GetEnum<TEnum>(string text) where TEnum : struct {
+            if (!typeof(TEnum).GetTypeInfo().IsEnum) {
+                throw new InvalidOperationException("Generic parameter 'TEnum' must be an enum.");
+            }
+            return (TEnum)Enum.Parse(typeof(TEnum), text);
         }
 
     }

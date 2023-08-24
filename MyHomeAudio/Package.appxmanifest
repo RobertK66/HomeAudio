@@ -8,7 +8,7 @@
   IgnorableNamespaces="uap rescap">
 
   <Identity
-    Name="b1000f29-5d74-47c6-800b-b36d7f1d18e7"
+    Name="Rob1000f29-5d74-47c6-800b-b36d7f1d18e7"
     Publisher="CN=RKOS Software"
     Version="1.0.8.0" />
 
@@ -47,6 +47,5 @@
 
   <Capabilities>
     <rescap:Capability Name="runFullTrust" />
-    <Capability Name="privateNetworkClientServer"/>
   </Capabilities>
 </Package>

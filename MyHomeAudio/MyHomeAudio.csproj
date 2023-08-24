@@ -17,7 +17,7 @@
     <AppxAutoIncrementPackageRevision>False</AppxAutoIncrementPackageRevision>
     <AppxSymbolPackageEnabled>False</AppxSymbolPackageEnabled>
     <GenerateTestArtifacts>True</GenerateTestArtifacts>
-    <AppxBundle>Never</AppxBundle>
+    <AppxBundle>Auto</AppxBundle>
     <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
 
   </PropertyGroup>
@@ -26,6 +26,7 @@
   <PropertyGroup>
     <PublishReadyToRun>false</PublishReadyToRun>
     <AssemblyVersion>1.0.0.42</AssemblyVersion>
+    <AppxBundlePlatforms>x86|x64</AppxBundlePlatforms>
   </PropertyGroup>
 
   

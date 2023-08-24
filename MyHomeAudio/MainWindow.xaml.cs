@@ -18,6 +18,7 @@ using WinRT.Interop;          // Needed for XAML/HWND interop.
 using Windows.UI;
 using System.Net.NetworkInformation;
 using MyHomeAudio.pages;
+using Windows.Storage;
 
 //using AppUIBasics.Common;
 //using AppUIBasics.Data;
@@ -45,6 +46,8 @@ namespace MyHomeAudio {
 
     public sealed partial class MainWindow : Window {
 
+        public NavigationView MainNavPane { get => this.MainNavView; }
+
         public MainWindow() {
             this.InitializeComponent();
             AppWindow.Title = "My Audio - Cast Application";
@@ -52,24 +55,37 @@ namespace MyHomeAudio {
             AppWindow.TitleBar.BackgroundColor = Colors.Bisque;
             AppWindow.TitleBar.ButtonBackgroundColor = Colors.Bisque;
 
+            var isLeft = ApplicationData.Current.LocalSettings.Values[AppSettingKeys.IsLeftMode];
+            if (isLeft == null || ((bool)isLeft == true)) {
+                MainNavView.PaneDisplayMode = NavigationViewPaneDisplayMode.Auto;
+            } else {
+                MainNavView.PaneDisplayMode = NavigationViewPaneDisplayMode.Top;
+            }
+
+            String theme = ApplicationData.Current.LocalSettings.Values[AppSettingKeys.UiTheme]?.ToString();
+            if (theme != null) {
+                var t = App.GetEnum<ElementTheme>(theme);
+
+                if (this.Content is FrameworkElement rootElement) {
+                    rootElement.RequestedTheme = t;
+                }
+            }
+
         }
 
         private void NavigationView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args) {
             if (args.IsSettingsInvoked) {
                 sender.AlwaysShowHeader = false;
-                //ContentFrame.Navigate(typeof(SettingsPage));
-                ContentFrame.Content = new SettingsPage();
+                ContentFrame.Navigate(typeof(SettingsPage));
+                //ContentFrame.Content = new SettingsPage();
             } else {
                 sender.AlwaysShowHeader = true;
                 string selectedItemTag = (String)args.InvokedItem;
                 sender.Header = "Sample Page " + selectedItemTag;
-                //ContentFrame.Navigate(typeof(ContentPage));
-                ContentFrame.Content = new ContentPage();
+                ContentFrame.Navigate(typeof(ContentPage));
+                //ContentFrame.Content = new ContentPage();
             }
         }
 
-        private void NavigationView_BackRequested(NavigationView sender, NavigationViewBackRequestedEventArgs args) {
-            ContentFrame.GoBack();
-        }
     }
 }
