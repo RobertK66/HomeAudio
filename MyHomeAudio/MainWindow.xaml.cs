@@ -19,6 +19,8 @@ using Windows.UI;
 using System.Net.NetworkInformation;
 using MyHomeAudio.pages;
 using Windows.Storage;
+using System.Diagnostics;
+using Microsoft.UI.Xaml.Shapes;
 
 //using AppUIBasics.Common;
 //using AppUIBasics.Data;
@@ -71,6 +73,25 @@ namespace MyHomeAudio {
                 }
             }
 
+            var repPath = ApplicationData.Current.LocalSettings.Values[AppSettingKeys.ReposPath]?.ToString();
+            if (repPath == null) {
+                repPath = ApplicationData.Current.LocalFolder.Path;
+            }
+            BuildMenue(repPath);
+
+
+        }
+
+        public void BuildMenue(string repPath) {
+            MainNavView.MenuItems.Clear();
+            int i = 0;
+            foreach(var f in Directory.GetFiles(repPath, "*.json")) {
+                if (File.ReadAllText(f).Contains("\"Tracks\"")) {
+                    MainNavView.MenuItems.Add(new NavigationViewItem() { Icon = new FontIcon() { Glyph = "\uEA3F" }, Content= System.IO.Path.GetFileName(f), Tag = "CD-" + i++ });
+                } else {
+                    MainNavView.MenuItems.Add(new NavigationViewItem() { Icon = new FontIcon() { Glyph = "\uE704" }, Content = System.IO.Path.GetFileName(f), Tag = "Radio-" + i++ });
+                }
+            }
         }
 
         private void NavigationView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args) {
@@ -80,9 +101,9 @@ namespace MyHomeAudio {
                 //ContentFrame.Content = new SettingsPage();
             } else {
                 sender.AlwaysShowHeader = true;
-                string selectedItemTag = (String)args.InvokedItem;
-                sender.Header = "Sample Page " + selectedItemTag;
-                ContentFrame.Navigate(typeof(ContentPage));
+                string selectedItem = (String)args.InvokedItem;
+                sender.Header = "Sample Page " + selectedItem;
+                ContentFrame.Navigate(typeof(ContentPage), selectedItem);
                 //ContentFrame.Content = new ContentPage();
             }
         }

@@ -9,7 +9,7 @@ namespace WinGuiPackaged.logger {
     [UnsupportedOSPlatform("browser")]
     [ProviderAlias("ConGuiConsole")]
     public sealed class WinUiLoggerProvider : ILoggerProvider {
-        private readonly IDisposable? _onChangeToken;
+        private readonly IDisposable _onChangeToken;
         private WinUiLoggerConfiguration _currentConfig;
         private readonly ConcurrentDictionary<string, WinUiLogger> _loggers =
             new(StringComparer.OrdinalIgnoreCase);

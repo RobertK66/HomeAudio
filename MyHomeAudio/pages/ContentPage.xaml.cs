@@ -23,6 +23,16 @@ namespace MyHomeAudio.pages {
     public sealed partial class ContentPage : Page {
         public ContentPage() {
             this.InitializeComponent();
+            MyContent.Text += ".const.";
+        }
+
+        private void Page_Loaded(object sender, RoutedEventArgs e) {
+
+            MyContent.Text += "load";
+        }
+
+        protected override void OnNavigatedTo(NavigationEventArgs e) {
+            MyContent.Text += "n(" + e.Parameter + ")";
         }
     }
 }

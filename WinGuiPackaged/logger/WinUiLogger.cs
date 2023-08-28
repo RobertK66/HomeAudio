@@ -16,7 +16,7 @@ namespace WinGuiPackaged.logger {
             Func<WinUiLoggerConfiguration> getCurrentConfig) =>
             (_name, _getCurrentConfig) = (name, getCurrentConfig);
 
-        public IDisposable? BeginScope<TState>(TState? state) where TState : notnull => default!;
+        public IDisposable BeginScope<TState>(TState state) where TState : notnull => default!;
 
         public bool IsEnabled(LogLevel logLevel) =>
             true;
@@ -25,8 +25,8 @@ namespace WinGuiPackaged.logger {
             LogLevel logLevel,
             EventId eventId,
             TState state,
-            Exception? exception,
-            Func<TState, Exception?, string> formatter) {
+            Exception exception,
+            Func<TState, Exception, string> formatter) {
             if (!IsEnabled(logLevel)) {
                 return;
             }
@@ -45,21 +45,21 @@ namespace WinGuiPackaged.logger {
             //}    
 
             //if (configured <= logLevel) { 
-            string? threadTxt = Thread.CurrentThread.Name;
-            //if (Thread.CurrentThread.IsThreadPoolThread) {
-            //    threadTxt = "TP";
-            //} 
-            //int unmanagedId = AppDomain.GetCurrentThreadId();
-            //ProcessThread? myThread = (from ProcessThread entry in Process.GetCurrentProcess().Threads
-            //                          where entry.Id == unmanagedId
-            //                          select entry).FirstOrDefault();
-            // threadTxt += "-" + Environment.CurrentManagedThreadId.ToString() + " " + unmanagedId.ToString() + ((myThread?.ToString())??"u")  + " ";
+            //string threadTxt = Thread.CurrentThread.Name;
+            ////if (Thread.CurrentThread.IsThreadPoolThread) {
+            ////    threadTxt = "TP";
+            ////} 
+            ////int unmanagedId = AppDomain.GetCurrentThreadId();
+            ////ProcessThread? myThread = (from ProcessThread entry in Process.GetCurrentProcess().Threads
+            ////                          where entry.Id == unmanagedId
+            ////                          select entry).FirstOrDefault();
+            //// threadTxt += "-" + Environment.CurrentManagedThreadId.ToString() + " " + unmanagedId.ToString() + ((myThread?.ToString())??"u")  + " ";
 
-            threadTxt += "-" + Environment.CurrentManagedThreadId.ToString() + " ";
+            //threadTxt += "-" + Environment.CurrentManagedThreadId.ToString() + " ";
 
             // threadTxt += Thread.CurrentThread.ExecutionContext?.GetType();
             // threadTxt += "xx";
-            string eventTxt = $"[{logLevel.ToString()}]";
+            string eventTxt = $"[{logLevel}]";
 
             if (!String.IsNullOrWhiteSpace(eventId.Name)) {
                 eventTxt += $", [{eventId.Name}]";

@@ -11,10 +11,13 @@ using Microsoft.VisualBasic;
 using Microsoft.WindowsAppSDK.Runtime;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
@@ -76,21 +79,67 @@ namespace MyHomeAudio.pages {
             }
 
             set {
-                if(_sts != value) { 
+                if (_sts != value) {
                     _sts = value;
-                    RaisePropertyChanged("SettingsTitleString");
+                    RaisePropertyChanged();
                 }
             }
-            
-            
         }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        public void RaisePropertyChanged(string name) {
-            if (PropertyChanged != null) {
-                PropertyChanged(this, new PropertyChangedEventArgs(name));
+        private String _repospath = ApplicationData.Current.LocalFolder.Path;
+        public String RepositoryPath {
+            get {
+                return _repospath;
+            }
+
+            set {
+                if (_repospath != value) {
+                    _repospath = value;
+                    RaisePropertyChanged();
+                }
             }
         }
+
+        private int ListReposFiles() {
+            int i = 0;
+            try {
+                RepositoryFiles.Clear();
+                foreach (var s in Directory.GetFiles(RepositoryPath, "*.json")) {
+                    RepositoryFiles.Add(s);
+                    i++;
+                }
+            } catch (Exception ex) {
+                Debug.WriteLine(ex);
+            }
+            return i;
+        }
+
+        private ObservableCollection<String> _reposfiles = new ObservableCollection<String>();
+        public ObservableCollection<String> RepositoryFiles {
+            get {
+                return _reposfiles;
+            }
+
+            set {
+                if (_reposfiles != value) {
+                    _reposfiles = value;
+                    RaisePropertyChanged();
+                }
+            }
+        }
+
+
+
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void RaisePropertyChanged([CallerMemberName] string? propertyName = null) {
+            if (PropertyChanged != null) {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+
+
+
 
         public string WinAppSdkDetails {
             get => App.WinAppSdkDetails;
@@ -127,6 +176,11 @@ namespace MyHomeAudio.pages {
             loadTime = DateTime.Now - startTime;
             constcount++;
             SettingsTitleString = string.Format("Settings Page constructed: {0}, loaded: {1} time: {2} ms.", constcount, loadcount, loadTime.Value.TotalMilliseconds);
+
+            var configPath = ApplicationData.Current.LocalSettings.Values[AppSettingKeys.ReposPath]?.ToString();
+            if (configPath != null) {
+                RepositoryPath = configPath;
+            } 
         }
 
         private void themeMode_SelectionChanged_1(object sender, SelectionChangedEventArgs e) {
@@ -165,7 +219,6 @@ namespace MyHomeAudio.pages {
                 navigationLocation.SelectedIndex = 1;
             }
 
-
             ElementTheme currentTheme = ElementTheme.Light;
             if (App.Current.m_window.Content is FrameworkElement rootElement) {
                 currentTheme = rootElement.RequestedTheme;
@@ -182,5 +235,32 @@ namespace MyHomeAudio.pages {
                     break;
             }
         }
+
+        private void SettingsExpander_Expanded(object sender, EventArgs e) {
+            if (ListReposFiles()>0) {
+                String configPath = ApplicationData.Current.LocalSettings.Values[AppSettingKeys.ReposPath]?.ToString();
+                if (configPath != null) {
+                    if (!RepositoryPath.Equals(configPath)) {
+                        // it really changend and there are valid files!
+                        ApplicationData.Current.LocalSettings.Values[AppSettingKeys.ReposPath] = RepositoryPath;
+                        App.Current.ReconfigureMainWindow(RepositoryPath);
+                    }
+                } else {
+                    ApplicationData.Current.LocalSettings.Values[AppSettingKeys.ReposPath] = RepositoryPath;
+                    App.Current.ReconfigureMainWindow(RepositoryPath);
+                }
+            }
+        }
+
+        private void reposPath_TextChanged(object sender, TextChangedEventArgs e) {
+            fileExpander.IsExpanded = false;        //TODO: find out why this is needed Observable collection should work as items if expanden !?
+            ListReposFiles();
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e) {
+            RepositoryPath = ApplicationData.Current.LocalFolder.Path;
+        }
+
+        
     }
 }

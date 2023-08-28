@@ -1,0 +1,190 @@
+[
+  {
+    "CDID": "810e5104",
+    "Name": "Some Folk from openmusicarchive",
+    "Artist": "...",
+    "Tracks": [
+      {
+        "ContentUrl": "http://www.openmusicarchive.org/audio/Frankie%20by%20Mississippi%20John%20Hurt.mp3",
+        "Name": "Frankie"
+      },
+      {
+        "ContentUrl": "http://www.openmusicarchive.org/audio/Mississippi%20Boweavil%20Blues%20by%20The%20Masked%20Marvel.mp3",
+        "Name": "Mississippi"
+      },
+      {
+        "ContentUrl": "http://www.openmusicarchive.org/audio/The%20Wild%20Wagoner%20by%20Jilson%20Setters.mp3",
+        "Name": "Wild Wagoner"
+      },
+      {
+        "ContentUrl": "http://www.openmusicarchive.org/audio/Drunkards%20Special%20by%20Coley%20Jones.mp3",
+        "Name": "Drunkards"
+      }
+    ]
+  },
+  {
+    "CDID": "960ad510",
+    "Name": "Some Tracks from freepd",
+    "Artist": "xyz",
+    "Tracks": [
+      {
+        "ContentUrl": "https://freepd.com/music/Barnville.mp3",
+        "Name": "Barnville"
+      },
+      {
+        "ContentUrl": "https://freepd.com/music/Deck%20the%20Halls.mp3",
+        "Name": "Deck the Halls"
+      },
+      {
+        "ContentUrl": "https://freepd.com/music/Happy%20Whistling%20Ukulele.mp3",
+        "Name": "Happy Whistling"
+      },
+      {
+        "ContentUrl": "https://freepd.com/music/Frogs%20Legs%20Rag.mp3",
+        "Name": "Frogs"
+      },
+      {
+        "ContentUrl": "https://freepd.com/music/Rush.mp3",
+        "Name": "Rush"
+      },
+      {
+        "ContentUrl": "https://freepd.com/music/Consecrated%20Ground.mp3",
+        "Name": "Consecrated Ground"
+      },
+      {
+        "ContentUrl": "https://freepd.com/music/Nightmare.mp3",
+        "Name": "Nightmare"
+      },
+      {
+        "ContentUrl": "https://freepd.com/music/Isolation%20Waltz.mp3",
+        "Name": "Isolation Waltz"
+      },
+      {
+        "ContentUrl": "https://freepd.com/music/City%20Run.mp3",
+        "Name": "City Run"
+      },
+      {
+        "ContentUrl": "https://freepd.com/music/Heroic%20Adventure.mp3",
+        "Name": "Heroic Adventure"
+      }
+    ]
+  },
+  {
+    "CDID": "a40d3f14",
+    "Name": "Memories (from local hdd)",
+    "Artist": "Barbra Streisand",
+    "Tracks": [
+      {
+        "ContentUrl": "http://192.168.177.65:50002/m/NDLNA/6582.mp3",
+        "Name": "You Don't Bring Me Flowers (Duet with Neil Diamond)/Memories"
+      },
+      {
+        "ContentUrl": "http://192.168.177.65:50002/m/NDLNA/6583.mp3",
+        "Name": "My Heart Belongs To Me/Memories"
+      },
+      {
+        "ContentUrl": "http://192.168.177.65:50002/m/NDLNA/6584.mp3",
+        "Name": "Wet/Memories"
+      },
+      {
+        "ContentUrl": "http://192.168.177.65:50002/m/NDLNA/6585.mp3",
+        "Name": "New York State Of Mind/Memories"
+      },
+      {
+        "ContentUrl": "http://192.168.177.65:50002/m/NDLNA/6586.mp3",
+        "Name": "A Man I Loved/Memories"
+      },
+      {
+        "ContentUrl": "http://192.168.177.65:50002/m/NDLNA/6587.mp3",
+        "Name": "No More Tears (Enough Is Enough)(Duet with Donna Summer)/Memories"
+      },
+      {
+        "ContentUrl": "http://192.168.177.65:50002/m/NDLNA/6588.mp3",
+        "Name": "Comin' In And Out Of Our Life/Memories"
+      },
+      {
+        "ContentUrl": "http://192.168.177.65:50002/m/NDLNA/6589.mp3",
+        "Name": "Evergreen (Love Theme from \"A Star Is Born\")/Memories"
+      },
+      {
+        "ContentUrl": "http://192.168.177.65:50002/m/NDLNA/6576.mp3",
+        "Name": "I Don't Break Easily/Memories"
+      },
+      {
+        "ContentUrl": "http://192.168.177.65:50002/m/NDLNA/6577.mp3",
+        "Name": "Kiss Me In The Rain/Memories"
+      },
+      {
+        "ContentUrl": "http://192.168.177.65:50002/m/NDLNA/6578.mp3",
+        "Name": "Lost Inside Of You/Memories"
+      },
+      {
+        "ContentUrl": "http://192.168.177.65:50002/m/NDLNA/6579.mp3",
+        "Name": "The Love Inside/Memories"
+      },
+      {
+        "ContentUrl": "http://192.168.177.65:50002/m/NDLNA/6580.mp3",
+        "Name": "The Way We Were/Memories"
+      }
+    ]
+  },
+  {
+    "CDID": "e10cd113",
+    "Name": "One Voice (from local hdd)",
+    "Artist": "Barbra Streisand",
+    "Tracks": [
+      {
+        "ContentUrl": "http://192.168.177.65:50002/m/NDLNA/6591.mp3",
+        "Name": "Somewhere/One Voice"
+      },
+      {
+        "ContentUrl": "http://192.168.177.65:50002/m/NDLNA/6602.mp3",
+        "Name": "Evergreen (Love Theme From \"A Star Is Born\")/One Voice"
+      },
+      {
+        "ContentUrl": "http://192.168.177.65:50002/m/NDLNA/6592.mp3",
+        "Name": "Something's Coming/One Voice"
+      },
+      {
+        "ContentUrl": "http://192.168.177.65:50002/m/NDLNA/6593.mp3",
+        "Name": "People/One Voice"
+      },
+      {
+        "ContentUrl": "http://192.168.177.65:50002/m/NDLNA/6594.mp3",
+        "Name": "Send In The Clowns/One Voice"
+      },
+      {
+        "ContentUrl": "http://192.168.177.65:50002/m/NDLNA/6595.mp3",
+        "Name": "Over The Rainbow/One Voice"
+      },
+      {
+        "ContentUrl": "http://192.168.177.65:50002/m/NDLNA/6596.mp3",
+        "Name": "Guilty (Duet With Barry Gibb)/One Voice"
+      },
+      {
+        "ContentUrl": "http://192.168.177.65:50002/m/NDLNA/6597.mp3",
+        "Name": "What Kind Of Fool (Duet With Barry Gibb)/One Voice"
+      },
+      {
+        "ContentUrl": "http://192.168.177.65:50002/m/NDLNA/6598.mp3",
+        "Name": "Papa, Can You Hear Me?/One Voice"
+      },
+      {
+        "ContentUrl": "http://192.168.177.65:50002/m/NDLNA/6599.mp3",
+        "Name": "The Way We Were/One Voice"
+      },
+      {
+        "ContentUrl": "http://192.168.177.65:50002/m/NDLNA/6600.mp3",
+        "Name": "It's A New World/One Voice"
+      },
+      {
+        "ContentUrl": "http://192.168.177.65:50002/m/NDLNA/6590.mp3",
+        "Name": "Happy Days Are Here Again/One Voice"
+      },
+      {
+        "ContentUrl": "http://192.168.177.65:50002/m/NDLNA/6601.mp3",
+        "Name": "America, The Beautiful/One Voice"
+      }
+    ]
+  }
+]
