@@ -8,7 +8,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-      NavigationCacheMode="Required"
+      NavigationCacheMode="Enabled"
     Loaded="Page_Loaded"
     
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
@@ -86,7 +86,20 @@
                         <ComboBoxItem Content="Top" />
                     </ComboBox>
                 </labs:SettingsCard>
-               
+
+
+                <!--  Media  -->
+                <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" Text="Media" />
+
+                <labs:SettingsExpander x:Name="fileExpander" Header="Media Repository Path" HeaderIcon="PreviewLink" ItemsSource="{x:Bind RepositoryFiles, Mode=TwoWay}" Expanded="SettingsExpander_Expanded">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBox x:Name="reposPath"  Text="{x:Bind RepositoryPath, Mode=TwoWay}" TextChanged="reposPath_TextChanged" />
+                        <Button Content="Reset default" Click="Button_Click" />
+                    </StackPanel>
+
+                </labs:SettingsExpander>
+
+
                 <!--  About  -->
                 <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" Text="About" />
 

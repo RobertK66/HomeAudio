@@ -8,6 +8,7 @@ using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Xaml.Shapes;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -18,6 +19,7 @@ using Windows.ApplicationModel.Activation;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Foundation.Metadata;
+using Windows.Storage;
 using WASDK = Microsoft.WindowsAppSDK;
 
 
@@ -42,9 +44,27 @@ namespace MyHomeAudio {
         /// </summary>
         /// <param name="args">Details about the launch request and process.</param>
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args) {
+
+            try {
+                String fullpath = System.Reflection.Assembly.GetEntryAssembly().Location;
+                String path = fullpath.Substring(0, fullpath.LastIndexOf("\\"));
+
+                if (!File.Exists(ApplicationData.Current.LocalFolder.Path + "\\Cds.json")) {
+                    System.IO.File.Copy(path + "\\Cds.json", ApplicationData.Current.LocalFolder.Path + "\\Cds.json");
+                }
+                if (!File.Exists(ApplicationData.Current.LocalFolder.Path + "\\WebRadios.json")) {
+                    System.IO.File.Copy(path + "\\WebRadios.json", ApplicationData.Current.LocalFolder.Path + "\\WebRadios.json");
+                }
+
+            } catch (Exception ex) {
+                Debug.WriteLine(ex);
+            }
+
             m_window = new MainWindow();
             //m_window.ExtendsContentIntoTitleBar = true;
             m_window.Activate();
+
+
         }
 
         public MainWindow m_window;
@@ -71,5 +91,9 @@ namespace MyHomeAudio {
             return (TEnum)Enum.Parse(typeof(TEnum), text);
         }
 
+        internal void ReconfigureMainWindow(string repositoryPath) {
+            m_window.BuildMenue(repositoryPath);
+
+        }
     }
 }
