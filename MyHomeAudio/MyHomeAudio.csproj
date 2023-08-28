@@ -25,7 +25,7 @@
   
   <PropertyGroup>
     <PublishReadyToRun>false</PublishReadyToRun>
-    <AssemblyVersion>1.0.9.1</AssemblyVersion>
+    <AssemblyVersion>1.0.10.1</AssemblyVersion>
     <AppxBundlePlatforms>x86|x64</AppxBundlePlatforms>
   </PropertyGroup>
 
