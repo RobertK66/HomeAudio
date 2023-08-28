@@ -6,7 +6,7 @@
     xmlns:local="using:MyHomeAudio.pages"
     xmlns:labs="using:CommunityToolkit.Labs.WinUI"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:system="using:System"
     mc:Ignorable="d"
       NavigationCacheMode="Enabled"
     Loaded="Page_Loaded"
@@ -33,24 +33,6 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <!--<VisualStateManager.VisualStateGroups>
-            <VisualStateGroup>
-                --><!--<VisualState x:Name="WideLayout">
-                    <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="{StaticResource Breakpoint640Plus}" />
-                    </VisualState.StateTriggers>
-                </VisualState>
-                <VisualState x:Name="NarrowLayout">
-                    <VisualState.StateTriggers>
-                        <AdaptiveTrigger MinWindowWidth="0" />
-                    </VisualState.StateTriggers>
-                    <VisualState.Setters>
-                        <Setter Target="contentSV.Padding" Value="16,0" />
-                        <Setter Target="PageHeader.Margin" Value="16,48,0,0" />
-                    </VisualState.Setters>
-                </VisualState>--><!--
-            </VisualStateGroup>
-        </VisualStateManager.VisualStateGroups>-->
         <TextBlock
            x:Name="PageHeader"
            Margin="36,24,36,0"
@@ -70,7 +52,7 @@
                     <labs:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE790;" />
                     </labs:SettingsCard.HeaderIcon>
-                    <ComboBox x:Name="themeMode" AutomationProperties.AutomationId="themeModeComboBox" SelectionChanged="themeMode_SelectionChanged_1">
+                    <ComboBox x:Name="themeMode" SelectionChanged="themeMode_SelectionChanged_1">
                         <ComboBoxItem Content="Light" Tag="Light" />
                         <ComboBoxItem Content="Dark" Tag="Dark" />
                         <ComboBoxItem Content="Use system setting" Tag="Default" />
@@ -92,11 +74,15 @@
                 <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" Text="Media" />
 
                 <labs:SettingsExpander x:Name="fileExpander" Header="Media Repository Path" HeaderIcon="PreviewLink" ItemsSource="{x:Bind RepositoryFiles, Mode=TwoWay}" Expanded="SettingsExpander_Expanded">
+                    <labs:SettingsExpander.ItemTemplate>
+                        <DataTemplate x:DataType="system:String">
+                            <labs:SettingsCard  Description="" Header="{Binding}" />
+                        </DataTemplate>
+                    </labs:SettingsExpander.ItemTemplate>
                     <StackPanel Orientation="Horizontal">
                         <TextBox x:Name="reposPath"  Text="{x:Bind RepositoryPath, Mode=TwoWay}" TextChanged="reposPath_TextChanged" />
                         <Button Content="Reset default" Click="Button_Click" />
                     </StackPanel>
-
                 </labs:SettingsExpander>
 
 
