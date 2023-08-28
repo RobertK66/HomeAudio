@@ -1,7 +1,7 @@
 # HomeAudio
 Simple WebRadio/CD-Player based on [Sharpcaster](https://github.com/Tapanila/SharpCaster/) and [ConsoleGUI](https://github.com/TomaszRewak/C-sharp-console-gui-framework)
 
-Usage:
+Usage (Release 0.0.1 only):
 * Download latest release
 * Extract version for Windows or Linux to your working dir.
   * Change the "CcName" entry in appsettings.json to give the name of the chromecast device you want to use for playback (if not sure what the name is, look for '... ChromeCastWrapper - found \<xyz\>' messages in log panel).
