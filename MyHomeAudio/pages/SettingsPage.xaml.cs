@@ -129,17 +129,12 @@ namespace MyHomeAudio.pages {
         }
 
 
-
-
         public event PropertyChangedEventHandler PropertyChanged;
         public void RaisePropertyChanged([CallerMemberName] string? propertyName = null) {
             if (PropertyChanged != null) {
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
-
-
-
 
         public string WinAppSdkDetails {
             get => App.WinAppSdkDetails;

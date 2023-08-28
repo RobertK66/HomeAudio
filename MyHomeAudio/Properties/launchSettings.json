@@ -1,7 +1,9 @@
 {
   "profiles": {
     "MyHomeAudio (Package)": {
-      "commandName": "MsixPackage"
+      "commandName": "MsixPackage",
+      "doNotLaunchApp": false,
+      "nativeDebugging": true
     },
     "MyHomeAudio (Unpackaged)": {
       "commandName": "Project"
