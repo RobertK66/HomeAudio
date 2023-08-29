@@ -17,7 +17,12 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WinGuiPackaged", "WinGuiPac
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MauiGUI", "MauiGUI\MauiGUI.csproj", "{684FC41D-63B0-4A3E-9FE6-E172FC17716C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyHomeAudio", "MyHomeAudio\MyHomeAudio.csproj", "{021B0BB8-CEAB-4BC4-AA22-B46AA3D8BFAD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyHomeAudio", "MyHomeAudio\MyHomeAudio.csproj", "{021B0BB8-CEAB-4BC4-AA22-B46AA3D8BFAD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Projektmappenelemente", "Projektmappenelemente", "{67F20CC1-71D5-4F00-9620-A4D57D453280}"
+	ProjectSection(SolutionItems) = preProject
+		.github\workflows\build-msix-pkg.yml = .github\workflows\build-msix-pkg.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
