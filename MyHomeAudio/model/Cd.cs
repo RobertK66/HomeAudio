@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace WinGuiPackaged.model {
+namespace MyHomeAudio.model {
     public class Cd {
         public string Name { get; set; }
         public string Artist { get; set; }

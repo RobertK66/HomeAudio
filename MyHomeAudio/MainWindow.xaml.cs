@@ -21,6 +21,9 @@ using MyHomeAudio.pages;
 using Windows.Storage;
 using System.Diagnostics;
 using Microsoft.UI.Xaml.Shapes;
+using MyHomeAudio.nav;
+using System.Collections.ObjectModel;
+using System.Collections;
 
 //using AppUIBasics.Common;
 //using AppUIBasics.Data;
@@ -49,6 +52,10 @@ namespace MyHomeAudio {
     public sealed partial class MainWindow : Window {
 
         public NavigationView MainNavPane { get => this.MainNavView; }
+
+        public ObservableCollection<CategoryBase> Categories = new ObservableCollection<CategoryBase>();
+
+
 
         public MainWindow() {
             this.InitializeComponent();
@@ -83,13 +90,20 @@ namespace MyHomeAudio {
         }
 
         public void BuildMenue(string repPath) {
-            MainNavView.MenuItems.Clear();
+            
+            Categories.Clear();
             int i = 0;
             foreach(var f in Directory.GetFiles(repPath, "*.json")) {
                 if (File.ReadAllText(f).Contains("\"Tracks\"")) {
-                    MainNavView.MenuItems.Add(new NavigationViewItem() { Icon = new FontIcon() { Glyph = "\uEA3F" }, Content= System.IO.Path.GetFileName(f), Tag = "CD-" + i++ });
+                    string reposid = "CD-" + i++;
+                    Categories.Add(new Category() { Glyph = Symbol.Target, Name = System.IO.Path.GetFileName(f), Tag = reposid  });
+                    App.Current.MediaRepository.AddCdRepos(reposid, f);
+                    //MainNavView.MenuItems.Add(new NavigationViewItem() { Icon = new FontIcon() { Glyph = "\uEA3F" }, Content= System.IO.Path.GetFileName(f), Tag = "CD-" + i++ });
                 } else {
-                    MainNavView.MenuItems.Add(new NavigationViewItem() { Icon = new FontIcon() { Glyph = "\uE704" }, Content = System.IO.Path.GetFileName(f), Tag = "Radio-" + i++ });
+                    string reposid = "Radio-" + i++;
+                    Categories.Add(new Category() { Glyph = Symbol.Scan, Name = System.IO.Path.GetFileName(f), Tag = reposid  });
+                    App.Current.MediaRepository.AddRadioRepos(reposid, f);
+                    //MainNavView.MenuItems.Add(new NavigationViewItem() { Icon = new FontIcon() { Glyph = "\uE704" }, Content = System.IO.Path.GetFileName(f), Tag = "Radio-" + i++ });
                 }
             }
         }
@@ -103,7 +117,12 @@ namespace MyHomeAudio {
                 sender.AlwaysShowHeader = true;
                 string selectedItem = (String)args.InvokedItem;
                 sender.Header = "Sample Page " + selectedItem;
-                ContentFrame.Navigate(typeof(ContentPage), selectedItem);
+                if (selectedItem.StartsWith("Cd")) {
+                    ContentFrame.Navigate(typeof(CdPage), args.InvokedItemContainer.Tag.ToString());
+                } else {
+                    ContentFrame.Navigate(typeof(RadioPage), args.InvokedItemContainer.Tag.ToString());
+                }
+
                 //ContentFrame.Content = new ContentPage();
             }
         }

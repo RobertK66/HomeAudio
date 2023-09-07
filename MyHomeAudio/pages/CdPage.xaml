@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="MyHomeAudio.pages.CdPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:MyHomeAudio.pages"
+    xmlns:localm="using:MyHomeAudio.model"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Page.Resources>
+        <DataTemplate x:Key="ImageTemplate" x:DataType="localm:Cd">
+            <ItemContainer HorizontalAlignment="Left" Width="800" Height="140" >
+                <StackPanel Orientation="Horizontal">
+                    <TextBox IsEnabled="False" Text="{x:Bind Name}"/>
+                    <TextBox IsEnabled="False" Text="{x:Bind Artist}"/>
+                    <Button x:Name="play" Click="play_Click">
+                        <SymbolIcon Symbol="Play"/>
+                    </Button>
+                </StackPanel>
+            </ItemContainer>
+        </DataTemplate>
+
+    </Page.Resources>
+    <Grid>
+
+
+        <ListView  ItemsSource="{x:Bind ListOfCDs}" ItemTemplate="{StaticResource ImageTemplate}"></ListView>
+    </Grid>
+</Page>

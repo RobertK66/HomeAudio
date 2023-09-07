@@ -4,7 +4,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:MyHomeAudio.pages"
-    xmlns:labs="using:CommunityToolkit.Labs.WinUI"
+    xmlns:labs="using:CommunityToolkit.WinUI.Controls"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:system="using:System"
     mc:Ignorable="d"
@@ -80,7 +80,8 @@
                         </DataTemplate>
                     </labs:SettingsExpander.ItemTemplate>
                     <StackPanel Orientation="Horizontal">
-                        <TextBox x:Name="reposPath"  Text="{x:Bind RepositoryPath, Mode=TwoWay}" TextChanged="reposPath_TextChanged" />
+                        <TextBox x:Name="reposPath"  Text="{x:Bind RepositoryPath, Mode=TwoWay}" IsEnabled="False"  TextChanged="reposPath_TextChanged" />
+                        <Button Content="..." Click="Button_Click_1" />
                         <Button Content="Reset default" Click="Button_Click" />
                     </StackPanel>
                 </labs:SettingsExpander>

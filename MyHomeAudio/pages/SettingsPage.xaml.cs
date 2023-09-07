@@ -1,14 +1,14 @@
-using CommunityToolkit.Labs.WinUI;
+using CommunityToolkit.WinUI.Controls;
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Data;
+using Microsoft.UI.Xaml.Documents;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.VisualBasic;
-using Microsoft.WindowsAppSDK.Runtime;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -24,8 +24,9 @@ using Windows.ApplicationModel;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Storage;
+using Windows.Storage.AccessCache;
+using Windows.Storage.Pickers;
 using static System.Net.Mime.MediaTypeNames;
-using WASDK = Microsoft.WindowsAppSDK;
 
 
 // To learn more about WinUI, the WinUI project structure,
@@ -232,7 +233,11 @@ namespace MyHomeAudio.pages {
         }
 
         private void SettingsExpander_Expanded(object sender, EventArgs e) {
-            if (ListReposFiles()>0) {
+           
+        }
+
+        private void reposPath_TextChanged(object sender, TextChangedEventArgs e) {
+            if (ListReposFiles() > 0) {
                 String configPath = ApplicationData.Current.LocalSettings.Values[AppSettingKeys.ReposPath]?.ToString();
                 if (configPath != null) {
                     if (!RepositoryPath.Equals(configPath)) {
@@ -247,15 +252,30 @@ namespace MyHomeAudio.pages {
             }
         }
 
-        private void reposPath_TextChanged(object sender, TextChangedEventArgs e) {
-            fileExpander.IsExpanded = false;        //TODO: find out why this is needed Observable collection should work as items if expanden !?
-            ListReposFiles();
-        }
-
         private void Button_Click(object sender, RoutedEventArgs e) {
             RepositoryPath = ApplicationData.Current.LocalFolder.Path;
         }
 
-        
+        private async void Button_Click_1(object sender, RoutedEventArgs e) {
+            // Create a folder picker
+            FolderPicker openPicker = new Windows.Storage.Pickers.FolderPicker();
+
+            // Retrieve the window handle (HWND) of the current WinUI 3 window.
+            var hWnd = WinRT.Interop.WindowNative.GetWindowHandle(App.Current.m_window);
+
+            // Initialize the folder picker with the window handle (HWND).
+            WinRT.Interop.InitializeWithWindow.Initialize(openPicker, hWnd);
+
+            // Set options for your folder picker
+            openPicker.SuggestedStartLocation = PickerLocationId.Desktop;
+            openPicker.FileTypeFilter.Add("*");
+
+            // Open the picker for the user to pick a folder
+            StorageFolder folder = await openPicker.PickSingleFolderAsync();
+            if (folder != null) {
+                StorageApplicationPermissions.FutureAccessList.AddOrReplace("PickedFolderToken", folder);
+                RepositoryPath = folder.Path;
+            } 
+        }
     }
 }
