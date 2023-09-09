@@ -26,13 +26,13 @@
   <PropertyGroup>
     <PublishReadyToRun>false</PublishReadyToRun>
     <AssemblyVersion>1.0.10.1</AssemblyVersion>
-    <AppxBundlePlatforms>x86|x64</AppxBundlePlatforms>
+    <AppxBundlePlatforms>x64</AppxBundlePlatforms>
   </PropertyGroup>
 
   
   <ItemGroup>
     <None Remove="pages\CdPage.xaml" />
-    <None Remove="pages\ContentPage.xaml" />
+    <None Remove="pages\ChromecastPage.xaml" />
     <None Remove="pages\RadioPage.xaml" />
     <None Remove="pages\SettingsPage.xaml" />
   </ItemGroup>
@@ -64,6 +64,9 @@
     <ProjectCapability Include="Msix" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\QueueCaster\QueueCaster.csproj" />
+  </ItemGroup>
+  <ItemGroup>
     <None Update="Cds.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -79,7 +82,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Page Update="pages\ContentPage.xaml">
+    <Page Update="pages\ChromecastPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

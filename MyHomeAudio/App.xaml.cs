@@ -7,6 +7,8 @@ using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Xaml.Shapes;
 using MyHomeAudio.model;
+using Sharpcaster.Interfaces;
+using Sharpcaster.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -15,6 +17,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
@@ -34,6 +37,9 @@ namespace MyHomeAudio {
 
         public MediaRepository MediaRepository = new MediaRepository();
 
+        public ChromeCastRepository ChromeCastRepos = new ChromeCastRepository();
+
+        //public List<ChromecastReceiver> KnownChromecastReceiver = new();
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
@@ -60,6 +66,12 @@ namespace MyHomeAudio {
                     System.IO.File.Copy(path + "\\WebRadios.json", ApplicationData.Current.LocalFolder.Path + "\\WebRadios.json");
                 }
 
+                IChromecastLocator locator = new Sharpcaster.MdnsChromecastLocator();
+                locator.ChromecastReceivedFound += Locator_ChromecastReceivedFound;
+                _ = locator.FindReceiversAsync(CancellationToken.None);         // Fire the search process and wait for receiver found events in the handler. No await here!
+
+
+
             } catch (Exception ex) {
                 Debug.WriteLine(ex);
             }
@@ -69,6 +81,11 @@ namespace MyHomeAudio {
             m_window.Activate();
 
 
+        }
+
+        private void Locator_ChromecastReceivedFound(object sender, Sharpcaster.Models.ChromecastReceiver e) {
+            ChromeCastRepos.Add(e);
+            //KnownChromecastReceiver.Add(e);
         }
 
         public MainWindow m_window;

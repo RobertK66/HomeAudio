@@ -36,7 +36,7 @@ namespace MyHomeAudio.pages {
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class SettingsPage : Page, INotifyPropertyChanged {
+    public sealed partial class SettingsPage : VmPage {
 
         private static int loadcount = 0;
         private static int constcount = 0;
@@ -129,13 +129,6 @@ namespace MyHomeAudio.pages {
             }
         }
 
-
-        public event PropertyChangedEventHandler PropertyChanged;
-        public void RaisePropertyChanged([CallerMemberName] string? propertyName = null) {
-            if (PropertyChanged != null) {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
-        }
 
         public string WinAppSdkDetails {
             get => App.WinAppSdkDetails;

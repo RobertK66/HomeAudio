@@ -3,7 +3,7 @@
   <PropertyGroup>
     <UapAppxPackageBuildMode>SideloadOnly</UapAppxPackageBuildMode>
     <AppxShowAllApps>False</AppxShowAllApps>
-    <AppxBuildConfigurationSelection>x86|x64</AppxBuildConfigurationSelection>
+    <AppxBuildConfigurationSelection>x64</AppxBuildConfigurationSelection>
     <PackageOptionalProjectsInIdeBuilds>False</PackageOptionalProjectsInIdeBuilds>
   </PropertyGroup>
   <ItemGroup>
@@ -22,7 +22,7 @@
     <Page Update="pages\CdPage.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="pages\ContentPage.xaml">
+    <Page Update="pages\ChromecastPage.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="pages\SettingsPage.xaml">

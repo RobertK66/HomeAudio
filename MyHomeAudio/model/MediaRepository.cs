@@ -22,6 +22,12 @@ namespace MyHomeAudio.model {
 
         internal void AddCdRepos(string reposid, string path) {
             var rep = new ObservableCollection<Cd>();
+            if (CdRepositories.ContainsKey(reposid)) {
+                rep = CdRepositories[reposid];
+                rep.Clear();
+            } else {
+                CdRepositories.Add(reposid, rep);
+            }
 
             if (File.Exists(path)) {
                 var cont = JsonSerializer.Deserialize<List<Cd>>(File.ReadAllText(path));
@@ -30,11 +36,17 @@ namespace MyHomeAudio.model {
                 }
             }
 
-            CdRepositories.Add(reposid, rep);
+            
         }
 
         internal void AddRadioRepos(string reposid, string path) {
             var rep = new ObservableCollection<NamedUrl>();
+            if (RadioRepositories.ContainsKey(reposid)) {
+                rep = RadioRepositories[reposid];
+                rep.Clear();
+            } else {
+                RadioRepositories.Add(reposid, rep);
+            }
 
             if (File.Exists(path)) {
                 try {
@@ -46,10 +58,8 @@ namespace MyHomeAudio.model {
                     Debug.WriteLine(ex.Message);
                 }
             }
-
-            RadioRepositories.Add(reposid, rep);
+            
         }
-
 
         internal ObservableCollection<Cd> GetCdRepository(string reposid) {
             if (CdRepositories.ContainsKey(reposid)) {

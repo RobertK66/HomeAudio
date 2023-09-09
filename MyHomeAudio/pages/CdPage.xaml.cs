@@ -1,3 +1,4 @@
+using ABI.System;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -15,8 +16,11 @@ using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
+using Windows.ApplicationModel.Chat;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using Windows.Media.Core;
+using Windows.Media.Playback;
 
 
 // To learn more about WinUI, the WinUI project structure,
@@ -26,10 +30,9 @@ namespace MyHomeAudio.pages {
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class CdPage : Page, INotifyPropertyChanged {
+    public sealed partial class CdPage : VmPage {
 
-        public event PropertyChangedEventHandler PropertyChanged;
-
+     
         private ObservableCollection<Cd>  _ListOfCDs;
         public ObservableCollection<Cd> ListOfCDs { get { return _ListOfCDs; } set { if (_ListOfCDs != value) { _ListOfCDs = value; RaisePropertyChanged(); } } }
         
@@ -37,12 +40,7 @@ namespace MyHomeAudio.pages {
             this.InitializeComponent();
         }
 
-        public void RaisePropertyChanged([CallerMemberName] string propertyName = null) {
-            if (PropertyChanged != null) {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
-        }
-
+     
         protected override void OnNavigatedTo(NavigationEventArgs e) {
             var p = e.Parameter;
             ListOfCDs = App.Current.MediaRepository.GetCdRepository(e.Parameter.ToString());
@@ -53,6 +51,10 @@ namespace MyHomeAudio.pages {
             Cd cd = (sender as FrameworkElement)?.DataContext as Cd;
             if (cd != null) {
                 Debug.WriteLine(cd.Name);
+                App.Current.ChromeCastRepos.PlayCed(cd);
+                ////MediaPlayer myPlayer = new();
+                ////myPlayer.Source = MediaSource.CreateFromUri(new Uri(cd.Tracks[0].ContentUrl));
+                ////myPlayer.Play();
             }
         }
     }

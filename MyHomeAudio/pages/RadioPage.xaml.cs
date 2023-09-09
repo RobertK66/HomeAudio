@@ -26,9 +26,7 @@ namespace MyHomeAudio.pages {
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class RadioPage : Page, INotifyPropertyChanged {
-
-        public event PropertyChangedEventHandler PropertyChanged;
+    public sealed partial class RadioPage : VmPage {
 
         private ObservableCollection<NamedUrl>  _ListOfRadios;
         public ObservableCollection<NamedUrl> ListOfRadios { get { return _ListOfRadios; } set { if (_ListOfRadios != value) { _ListOfRadios = value; RaisePropertyChanged(); } } }
@@ -37,12 +35,7 @@ namespace MyHomeAudio.pages {
             this.InitializeComponent();
         }
 
-        public void RaisePropertyChanged([CallerMemberName] string propertyName = null) {
-            if (PropertyChanged != null) {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
-        }
-
+        
         protected override void OnNavigatedTo(NavigationEventArgs e) {
             var p = e.Parameter;
             ListOfRadios = App.Current.MediaRepository.GetRadioRepository(e.Parameter.ToString());
@@ -52,7 +45,9 @@ namespace MyHomeAudio.pages {
         private void play_Click(object sender, RoutedEventArgs e) {
             NamedUrl url = (sender as FrameworkElement)?.DataContext as NamedUrl;
             if (url != null) {
+                App.Current.ChromeCastRepos.PlayRadio(url);
                 Debug.WriteLine(url.Name);
+                
             }
         }
     }

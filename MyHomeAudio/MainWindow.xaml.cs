@@ -55,6 +55,7 @@ namespace MyHomeAudio {
 
         public ObservableCollection<CategoryBase> Categories = new ObservableCollection<CategoryBase>();
 
+        public ObservableCollection<CategoryBase> FooterCategories = new ObservableCollection<CategoryBase>();
 
 
         public MainWindow() {
@@ -84,12 +85,14 @@ namespace MyHomeAudio {
             if (repPath == null) {
                 repPath = ApplicationData.Current.LocalFolder.Path;
             }
+            FooterCategories.Add(new Category() { Glyph = Symbol.AlignLeft, Name = "ChromeCast", Tag = "CC" });
             BuildMenue(repPath);
+            
 
 
-        }
+    }
 
-        public void BuildMenue(string repPath) {
+    public void BuildMenue(string repPath) {
             
             Categories.Clear();
             int i = 0;
@@ -117,7 +120,9 @@ namespace MyHomeAudio {
                 sender.AlwaysShowHeader = true;
                 string selectedItem = (String)args.InvokedItem;
                 sender.Header = "Sample Page " + selectedItem;
-                if (selectedItem.StartsWith("Cd")) {
+                if (selectedItem.Equals("ChromeCast")) {
+                    ContentFrame.Navigate(typeof(ChromecastPage));
+                } else if (selectedItem.StartsWith("Cd")) {
                     ContentFrame.Navigate(typeof(CdPage), args.InvokedItemContainer.Tag.ToString());
                 } else {
                     ContentFrame.Navigate(typeof(RadioPage), args.InvokedItemContainer.Tag.ToString());

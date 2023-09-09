@@ -22,6 +22,7 @@
                         </NavigationViewItem>
                     </DataTemplate>
                 </mynav:MenuItemTemplateSelector.ItemTemplate >
+                
                 <!--<mynav:MenuItemTemplateSelector.SeperatorTemplate>
                     <DataTemplate x:DataType="mynav:Separator" >
                         <NavigationViewItem IsEnabled="False"></NavigationViewItem>                
@@ -32,8 +33,12 @@
         <NavigationView x:Name="MainNavView" ItemInvoked="NavigationView_ItemInvoked" 
                         IsBackButtonVisible="Collapsed" Header="This is Header Text" 
                         MenuItemsSource="{x:Bind Categories, Mode=TwoWay}"
+                        FooterMenuItemsSource="{x:Bind FooterCategories, Mode=TwoWay}"
                         MenuItemTemplateSelector="{StaticResource selector}" >
-
+            <!--<NavigationView.FooterMenuItems >
+                <NavigationViewItem Icon="AlignLeft" Content="ChromeCast"/>
+            </NavigationView.FooterMenuItems>-->
+            
             <Frame x:Name="ContentFrame" />
 
         </NavigationView>

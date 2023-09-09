@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<local:VmPage
+    x:Class="MyHomeAudio.pages.ChromecastPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:MyHomeAudio.pages"
+    xmlns:localm="using:MyHomeAudio.model"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    NavigationCacheMode="Required">
+    <Page.Resources>
+        <DataTemplate x:Name="CccTemplate" x:DataType="localm:ChromeCastClient">
+            <ItemContainer HorizontalAlignment="Left" >
+                <StackPanel Orientation="Horizontal">
+                    <TextBox IsEnabled="False" Text="{x:Bind Name}"/>
+                    <TextBox IsEnabled="False" Text="{x:Bind Status, Mode=OneWay}"/>
+                    <TextBox IsEnabled="False" Text="{x:Bind Volume, Mode=OneWay}"/>
+                    <TextBox IsEnabled="False" Text="{x:Bind AppId, Mode=OneWay}"/>
+                    <TextBox IsEnabled="False" Text="{x:Bind MediaStatus, Mode=OneWay}"/>
+                </StackPanel>
+            </ItemContainer>
+        </DataTemplate>
+    </Page.Resources>
+    <StackPanel Orientation="Vertical">
+
+        <ComboBox x:Name="ChromeCastClients" ItemsSource="{x:Bind CCC, Mode=OneWay}" ItemTemplate="{StaticResource CccTemplate}" SelectedItem="{x:Bind SelectedCcc, Mode=TwoWay}" PlaceholderText="&lt;No Chromecast receiver found in Network>" />
+        
+    </StackPanel>
+</local:VmPage>
