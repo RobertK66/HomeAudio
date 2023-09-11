@@ -4,6 +4,7 @@ using Microsoft.UI.Dispatching;
 using QueueCaster;
 using QueueCaster.queue.models;
 using Sharpcaster.Channels;
+using Sharpcaster.Interfaces;
 using Sharpcaster.Messages.Receiver;
 using Sharpcaster.Models;
 using Sharpcaster.Models.ChromecastStatus;
@@ -56,7 +57,7 @@ namespace MyHomeAudio.model {
         public String AppId { get { return _appId; } set { _appId = value; RaisePropertyChanged(); } }
 
 
-        internal async Task TryConnectAsync() {
+        public async Task TryConnectAsync() {
             ConnectedClient = QueueCaster.ChromecastClient.CreateQueueCasterClient(null);
 
             var st = await ConnectedClient.ConnectChromecast(cr);
@@ -78,7 +79,9 @@ namespace MyHomeAudio.model {
         }
 
         private void ConnectedClient_Disconnected(object sender, EventArgs e) {
-            //throw new NotImplementedException();
+            // This client is done now -> reconnect a new one.
+            ConnectedClient = null;
+            _ = TryConnectAsync();
         }
 
         private void RcChannel_StatusChanged(object sender, EventArgs e) {
@@ -154,6 +157,30 @@ namespace MyHomeAudio.model {
                 }
             } finally {
                 semaphoreSlim?.Release();
+            }
+        }
+
+        internal void VolumeUp() {
+            var rcChannel =  ConnectedClient?.GetChannel<ReceiverChannel>();
+            if (rcChannel != null) {
+                Volume = (Volume) + 3;
+                if (Volume > 100) {
+                    Volume = 100;
+                }
+                //Log?.LogDebug("Vol- [{vol}]", String.Format("{0:0.000}", Volume));
+                _ = rcChannel.SetVolume(((double)Volume)/200);
+            }
+        }
+
+        internal void VolumeDown() {
+            var rcChannel = ConnectedClient?.GetChannel<ReceiverChannel>();
+            if (rcChannel != null) {
+                Volume = (Volume) - 3;
+                if (Volume < 0) {
+                    Volume = 0;
+                }
+                //Log?.LogDebug("Vol- [{vol}]", String.Format("{0:0.000}", Volume));
+                _ = rcChannel.SetVolume(((double)Volume) / 200);
             }
         }
     }
