@@ -122,7 +122,7 @@ namespace MyHomeAudio {
                 sender.Header = "Sample Page " + selectedItem;
                 if (selectedItem.Equals("ChromeCast")) {
                     ContentFrame.Navigate(typeof(ChromecastPage));
-                } else if (selectedItem.StartsWith("Cd")) {
+                } else if (selectedItem.Contains("Cd")) {
                     ContentFrame.Navigate(typeof(CdPage), args.InvokedItemContainer.Tag.ToString());
                 } else {
                     ContentFrame.Navigate(typeof(RadioPage), args.InvokedItemContainer.Tag.ToString());
@@ -132,5 +132,10 @@ namespace MyHomeAudio {
             }
         }
 
+      
+
+        private void MainNavView_AccessKeyInvoked(UIElement sender, AccessKeyInvokedEventArgs args) {
+            App.Current.ChromeCastRepos.VolumeUp();
+        }
     }
 }

@@ -169,7 +169,9 @@ namespace MyHomeAudio.pages {
             var configPath = ApplicationData.Current.LocalSettings.Values[AppSettingKeys.ReposPath]?.ToString();
             if (configPath != null) {
                 RepositoryPath = configPath;
-            } 
+            }
+
+            CreateFileList();
         }
 
         private void themeMode_SelectionChanged_1(object sender, SelectionChangedEventArgs e) {
@@ -230,6 +232,10 @@ namespace MyHomeAudio.pages {
         }
 
         private void reposPath_TextChanged(object sender, TextChangedEventArgs e) {
+            CreateFileList();
+        }
+
+        private void CreateFileList() {
             if (ListReposFiles() > 0) {
                 String configPath = ApplicationData.Current.LocalSettings.Values[AppSettingKeys.ReposPath]?.ToString();
                 if (configPath != null) {

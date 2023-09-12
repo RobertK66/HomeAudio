@@ -13,7 +13,7 @@ using System.Xml;
 namespace DLNAMediaRepos {
 
     public class DLNAAlbumRepository  {
-        Dictionary<string, (string albumName, List<(string url, string title)> tracks, string artist, string cdid)> CdAlbums = new();
+        Dictionary<string, (string albumName, List<(string url, string title)> tracks, string artist, string cdid, string picpath)> CdAlbums = new();
         Dictionary<string, string> RadioStations = new();
 
         DLNAClient client = new();
@@ -81,8 +81,8 @@ namespace DLNAMediaRepos {
                 cdXmlDocument.LoadXml(cd.XMLDump);
                 var artist = cdXmlDocument.GetElementsByTagName("upnp:artist").Item(0);
                 string art = artist?.InnerText ?? string.Empty;
-
-                (string albumName, List<(string url, string title)> tracks, string artist, string cdid) album = (cd.Name, new List<(string url, string title)>(), art, "");
+                var picpath = cdXmlDocument.GetElementsByTagName("upnp:albumArtURI").Item(0)?.FirstChild?.Value;
+                (string albumName, List<(string url, string title)> tracks, string artist, string cdid, string picpath) album = (cd.Name, new List<(string url, string title)>(), art, "", picpath);
                
                 int trackStart = 2;         // Starting second of track 1
                 int XX = 0;                 // Sum of starting seconds
@@ -138,7 +138,7 @@ namespace DLNAMediaRepos {
             return webradio;
         }
 
-        public List<(string name, List<(string url, string name)> tracks, string artist, string cdid)> GetAllAlbums() {
+        public List<(string name, List<(string url, string name)> tracks, string artist, string cdid, string picpath)> GetAllAlbums() {
             return CdAlbums.Values.OrderBy(a=>a.artist).ToList();
         }
 

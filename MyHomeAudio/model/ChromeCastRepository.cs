@@ -41,5 +41,9 @@ namespace MyHomeAudio.model
         internal void SetActiveClient(ChromeCastClient selectedCcc) {
             _activeClient = selectedCcc;
         }
+
+        internal void VolumeUp() {
+            _activeClient?.VolumeUp();
+        }
     }
 }

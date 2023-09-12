@@ -13,18 +13,21 @@
 
     <Page.Resources>
         <DataTemplate x:Key="ImageTemplate" x:DataType="localm:Cd">
-            <ItemContainer HorizontalAlignment="Left" Width="800" Height="140" >
-                <StackPanel Orientation="Horizontal">
-                    <TextBox IsEnabled="False" Text="{x:Bind Name}"/>
-                    <TextBox IsEnabled="False" Text="{x:Bind Artist}"/>
-                    <Button x:Name="play" Click="play_Click">
-                        <SymbolIcon Symbol="Play"/>
-                    </Button>
-                </StackPanel>
+            <ItemContainer HorizontalAlignment="Left" Width="160" Height="160">
+                <Grid >
+                    <Image Source="{x:Bind Image}" />
+                    <TextBlock Text="{x:Bind Artist}" VerticalAlignment="Top" HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorPrimaryBrush}" TextWrapping="Wrap"/>
+                    <TextBlock Text="{x:Bind Name}" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorPrimaryBrush}" TextWrapping="Wrap"/> 
+                </Grid>
             </ItemContainer>
         </DataTemplate>
     </Page.Resources>
     <Grid>
-        <ListView  ItemsSource="{x:Bind ListOfCDs}" ItemTemplate="{StaticResource ImageTemplate}"></ListView>
+        <ItemsView  ItemsSource="{x:Bind ListOfCDs, Mode=TwoWay}" ItemTemplate="{StaticResource ImageTemplate}" IsItemInvokedEnabled="True" ItemInvoked="ItemsView_ItemInvoked">
+        <ItemsView.Layout>
+            <LinedFlowLayout ItemsJustification="SpaceAround" ItemsStretch="Fill"/>
+        </ItemsView.Layout>
+
+        </ItemsView>
     </Grid>
 </local:VmPage>

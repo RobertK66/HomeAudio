@@ -47,15 +47,13 @@ namespace MyHomeAudio.pages {
             base.OnNavigatedTo(e);
         }
 
-        private void play_Click(object sender, RoutedEventArgs e) {
-            Cd cd = (sender as FrameworkElement)?.DataContext as Cd;
+        private void ItemsView_ItemInvoked(ItemsView sender, ItemsViewItemInvokedEventArgs args) {
+            Cd cd = (args.InvokedItem as Cd);
             if (cd != null) {
                 Debug.WriteLine(cd.Name);
                 App.Current.ChromeCastRepos.PlayCed(cd);
-                ////MediaPlayer myPlayer = new();
-                ////myPlayer.Source = MediaSource.CreateFromUri(new Uri(cd.Tracks[0].ContentUrl));
-                ////myPlayer.Play();
-            }
+            } 
+
         }
     }
 }

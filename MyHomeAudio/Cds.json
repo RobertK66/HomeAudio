@@ -73,6 +73,7 @@
     "CDID": "a40d3f14",
     "Name": "Memories (from local hdd)",
     "Artist": "Barbra Streisand",
+    "Picpath": "http://192.168.177.65:50002/transcoder/jpegtnscaler.cgi/albumart/6566.jpg",
     "Tracks": [
       {
         "ContentUrl": "http://192.168.177.65:50002/m/NDLNA/6582.mp3",

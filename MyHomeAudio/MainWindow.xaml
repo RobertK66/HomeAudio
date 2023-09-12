@@ -10,7 +10,7 @@
     mc:Ignorable="d">
     
         
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" >
         <Grid.Resources>
             <mynav:MenuItemTemplateSelector x:Key="selector">
                 <mynav:MenuItemTemplateSelector.ItemTemplate>
@@ -30,15 +30,23 @@
                 </mynav:MenuItemTemplateSelector.SeperatorTemplate >-->
             </mynav:MenuItemTemplateSelector>
         </Grid.Resources>
+       
         <NavigationView x:Name="MainNavView" ItemInvoked="NavigationView_ItemInvoked" 
                         IsBackButtonVisible="Collapsed" Header="This is Header Text" 
                         MenuItemsSource="{x:Bind Categories, Mode=TwoWay}"
                         FooterMenuItemsSource="{x:Bind FooterCategories, Mode=TwoWay}"
-                        MenuItemTemplateSelector="{StaticResource selector}" >
+                        MenuItemTemplateSelector="{StaticResource selector}"
+                        AccessKeyInvoked="MainNavView_AccessKeyInvoked">
             <!--<NavigationView.FooterMenuItems >
                 <NavigationViewItem Icon="AlignLeft" Content="ChromeCast"/>
             </NavigationView.FooterMenuItems>-->
-            
+
+            <!--<NavigationView.KeyboardAccelerators>
+                <KeyboardAccelerator
+         Modifiers="Control" 
+             Key="G" />
+            </NavigationView.KeyboardAccelerators>-->
+
             <Frame x:Name="ContentFrame" />
 
         </NavigationView>

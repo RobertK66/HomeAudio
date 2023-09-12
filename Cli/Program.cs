@@ -91,7 +91,7 @@ public class Program : IHostedService {
             // Convert tuples to JSON objects as anonym classes -> attributes have names and not 'ItemN' when JSON serialized.
             var track = new { ContentUrl = default(string), Name = default(string) };
             var tracks = Array.CreateInstance(track.GetType(), 1);
-            var album = new { CDID = default(string), Name = default(string), Artist = default(string), Tracks = tracks };
+            var album = new { CDID = default(string), Name = default(string), Artist = default(string), Tracks = tracks, Picpath = default(string) };
             var CdArray = Array.CreateInstance(album.GetType(), aa.Count);
             int albumIdx = 0;
             foreach (var a in aa) {
@@ -101,7 +101,7 @@ public class Program : IHostedService {
                 foreach(var t in a.tracks) {
                     tracks.SetValue(new { ContentUrl = t.url, Name = t.name }, idx++);
                 }
-                var alb = new { CDID = a.cdid, Name = a.name, Artist = a.artist, Tracks = tracks };
+                var alb = new { CDID = a.cdid, Name = a.name, Artist = a.artist, Tracks = tracks, Picpath=a.picpath };
                 CdArray.SetValue(alb, albumIdx++);
             }
             var CdRepos = new { CdRepos = CdArray };
