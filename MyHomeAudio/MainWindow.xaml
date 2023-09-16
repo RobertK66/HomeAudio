@@ -7,6 +7,7 @@
     xmlns:mynav="using:MyHomeAudio.nav"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    Activated="Window_Activated"
     mc:Ignorable="d">
     
         
@@ -36,18 +37,23 @@
                         MenuItemsSource="{x:Bind Categories, Mode=TwoWay}"
                         FooterMenuItemsSource="{x:Bind FooterCategories, Mode=TwoWay}"
                         MenuItemTemplateSelector="{StaticResource selector}"
-                        AccessKeyInvoked="MainNavView_AccessKeyInvoked">
-            <!--<NavigationView.FooterMenuItems >
-                <NavigationViewItem Icon="AlignLeft" Content="ChromeCast"/>
-            </NavigationView.FooterMenuItems>-->
-
-            <!--<NavigationView.KeyboardAccelerators>
-                <KeyboardAccelerator
-         Modifiers="Control" 
-             Key="G" />
-            </NavigationView.KeyboardAccelerators>-->
-
-            <Frame x:Name="ContentFrame" />
+                        AlwaysShowHeader="False">
+            <Grid >
+                <Grid.RowDefinitions>
+                    <RowDefinition  Height="Auto"/>
+                    <RowDefinition  Height="*"/>
+                </Grid.RowDefinitions>
+                <local:CcPlayer Grid.Row="0" x:Name="ccPlayer" HorizontalAlignment="Stretch" 
+                                PlayerName="{x:Bind ActiveCcc.Name, Mode=OneWay}"
+                                AppId="{x:Bind ActiveCcc.AppId, Mode=OneWay }"
+                                MediaStatus="{x:Bind ActiveCcc.MediaStatus, Mode=OneWay}"
+                                Volume="{x:Bind ActiveCcc.Volume, Mode=OneWay}"
+                                Status="{x:Bind ActiveCcc.Status, Mode=OneWay}"
+                                VolumeUp="ccPlayer_VolumeUp"
+                                VolumeDown="ccPlayer_VolumeDown"
+                                /> 
+                <Frame Grid.Row="1" x:Name="ContentFrame" VerticalAlignment="Stretch"/>
+            </Grid>
 
         </NavigationView>
       

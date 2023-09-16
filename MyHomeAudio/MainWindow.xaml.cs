@@ -24,6 +24,9 @@ using Microsoft.UI.Xaml.Shapes;
 using MyHomeAudio.nav;
 using System.Collections.ObjectModel;
 using System.Collections;
+using MyHomeAudio.model;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 
 //using AppUIBasics.Common;
 //using AppUIBasics.Data;
@@ -49,13 +52,28 @@ namespace MyHomeAudio {
     /// </summary>
 
 
-    public sealed partial class MainWindow : Window {
+    public sealed partial class MainWindow : Window, INotifyPropertyChanged {
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        public void RaisePropertyChanged([CallerMemberName] string propertyName = null) {
+            if (PropertyChanged != null) {
+                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+
 
         public NavigationView MainNavPane { get => this.MainNavView; }
 
         public ObservableCollection<CategoryBase> Categories = new ObservableCollection<CategoryBase>();
 
         public ObservableCollection<CategoryBase> FooterCategories = new ObservableCollection<CategoryBase>();
+
+
+        private ChromeCastClient _selectedCCC;
+        public ChromeCastClient ActiveCcc { get { return _selectedCCC; } set { if (_selectedCCC != value) { _selectedCCC = value; RaisePropertyChanged(); } } }
+
+
+
 
 
         public MainWindow() {
@@ -87,39 +105,31 @@ namespace MyHomeAudio {
             }
             FooterCategories.Add(new Category() { Glyph = Symbol.AlignLeft, Name = "ChromeCast", Tag = "CC" });
             BuildMenue(repPath);
-            
+        }
 
-
-    }
-
-    public void BuildMenue(string repPath) {
-            
+        public void BuildMenue(string repPath) {
             Categories.Clear();
             int i = 0;
-            foreach(var f in Directory.GetFiles(repPath, "*.json")) {
+            foreach (var f in Directory.GetFiles(repPath, "*.json")) {
                 if (File.ReadAllText(f).Contains("\"Tracks\"")) {
                     string reposid = "CD-" + i++;
-                    Categories.Add(new Category() { Glyph = Symbol.Target, Name = System.IO.Path.GetFileName(f), Tag = reposid  });
+                    Categories.Add(new Category() { Glyph = Symbol.Target, Name = System.IO.Path.GetFileName(f), Tag = reposid });
                     App.Current.MediaRepository.AddCdRepos(reposid, f);
-                    //MainNavView.MenuItems.Add(new NavigationViewItem() { Icon = new FontIcon() { Glyph = "\uEA3F" }, Content= System.IO.Path.GetFileName(f), Tag = "CD-" + i++ });
                 } else {
                     string reposid = "Radio-" + i++;
-                    Categories.Add(new Category() { Glyph = Symbol.Scan, Name = System.IO.Path.GetFileName(f), Tag = reposid  });
+                    Categories.Add(new Category() { Glyph = Symbol.Scan, Name = System.IO.Path.GetFileName(f), Tag = reposid });
                     App.Current.MediaRepository.AddRadioRepos(reposid, f);
-                    //MainNavView.MenuItems.Add(new NavigationViewItem() { Icon = new FontIcon() { Glyph = "\uE704" }, Content = System.IO.Path.GetFileName(f), Tag = "Radio-" + i++ });
                 }
             }
         }
 
         private void NavigationView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args) {
             if (args.IsSettingsInvoked) {
-                sender.AlwaysShowHeader = false;
+                //this.ccPlayer.Visibility = Visibility.Collapsed;
                 ContentFrame.Navigate(typeof(SettingsPage));
-                //ContentFrame.Content = new SettingsPage();
             } else {
-                sender.AlwaysShowHeader = true;
+                //this.ccPlayer.Visibility = Visibility.Visible;
                 string selectedItem = (String)args.InvokedItem;
-                sender.Header = "Sample Page " + selectedItem;
                 if (selectedItem.Equals("ChromeCast")) {
                     ContentFrame.Navigate(typeof(ChromecastPage));
                 } else if (selectedItem.Contains("Cd")) {
@@ -127,15 +137,21 @@ namespace MyHomeAudio {
                 } else {
                     ContentFrame.Navigate(typeof(RadioPage), args.InvokedItemContainer.Tag.ToString());
                 }
-
-                //ContentFrame.Content = new ContentPage();
             }
         }
 
-      
+        private void ccPlayer_VolumeUp(object sender, EventArgs e) {
+            ActiveCcc?.VolumeUp();
+        }
 
-        private void MainNavView_AccessKeyInvoked(UIElement sender, AccessKeyInvokedEventArgs args) {
-            App.Current.ChromeCastRepos.VolumeUp();
+        private void ccPlayer_VolumeDown(object sender, EventArgs e) {
+            ActiveCcc?.VolumeDown();
+        }
+
+        private void Window_Activated(object sender, WindowActivatedEventArgs args) {
+            if (ContentFrame?.Content == null) {
+                ContentFrame.Navigate(typeof(RadioPage), ((Category)Categories.Where(c => ((Category)c).Tag.StartsWith("Radio")).FirstOrDefault())?.Tag);
+            }
         }
     }
 }

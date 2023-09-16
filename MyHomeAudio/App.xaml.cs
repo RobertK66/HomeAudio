@@ -37,7 +37,7 @@ namespace MyHomeAudio {
 
         public MediaRepository MediaRepository = new MediaRepository();
 
-        public ChromeCastRepository ChromeCastRepos = new ChromeCastRepository();
+        public ChromeCastRepository ChromeCastRepos = new ChromeCastRepository("Büro");
 
         //public List<ChromecastReceiver> KnownChromecastReceiver = new();
 
@@ -59,9 +59,9 @@ namespace MyHomeAudio {
                 String fullpath = System.Reflection.Assembly.GetEntryAssembly().Location;
                 String path = fullpath.Substring(0, fullpath.LastIndexOf("\\"));
 
-                //if (!File.Exists(ApplicationData.Current.LocalFolder.Path + "\\Cds.json")) {
+                if (!File.Exists(ApplicationData.Current.LocalFolder.Path + "\\Cds.json")) {
                     System.IO.File.Copy(path + "\\Cds.json", ApplicationData.Current.LocalFolder.Path + "\\Cds.json", true);
-                //}
+                }
                 if (!File.Exists(ApplicationData.Current.LocalFolder.Path + "\\WebRadios.json")) {
                     System.IO.File.Copy(path + "\\WebRadios.json", ApplicationData.Current.LocalFolder.Path + "\\WebRadios.json");
                 }

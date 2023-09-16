@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<UserControl
+    x:Class="MyHomeAudio.CcPlayer"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:MyHomeAudio"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d">
+
+    <ItemContainer HorizontalAlignment="Left" Margin="4">
+        <StackPanel Orientation="Horizontal" Padding="4,0,4,0">
+            <Button x:Name="VolDown" Content="vol-" VerticalAlignment="Top"  Click="VolDown_Click" >
+                <Button.KeyboardAccelerators>
+                    <KeyboardAccelerator Modifiers="None" Key="Subtract" />
+                </Button.KeyboardAccelerators>
+            </Button>
+            <Button x:Name="VolUp" Content="vol+" VerticalAlignment="Top"  Click="VolUp_Click">
+                <Button.KeyboardAccelerators>
+                    <KeyboardAccelerator Modifiers="None" Key="Add" />
+                </Button.KeyboardAccelerators>
+            </Button>
+            <TextBox IsEnabled="False" Text="{x:Bind PlayerName, Mode=OneWay}"/>
+            <TextBox IsEnabled="False" Text="{x:Bind Status, Mode=OneWay }"/>
+            <TextBox IsEnabled="False" Text="{x:Bind Volume, Mode=OneWay }"/>
+            <TextBox IsEnabled="False" Text="{x:Bind AppId, Mode=OneWay  }"/>
+            <TextBox IsEnabled="False" Text="{x:Bind MediaStatus, Mode=OneWay }"/>
+        </StackPanel>
+    </ItemContainer>
+
+</UserControl>

@@ -48,15 +48,12 @@ namespace MyHomeAudio.pages {
 
         public ChromecastPage() {
             this.InitializeComponent();
-            var dq = DispatcherQueue.GetForCurrentThread();
 
             CCC = App.Current.ChromeCastRepos.GetClients();
-            //foreach (var cr in App.Current.KnownChromecastReceiver) {
-            //    CCC.Add(new ChromeCastClient(cr, dq));
-            //}
             if (CCC.Count > 0) {
-                SelectedCcc = CCC.Where(cc=>cc.Name.StartsWith("Bü")).FirstOrDefault()??CCC[0];
-                App.Current.ChromeCastRepos.SetActiveClient(SelectedCcc);
+                SelectedCcc = App.Current.m_window.ActiveCcc;
+                //SelectedCcc = CCC.Where(cc=>cc.Name.StartsWith("Bü")).FirstOrDefault()??CCC[0];
+                //App.Current.ChromeCastRepos.SetActiveClient(SelectedCcc);
                 //_ = SelectedCcc.TryConnectAsync();
             }
         }
@@ -65,12 +62,8 @@ namespace MyHomeAudio.pages {
 
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e) {
-            SelectedCcc.VolumeUp();
-        }
-
-        private void Button_Click_1(object sender, RoutedEventArgs e) {
-            SelectedCcc.VolumeDown();
+        private void ChromeCastClients_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+            App.Current.m_window.ActiveCcc = SelectedCcc;
         }
     }
 }

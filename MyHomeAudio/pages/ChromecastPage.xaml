@@ -23,24 +23,14 @@
             </ItemContainer>
         </DataTemplate>
     </Page.Resources>
-    <StackPanel Orientation="Horizontal">
+    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
 
-        
-        <Button Content="vol-" Click="Button_Click_1" VerticalAlignment="Top" Margin="4,8,4,0">
-            <Button.KeyboardAccelerators>
-                <KeyboardAccelerator 
-            Modifiers="Control" 
-            Key="N" />
-            </Button.KeyboardAccelerators>
-        </Button>
-        <Button Content="vol+" Click="Button_Click" VerticalAlignment="Top" Margin="4,8,4,0">
-            <Button.KeyboardAccelerators>
-                <KeyboardAccelerator 
-            Modifiers="Control" 
-            Key="M" />
-            </Button.KeyboardAccelerators>
-        </Button>
-        <ComboBox x:Name="ChromeCastClients" ItemsSource="{x:Bind CCC, Mode=OneWay}" ItemTemplate="{StaticResource CccTemplate}" SelectedItem="{x:Bind SelectedCcc, Mode=TwoWay}" PlaceholderText="&lt;No Chromecast receiver found in Network>" />
+     
+        <ComboBox x:Name="ChromeCastClients" ItemsSource="{x:Bind CCC, Mode=OneWay}"
+                  ItemTemplate="{StaticResource CccTemplate}" 
+                  SelectedItem="{x:Bind SelectedCcc, Mode=TwoWay}"
+                  SelectionChanged="ChromeCastClients_SelectionChanged"
+                  PlaceholderText="&lt;No Chromecast receiver found in Network>" />
 
     </StackPanel>
 </local:VmPage>

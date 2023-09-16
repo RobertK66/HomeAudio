@@ -57,7 +57,8 @@ namespace MyHomeAudio.model {
         public String AppId { get { return _appId; } set { _appId = value; RaisePropertyChanged(); } }
 
 
-        public async Task TryConnectAsync() {
+        public async Task<bool> TryConnectAsync() {
+            bool connected = false;
             ConnectedClient = QueueCaster.ChromecastClient.CreateQueueCasterClient(null);
 
             var st = await ConnectedClient.ConnectChromecast(cr);
@@ -69,13 +70,12 @@ namespace MyHomeAudio.model {
                 if (rcChannel != null) {
                     rcChannel.StatusChanged += RcChannel_StatusChanged;
                 }
-
                 st = await ConnectedClient.LaunchApplicationAsync("9B5A75B4", true);    // TODO: APPID from config!
-
                 ConnectedClient.Disconnected += ConnectedClient_Disconnected;
+                connected = true;
                 //Log.LogDebug("Launched/joined App[0]: {appId}", (((st?.Applications?.Count ?? 0) > 0) ? st?.Applications[0].AppId : "<null>"));
             }
-            
+            return connected;
         }
 
         private void ConnectedClient_Disconnected(object sender, EventArgs e) {
