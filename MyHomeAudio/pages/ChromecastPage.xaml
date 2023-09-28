@@ -11,7 +11,7 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     NavigationCacheMode="Required">
     <Page.Resources>
-        <DataTemplate x:Name="CccTemplate" x:DataType="localm:ChromeCastClient">
+        <DataTemplate x:Name="CccTemplate" x:DataType="localm:ChromeCastClientWrapper">
             <ItemContainer HorizontalAlignment="Left" >
                 <StackPanel Orientation="Horizontal">
                     <TextBox IsEnabled="False" Text="{x:Bind Name}"/>
@@ -23,14 +23,21 @@
             </ItemContainer>
         </DataTemplate>
     </Page.Resources>
-    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition  Height="Auto"/>
+            <RowDefinition  Height="*"/>
+        </Grid.RowDefinitions>
 
-     
-        <ComboBox x:Name="ChromeCastClients" ItemsSource="{x:Bind CCC, Mode=OneWay}"
+
+        <ComboBox Grid.Row="0" x:Name="ChromeCastClients" ItemsSource="{x:Bind CCC, Mode=OneWay}"
                   ItemTemplate="{StaticResource CccTemplate}" 
                   SelectedItem="{x:Bind SelectedCcc, Mode=TwoWay}"
                   SelectionChanged="ChromeCastClients_SelectionChanged"
                   PlaceholderText="&lt;No Chromecast receiver found in Network>" />
 
-    </StackPanel>
+        <ScrollViewer x:Name="logScroll"  Grid.Row="1" VerticalAlignment="Stretch" VerticalScrollBarVisibility="Visible" VerticalScrollMode="Enabled" >
+            <TextBlock Text="{x:Bind LoggerVm.ContentText, Mode=TwoWay}" TextWrapping="Wrap" SizeChanged="TextBlock_SizeChanged"></TextBlock>
+        </ScrollViewer>
+    </Grid>
 </local:VmPage>

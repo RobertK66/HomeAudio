@@ -26,6 +26,7 @@ namespace MyHomeAudio {
         public event EventHandler VolumeUp;
         public event EventHandler VolumeDown;
 
+
         public string PlayerName {
             get { return (string)GetValue(PlayerNameProperty); }
             set { SetValue(PlayerNameProperty, value); }
@@ -80,6 +81,18 @@ namespace MyHomeAudio {
                 typeof(string),
                 typeof(CcPlayer),
                 new PropertyMetadata(null));
+
+        public bool IsConnected {
+            get { return (bool)GetValue(IsConnectedProperty); }
+            set { SetValue(IsConnectedProperty, value); }
+        }
+        public static readonly DependencyProperty IsConnectedProperty =
+            DependencyProperty.Register(
+                "IsConnected",
+                typeof(bool),
+                typeof(CcPlayer),
+                new PropertyMetadata(false));
+
 
         private void VolDown_Click(object sender, RoutedEventArgs e) {
             VolumeDown?.Invoke(this, EventArgs.Empty);

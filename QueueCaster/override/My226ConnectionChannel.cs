@@ -11,8 +11,9 @@ namespace QueueCaster
     public class My226ConnectionChannel :ConnectionChannel {
         public override Task OnMessageReceivedAsync(IMessage message) {
             if (message is CloseMessage) {
-                _ = Task.Run(() => {
-                    Client.DisconnectAsync();
+                _ = Task.Run(async () => {
+                    await Client.DisconnectAsync();
+                    await Task.Delay(2000);
                 });
             }
             return Task.CompletedTask;

@@ -6,16 +6,24 @@
     xmlns:local="using:MyHomeAudio"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:converters="using:CommunityToolkit.WinUI.Converters"
     mc:Ignorable="d">
 
-    <ItemContainer HorizontalAlignment="Left" Margin="4">
+    <UserControl.Resources>
+
+        <converters:BoolToObjectConverter x:Key="BoolToColorConverter" TrueValue="Green" FalseValue="Red"/>
+
+    </UserControl.Resources>
+    <ItemContainer HorizontalAlignment="Left" Margin="4" IsTabStop="{x:Bind IsTabStop}">
+        <Border BorderBrush="{x:Bind IsConnected, Mode=OneWay, Converter={StaticResource BoolToColorConverter}}" Visibility="Visible" BorderThickness="2">
+        
         <StackPanel Orientation="Horizontal" Padding="4,0,4,0">
-            <Button x:Name="VolDown" Content="vol-" VerticalAlignment="Top"  Click="VolDown_Click" >
+            <Button x:Name="VolDown" Content="vol-" VerticalAlignment="Top"  Click="VolDown_Click" IsTabStop="{x:Bind IsTabStop}">
                 <Button.KeyboardAccelerators>
                     <KeyboardAccelerator Modifiers="None" Key="Subtract" />
                 </Button.KeyboardAccelerators>
             </Button>
-            <Button x:Name="VolUp" Content="vol+" VerticalAlignment="Top"  Click="VolUp_Click">
+            <Button x:Name="VolUp" Content="vol+" VerticalAlignment="Top"  Click="VolUp_Click" IsTabStop="{x:Bind IsTabStop}">
                 <Button.KeyboardAccelerators>
                     <KeyboardAccelerator Modifiers="None" Key="Add" />
                 </Button.KeyboardAccelerators>
@@ -26,6 +34,7 @@
             <TextBox IsEnabled="False" Text="{x:Bind AppId, Mode=OneWay  }"/>
             <TextBox IsEnabled="False" Text="{x:Bind MediaStatus, Mode=OneWay }"/>
         </StackPanel>
+        </Border>
     </ItemContainer>
 
 </UserControl>

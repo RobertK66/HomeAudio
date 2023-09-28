@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Xaml.Shapes;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.UI.Xaml.Shapes;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -12,12 +13,13 @@ using System.Threading.Tasks;
 
 namespace MyHomeAudio.model {
     public class MediaRepository {
+        private ILogger Log;
 
         Dictionary<String, ObservableCollection<Cd>> CdRepositories = new Dictionary<string, ObservableCollection<Cd>>();
         Dictionary<String, ObservableCollection<NamedUrl>> RadioRepositories = new Dictionary<string, ObservableCollection<NamedUrl>>();
 
-        public MediaRepository() {
-                
+        public MediaRepository(ILoggerFactory lf) {
+            Log = lf.CreateLogger(typeof(MediaRepository));
         }
 
         internal void AddCdRepos(string reposid, string path) {
@@ -34,6 +36,7 @@ namespace MyHomeAudio.model {
                 foreach (var item in cont) {
                     rep.Add(item);
                 }
+                Log.LogDebug("Added {count} cds from {path}", cont.Count, path);
             }
 
             
@@ -54,6 +57,7 @@ namespace MyHomeAudio.model {
                     foreach (var item in cont) {
                         rep.Add(item);
                     }
+                    Log.LogDebug("Added {count} webradios from {path}", cont.Count, path);
                 } catch (Exception ex) {
                     Debug.WriteLine(ex.Message);
                 }

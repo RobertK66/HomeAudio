@@ -1,4 +1,5 @@
 using ABI.Windows.Data.Json;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -7,6 +8,7 @@ using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
+using MyHomeAudio.logger;
 using MyHomeAudio.model;
 using Sharpcaster.Models;
 using System;
@@ -27,12 +29,14 @@ namespace MyHomeAudio.pages {
     /// </summary>
     public sealed partial class ChromecastPage: VmPage {
 
-        private ChromeCastClient _selectedCCC;
-        public ChromeCastClient SelectedCcc { get { return _selectedCCC; } set { if (_selectedCCC != value) { _selectedCCC = value; RaisePropertyChanged(); } } }
+        public LoggerVm LoggerVm { get; set; }
+
+        private ChromeCastClientWrapper _selectedCCC;
+        public ChromeCastClientWrapper SelectedCcc { get { return _selectedCCC; } set { if (_selectedCCC != value) { _selectedCCC = value; RaisePropertyChanged(); } } }
 
 
-        private ObservableCollection<ChromeCastClient> _ccc = null;
-        public ObservableCollection<ChromeCastClient> CCC {
+        private ObservableCollection<ChromeCastClientWrapper> _ccc = null;
+        public ObservableCollection<ChromeCastClientWrapper> CCC {
             get {
                 return _ccc;
             }
@@ -56,6 +60,8 @@ namespace MyHomeAudio.pages {
                 //App.Current.ChromeCastRepos.SetActiveClient(SelectedCcc);
                 //_ = SelectedCcc.TryConnectAsync();
             }
+
+            LoggerVm = (LoggerVm) App.Current.MyHost.Services.GetService(typeof(LoggerVm));
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e) {
@@ -63,7 +69,11 @@ namespace MyHomeAudio.pages {
         }
 
         private void ChromeCastClients_SelectionChanged(object sender, SelectionChangedEventArgs e) {
-            App.Current.m_window.ActiveCcc = SelectedCcc;
+            //App.Current.m_window.ActiveCcc = SelectedCcc;
+        }
+
+        private void TextBlock_SizeChanged(object sender, SizeChangedEventArgs e) {
+            logScroll.ScrollToVerticalOffset(logScroll.ScrollableHeight);
         }
     }
 }

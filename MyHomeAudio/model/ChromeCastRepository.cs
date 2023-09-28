@@ -1,4 +1,5 @@
 ﻿using ABI.System;
+using Microsoft.Extensions.Logging;
 using Microsoft.UI.Dispatching;
 using Sharpcaster.Models;
 using System;
@@ -12,17 +13,21 @@ namespace MyHomeAudio.model
 {
     public class ChromeCastRepository {
 
-        private ChromeCastClient _activeClient = null;
-        private ObservableCollection<ChromeCastClient> KnownChromecasts = new ObservableCollection<ChromeCastClient>();
+        private ChromeCastClientWrapper _activeClient = null;
+        private ObservableCollection<ChromeCastClientWrapper> KnownChromecasts = new ObservableCollection<ChromeCastClientWrapper>();
         private string _autoConnectName;
+        private string _appId;
+        private ILoggerFactory _loggerFactory;  
 
-        public ChromeCastRepository(string autoConnectName) {
+        public ChromeCastRepository(string autoConnectName, string appId, Microsoft.Extensions.Logging.ILoggerFactory loggerFactory) {
             _autoConnectName = autoConnectName;
+            _appId = appId;
+            _loggerFactory = loggerFactory;
         }
 
         public void Add(ChromecastReceiver e) {
             var dq = DispatcherQueue.GetForCurrentThread();
-            var ccc = new ChromeCastClient(e, dq);
+            var ccc = new ChromeCastClientWrapper(e, dq, _loggerFactory);
             KnownChromecasts.Add(ccc);
             
             if (e.Name.StartsWith(_autoConnectName)) {
@@ -30,14 +35,14 @@ namespace MyHomeAudio.model
             }
         }
 
-        public async Task TryConnectAsync(ChromeCastClient ccc) {
-            var status = await ccc.TryConnectAsync();
+        public async Task TryConnectAsync(ChromeCastClientWrapper ccc) {
+            var status = await ccc.TryConnectAsync(_appId);
             if (status) {
                 SetActiveClient(ccc);
             }
         }
 
-        public ObservableCollection<ChromeCastClient> GetClients() {
+        public ObservableCollection<ChromeCastClientWrapper> GetClients() {
             return KnownChromecasts;
         }
 
@@ -49,7 +54,7 @@ namespace MyHomeAudio.model
             _activeClient?.PlayRadioAsync(url);
         }
 
-        internal void SetActiveClient(ChromeCastClient selectedCcc) {
+        internal void SetActiveClient(ChromeCastClientWrapper selectedCcc) {
             _activeClient = selectedCcc;
             App.Current.m_window.ActiveCcc = selectedCcc;
         }

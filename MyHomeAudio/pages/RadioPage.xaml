@@ -17,17 +17,16 @@
                 <StackPanel Orientation="Horizontal">
                     <TextBox IsEnabled="False" Text="{x:Bind Name}"/>
                     <TextBox IsEnabled="False" Text="{x:Bind ContentUrl}"/>
-                    <Button x:Name="play" Click="play_Click">
-                        <SymbolIcon Symbol="Play"/>
-                    </Button>
                 </StackPanel>
             </ItemContainer>
         </DataTemplate>
 
     </Page.Resources>
     <Grid>
-
-
-        <ListView  ItemsSource="{x:Bind ListOfRadios}" ItemTemplate="{StaticResource ImageTemplate}"></ListView>
+        <ItemsView ItemsSource="{x:Bind ListOfRadios}"
+                   ItemTemplate="{StaticResource ImageTemplate}"
+                   IsItemInvokedEnabled="True"
+                   ItemInvoked="ItemsView_ItemInvoked"
+                   />
     </Grid>
 </local:VmPage>

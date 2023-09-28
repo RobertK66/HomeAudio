@@ -21,7 +21,7 @@ using System.Threading.Tasks;
 using Windows.Devices.Radios;
 
 namespace MyHomeAudio.model {
-    public class ChromeCastClient : INotifyPropertyChanged {
+    public class ChromeCastClientWrapper : INotifyPropertyChanged {
         private SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -32,35 +32,43 @@ namespace MyHomeAudio.model {
         }
 
         DispatcherQueue _dispatcherQueue;
-        QueueCaster.ChromecastClient ConnectedClient = null;
+        String _connectionAppId;
+        ChromecastClient ConnectedClient = null;
+
 
         private ChromecastReceiver cr;
         private String _name;
         private String _status;
         private String _mediaStatus;
         private String _appId;
+        private bool _isConnected;
+        private ILoggerFactory _loggerFactory;
 
         private int _volume;
 
-        public ChromeCastClient(ChromecastReceiver cr, DispatcherQueue dc) {
+        public ChromeCastClientWrapper(ChromecastReceiver cr, DispatcherQueue dc, ILoggerFactory lf) {
             this.cr = cr;
             Name = cr.Name;
             Status = cr.Status;
             _dispatcherQueue = dc;
+            _loggerFactory = lf;
         }
 
         public String Name { get { return _name; } set { _name = value; RaisePropertyChanged(); } }
         public String Status { get { return _status; } set { _status = value; RaisePropertyChanged(); } }
         public int Volume { get { return _volume; } set { _volume = value; RaisePropertyChanged(); } }
         public String MediaStatus { get { return _mediaStatus; } set { _mediaStatus = value; RaisePropertyChanged(); } }
-
         public String AppId { get { return _appId; } set { _appId = value; RaisePropertyChanged(); } }
+        public bool IsConnected { get { return _isConnected; } set { _isConnected = value; RaisePropertyChanged(); } }
 
+        public async Task<bool> TryConnectAsync(string appId) {
+            //bool connected = false;
+            IsConnected = false;
+            _connectionAppId = appId;
 
-        public async Task<bool> TryConnectAsync() {
-            bool connected = false;
-            ConnectedClient = QueueCaster.ChromecastClient.CreateQueueCasterClient(null);
+            ConnectedClient = QueueCaster.ChromecastClient.CreateQueueCasterClient(_loggerFactory);
 
+            //cr.DeviceUri = new System.Uri("http://localhost:123/base");
             var st = await ConnectedClient.ConnectChromecast(cr);
             //Log.LogDebug("Connected available App[0]: {appid}", (((st?.Applications?.Count ?? 0) > 0) ? st?.Applications[0].AppId : "<null>"));
             var mediaChannel = ConnectedClient.GetChannel<QueueMediaChannel>();
@@ -70,18 +78,23 @@ namespace MyHomeAudio.model {
                 if (rcChannel != null) {
                     rcChannel.StatusChanged += RcChannel_StatusChanged;
                 }
-                st = await ConnectedClient.LaunchApplicationAsync("9B5A75B4", true);    // TODO: APPID from config!
+                st = await ConnectedClient.LaunchApplicationAsync(appId, true);   
+                
                 ConnectedClient.Disconnected += ConnectedClient_Disconnected;
-                connected = true;
+                IsConnected = true;
                 //Log.LogDebug("Launched/joined App[0]: {appId}", (((st?.Applications?.Count ?? 0) > 0) ? st?.Applications[0].AppId : "<null>"));
             }
-            return connected;
+            return IsConnected;
         }
 
         private void ConnectedClient_Disconnected(object sender, EventArgs e) {
             // This client is done now -> reconnect a new one.
-            ConnectedClient = null;
-            _ = TryConnectAsync();
+            _dispatcherQueue.TryEnqueue(async () => {
+                IsConnected = false;
+                ConnectedClient = null;
+                await Task.Delay(3000);
+                _ = TryConnectAsync(_connectionAppId);
+            });
         }
 
         private void RcChannel_StatusChanged(object sender, EventArgs e) {
@@ -91,9 +104,11 @@ namespace MyHomeAudio.model {
                 //Log.LogTrace("Status changed: " + sc.Status.Volume.Level.ToString());
 
                 _dispatcherQueue.TryEnqueue(() => {
-                    Volume = (int)(sc.Status.Volume.Level * 200);
-                    Status = sc.Status.Applications.FirstOrDefault()?.StatusText;
-                    AppId = sc.Status.Applications.FirstOrDefault()?.AppId +  "/" + sc.Status.Applications.FirstOrDefault()?.DisplayName;
+                    if (sc.Status?.Volume != null) {
+                        Volume = (int)(sc.Status?.Volume?.Level * 200);
+                    }
+                    Status = sc.Status?.Applications?.FirstOrDefault()?.StatusText;
+                    AppId = sc.Status?.Applications?.FirstOrDefault()?.AppId +  "/" + sc.Status?.Applications?.FirstOrDefault()?.DisplayName;
                 });
 
 

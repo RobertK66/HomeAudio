@@ -1,3 +1,5 @@
+using ABI.System;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -34,20 +36,18 @@ namespace MyHomeAudio.pages {
         public RadioPage() {
             this.InitializeComponent();
         }
-
         
         protected override void OnNavigatedTo(NavigationEventArgs e) {
             var p = e.Parameter;
-            ListOfRadios = App.Current.MediaRepository.GetRadioRepository(e.Parameter.ToString());
+            ListOfRadios = App.Current.MyHost.Services.GetRequiredService<MediaRepository>().GetRadioRepository(e.Parameter.ToString());
             base.OnNavigatedTo(e);
         }
 
-        private void play_Click(object sender, RoutedEventArgs e) {
-            NamedUrl url = (sender as FrameworkElement)?.DataContext as NamedUrl;
-            if (url != null) {
-                App.Current.ChromeCastRepos.PlayRadio(url);
-                Debug.WriteLine(url.Name);
-                
+        private void ItemsView_ItemInvoked(ItemsView sender, ItemsViewItemInvokedEventArgs args) {
+            NamedUrl radio = (args.InvokedItem as NamedUrl);
+            if (radio != null) {
+                Debug.WriteLine(radio.Name);
+                App.Current.ChromeCastRepos.PlayRadio(radio);
             }
         }
     }

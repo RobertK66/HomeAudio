@@ -101,6 +101,45 @@ namespace MyHomeAudio.pages {
             }
         }
 
+        private String _autoConnectionName = "Büro";
+        public String AutoConnectName {
+            get {
+                return _autoConnectionName;
+            }
+
+            set {
+                if (_autoConnectionName != value) {
+                    _autoConnectionName = value;
+                    RaisePropertyChanged();
+                    NewAutoConnect();
+                }
+            }
+        }
+
+        private String _usedAppId = "CC1AD845";
+        public String UsedAppId {
+            get {
+                return _usedAppId;
+            }
+
+            set {
+                if (_usedAppId != value) {
+                    _usedAppId = value;
+                    RaisePropertyChanged();
+                    NewAppId();
+                }
+            }
+        }
+
+        private void NewAppId() {
+            ApplicationData.Current.LocalSettings.Values[AppSettingKeys.AppId] = UsedAppId;
+        }
+
+        private void NewAutoConnect() {
+            ApplicationData.Current.LocalSettings.Values[AppSettingKeys.AutoConnect] = AutoConnectName;
+            // TODO - Switch it now....
+        }
+
         private int ListReposFiles() {
             int i = 0;
             try {
@@ -170,8 +209,12 @@ namespace MyHomeAudio.pages {
             if (configPath != null) {
                 RepositoryPath = configPath;
             }
-
             CreateFileList();
+
+            var aotoConnect = ApplicationData.Current.LocalSettings.Values[AppSettingKeys.AutoConnect]?.ToString();
+            if (!string.IsNullOrEmpty(aotoConnect)) {
+                AutoConnectName = aotoConnect;
+            }
         }
 
         private void themeMode_SelectionChanged_1(object sender, SelectionChangedEventArgs e) {
@@ -276,5 +319,6 @@ namespace MyHomeAudio.pages {
                 RepositoryPath = folder.Path;
             } 
         }
+
     }
 }

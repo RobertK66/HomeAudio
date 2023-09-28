@@ -27,6 +27,8 @@ using System.Collections;
 using MyHomeAudio.model;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using MyHomeAudio.logger;
+using Microsoft.Extensions.DependencyInjection;
 
 //using AppUIBasics.Common;
 //using AppUIBasics.Data;
@@ -64,13 +66,15 @@ namespace MyHomeAudio {
 
         public NavigationView MainNavPane { get => this.MainNavView; }
 
+        public LoggerVm LoggerVm { get; set; }
+
         public ObservableCollection<CategoryBase> Categories = new ObservableCollection<CategoryBase>();
 
         public ObservableCollection<CategoryBase> FooterCategories = new ObservableCollection<CategoryBase>();
 
 
-        private ChromeCastClient _selectedCCC;
-        public ChromeCastClient ActiveCcc { get { return _selectedCCC; } set { if (_selectedCCC != value) { _selectedCCC = value; RaisePropertyChanged(); } } }
+        private ChromeCastClientWrapper _selectedCCC;
+        public ChromeCastClientWrapper ActiveCcc { get { return _selectedCCC; } set { if (_selectedCCC != value) { _selectedCCC = value; RaisePropertyChanged(); } } }
 
 
 
@@ -82,6 +86,8 @@ namespace MyHomeAudio {
             AppWindow.TitleBar.IconShowOptions = IconShowOptions.HideIconAndSystemMenu;
             AppWindow.TitleBar.BackgroundColor = Colors.Bisque;
             AppWindow.TitleBar.ButtonBackgroundColor = Colors.Bisque;
+
+            LoggerVm = App.Current.MyHost.Services.GetService<LoggerVm>();
 
             var isLeft = ApplicationData.Current.LocalSettings.Values[AppSettingKeys.IsLeftMode];
             if (isLeft == null || ((bool)isLeft == true)) {
@@ -114,11 +120,11 @@ namespace MyHomeAudio {
                 if (File.ReadAllText(f).Contains("\"Tracks\"")) {
                     string reposid = "CD-" + i++;
                     Categories.Add(new Category() { Glyph = Symbol.Target, Name = System.IO.Path.GetFileName(f), Tag = reposid });
-                    App.Current.MediaRepository.AddCdRepos(reposid, f);
+                    App.Current.MyHost.Services.GetRequiredService<MediaRepository>().AddCdRepos(reposid, f);
                 } else {
                     string reposid = "Radio-" + i++;
                     Categories.Add(new Category() { Glyph = Symbol.Scan, Name = System.IO.Path.GetFileName(f), Tag = reposid });
-                    App.Current.MediaRepository.AddRadioRepos(reposid, f);
+                    App.Current.MyHost.Services.GetRequiredService<MediaRepository>().AddRadioRepos(reposid, f);
                 }
             }
         }

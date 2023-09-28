@@ -1,4 +1,5 @@
 using ABI.System;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
@@ -43,7 +44,7 @@ namespace MyHomeAudio.pages {
      
         protected override void OnNavigatedTo(NavigationEventArgs e) {
             var p = e.Parameter;
-            ListOfCDs = App.Current.MediaRepository.GetCdRepository(e.Parameter.ToString());
+            ListOfCDs = App.Current.MyHost.Services.GetRequiredService<MediaRepository>().GetCdRepository(e.Parameter.ToString());
             base.OnNavigatedTo(e);
         }
 

@@ -69,6 +69,13 @@
                     </ComboBox>
                 </labs:SettingsCard>
 
+                <labs:SettingsCard Header="Auto Connect Chromecast" HeaderIcon="Play">
+                    <TextBox x:Name="autoConnectName"  Text="{x:Bind AutoConnectName,  Mode=TwoWay}" />
+                </labs:SettingsCard>
+
+                <labs:SettingsCard Header="Chromecast App Id" HeaderIcon="Play">
+                    <TextBox x:Name="appId"  Text="{x:Bind UsedAppId,  Mode=TwoWay}" />
+                </labs:SettingsCard>
 
                 <!--  Media  -->
                 <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" Text="Media" />
