@@ -19,7 +19,7 @@
     <GenerateTestArtifacts>True</GenerateTestArtifacts>
     <AppxBundle>Auto</AppxBundle>
     <HoursBetweenUpdateChecks>0</HoursBetweenUpdateChecks>
-
+<Nullable>enable</Nullable>
   </PropertyGroup>
 
   

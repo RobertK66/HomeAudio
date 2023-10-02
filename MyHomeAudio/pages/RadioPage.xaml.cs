@@ -44,7 +44,7 @@ namespace MyHomeAudio.pages {
         }
 
         private void ItemsView_ItemInvoked(ItemsView sender, ItemsViewItemInvokedEventArgs args) {
-            NamedUrl radio = (args.InvokedItem as NamedUrl);
+            NamedUrl? radio = (args.InvokedItem as NamedUrl);
             if (radio != null) {
                 Debug.WriteLine(radio.Name);
                 App.Current.ChromeCastRepos.PlayRadio(radio);

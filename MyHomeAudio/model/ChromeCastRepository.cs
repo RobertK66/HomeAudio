@@ -15,11 +15,11 @@ namespace MyHomeAudio.model
 
         private ChromeCastClientWrapper _activeClient = null;
         private ObservableCollection<ChromeCastClientWrapper> KnownChromecasts = new ObservableCollection<ChromeCastClientWrapper>();
-        private string _autoConnectName;
+        private string? _autoConnectName;
         private string _appId;
         private ILoggerFactory _loggerFactory;  
 
-        public ChromeCastRepository(string autoConnectName, string appId, Microsoft.Extensions.Logging.ILoggerFactory loggerFactory) {
+        public ChromeCastRepository(string? autoConnectName, string appId, Microsoft.Extensions.Logging.ILoggerFactory loggerFactory) {
             _autoConnectName = autoConnectName;
             _appId = appId;
             _loggerFactory = loggerFactory;
@@ -30,7 +30,8 @@ namespace MyHomeAudio.model
             var ccc = new ChromeCastClientWrapper(e, dq, _loggerFactory);
             KnownChromecasts.Add(ccc);
             
-            if (e.Name.StartsWith(_autoConnectName)) {
+
+            if ((_autoConnectName != null) && e.Name.StartsWith(_autoConnectName)) {
                 _ = TryConnectAsync(ccc);
             }
         }

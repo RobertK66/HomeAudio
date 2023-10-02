@@ -43,11 +43,18 @@ namespace MyHomeAudio {
     /// </summary>
     public partial class App : Application {
 
-        public ChromeCastRepository ChromeCastRepos = null;
+        public new static App Current => (App)Application.Current;
 
+        // Non Nullable - Constructor created
         public IHost MyHost;
         private ILoggerFactory loggerFactory;
         private ILogger<App> Log;
+
+        // Nullable created in OnLaunched
+        public ChromeCastRepository? ChromeCastRepos;
+        private AppSettings? appSettings;
+        public MainWindow? m_window;
+
 
         public App() {
             this.InitializeComponent();
@@ -61,6 +68,7 @@ namespace MyHomeAudio {
                          ConfigureServices((context, services) => {
                              services.AddSingleton(logVm);
                              services.AddSingleton<MediaRepository>();
+                             services.AddSingleton<AppSettings>();
 
                              services.AddLogging(logging => {
                                  logging.AddFilter(level => level >= LogLevel.Trace)
@@ -71,8 +79,8 @@ namespace MyHomeAudio {
                          }).
                          Build();
 
-            Log = MyHost.Services.GetService<ILogger<App>>();
-            loggerFactory = MyHost.Services.GetService<ILoggerFactory>();
+            Log = MyHost.Services.GetRequiredService<ILogger<App>>();
+            loggerFactory = MyHost.Services.GetRequiredService<ILoggerFactory>();
             Log.LogTrace("Application instanciated.");
         }
 
@@ -80,30 +88,28 @@ namespace MyHomeAudio {
 
             try {
                 Log.LogInformation("Application loaded.");
+                appSettings = MyHost.Services.GetRequiredService<AppSettings>();
 
-                String appId = (string)ApplicationData.Current.LocalSettings.Values[AppSettingKeys.AppId];
-                if (String.IsNullOrEmpty(appId)) {
-                    appId = AppSetting.DefaultAppId;
+                ChromeCastRepos = new ChromeCastRepository(appSettings.AutoConnectName,
+                                                           appSettings.AppId, loggerFactory);
+
+                // if not done already, copy the provided examples to current executable path. 
+                string? fullpath = System.Reflection.Assembly.GetEntryAssembly()?.Location;
+                if (fullpath != null) {
+                    String path = fullpath.Substring(0, fullpath.LastIndexOf("\\"));
+
+                    if (!File.Exists(ApplicationData.Current.LocalFolder.Path + "\\Cds.json")) {
+                        System.IO.File.Copy(path + "\\Cds.json", ApplicationData.Current.LocalFolder.Path + "\\Cds.json", true);
+                    }
+                    if (!File.Exists(ApplicationData.Current.LocalFolder.Path + "\\WebRadios.json")) {
+                        System.IO.File.Copy(path + "\\WebRadios.json", ApplicationData.Current.LocalFolder.Path + "\\WebRadios.json");
+                    }
                 }
 
-                ChromeCastRepos = new ChromeCastRepository((string)ApplicationData.Current.LocalSettings.Values[AppSettingKeys.AutoConnect],
-                                                           appId, loggerFactory);
-
-                String fullpath = System.Reflection.Assembly.GetEntryAssembly().Location;
-                String path = fullpath.Substring(0, fullpath.LastIndexOf("\\"));
-
-                if (!File.Exists(ApplicationData.Current.LocalFolder.Path + "\\Cds.json")) {
-                    System.IO.File.Copy(path + "\\Cds.json", ApplicationData.Current.LocalFolder.Path + "\\Cds.json", true);
-                }
-                if (!File.Exists(ApplicationData.Current.LocalFolder.Path + "\\WebRadios.json")) {
-                    System.IO.File.Copy(path + "\\WebRadios.json", ApplicationData.Current.LocalFolder.Path + "\\WebRadios.json");
-                }
-
+                // start the search for CC Receivers in local network
                 IChromecastLocator locator = new Sharpcaster.MdnsChromecastLocator();
                 locator.ChromecastReceivedFound += Locator_ChromecastReceivedFound;
-                _ = locator.FindReceiversAsync(CancellationToken.None);         // Fire the search process and wait for receiver found events in the handler. No await here!
-
-
+                _ = locator.FindReceiversAsync(CancellationToken.None);          // Fire the search process and wait for receiver found events in the handler. No await here!
 
             } catch (Exception ex) {
                 Debug.WriteLine(ex);
@@ -114,15 +120,13 @@ namespace MyHomeAudio {
             m_window.Activate();
         }
 
-        private void Locator_ChromecastReceivedFound(object sender, Sharpcaster.Models.ChromecastReceiver e) {
-            ChromeCastRepos.Add(e);
-            //KnownChromecastReceiver.Add(e);
+        
+        private void Locator_ChromecastReceivedFound(object? sender, Sharpcaster.Models.ChromecastReceiver e) {
+            ChromeCastRepos?.Add(e);
         }
 
-        public MainWindow m_window;
+       
 
-
-        public new static App Current => (App)Application.Current;
 
         public static string WinAppSdkDetails {
             get => "?? ?? ?? ??";
@@ -144,8 +148,7 @@ namespace MyHomeAudio {
         }
 
         internal void ReconfigureMainWindow(string repositoryPath) {
-            m_window.BuildMenue(repositoryPath);
-
+            m_window?.BuildMenue(repositoryPath);
         }
 
         
