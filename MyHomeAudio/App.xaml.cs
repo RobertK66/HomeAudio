@@ -44,17 +44,17 @@ namespace MyHomeAudio {
     public partial class App : Application {
 
         public new static App Current => (App)Application.Current;
+        public static IServiceProvider Services => App.Current.MyHost.Services;
 
         // Non Nullable - Constructor created
-        public IHost MyHost;
-        private ILoggerFactory loggerFactory;
+        private IHost MyHost;
         private ILogger<App> Log;
+        private AppSettings appSettings;
+        
+        //public ChromeCastRepository ChromeCastRepos;
 
         // Nullable created in OnLaunched
-        public ChromeCastRepository? ChromeCastRepos;
-        private AppSettings? appSettings;
         public MainWindow? m_window;
-
 
         public App() {
             this.InitializeComponent();
@@ -69,9 +69,10 @@ namespace MyHomeAudio {
                              services.AddSingleton(logVm);
                              services.AddSingleton<MediaRepository>();
                              services.AddSingleton<AppSettings>();
-
+                             services.AddSingleton<ChromeCastRepository>();
                              services.AddLogging(logging => {
-                                 logging.AddFilter(level => level >= LogLevel.Trace)
+                                 logging
+                                 .AddFilter(level => level >= LogLevel.Trace)
                                  .AddWinUiLogger((con) => {       // This adds our LogPanel as possible target (configure in appsettings.json)
                                      con.LoggerVm = logVm;
                                  });
@@ -79,19 +80,17 @@ namespace MyHomeAudio {
                          }).
                          Build();
 
-            Log = MyHost.Services.GetRequiredService<ILogger<App>>();
-            loggerFactory = MyHost.Services.GetRequiredService<ILoggerFactory>();
+            Log = App.Services.GetRequiredService<ILogger<App>>();
             Log.LogTrace("Application instanciated.");
+
+            appSettings = App.Services.GetRequiredService<AppSettings>();
+
         }
 
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args) {
 
             try {
                 Log.LogInformation("Application loaded.");
-                appSettings = MyHost.Services.GetRequiredService<AppSettings>();
-
-                ChromeCastRepos = new ChromeCastRepository(appSettings.AutoConnectName,
-                                                           appSettings.AppId, loggerFactory);
 
                 // if not done already, copy the provided examples to current executable path. 
                 string? fullpath = System.Reflection.Assembly.GetEntryAssembly()?.Location;
@@ -122,10 +121,8 @@ namespace MyHomeAudio {
 
         
         private void Locator_ChromecastReceivedFound(object? sender, Sharpcaster.Models.ChromecastReceiver e) {
-            ChromeCastRepos?.Add(e);
+            App.Services.GetRequiredService<ChromeCastRepository>().Add(e);
         }
-
-       
 
 
         public static string WinAppSdkDetails {

@@ -44,7 +44,7 @@ namespace MyHomeAudio.pages {
      
         protected override void OnNavigatedTo(NavigationEventArgs e) {
             var p = e.Parameter;
-            ListOfCDs = App.Current.MyHost.Services.GetRequiredService<MediaRepository>().GetCdRepository(e.Parameter.ToString());
+            ListOfCDs = App.Services.GetRequiredService<MediaRepository>().GetCdRepository(e.Parameter.ToString());
             base.OnNavigatedTo(e);
         }
 
@@ -52,7 +52,7 @@ namespace MyHomeAudio.pages {
             Cd cd = (args.InvokedItem as Cd);
             if (cd != null) {
                 Debug.WriteLine(cd.Name);
-                App.Current.ChromeCastRepos.PlayCed(cd);
+                App.Services.GetRequiredService<ChromeCastRepository>().PlayCed(cd);
             } 
 
         }

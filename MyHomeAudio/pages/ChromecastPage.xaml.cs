@@ -14,6 +14,7 @@ using Sharpcaster.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -53,7 +54,7 @@ namespace MyHomeAudio.pages {
         public ChromecastPage() {
             this.InitializeComponent();
 
-            CCC = App.Current.ChromeCastRepos.GetClients();
+            CCC = App.Services.GetRequiredService<ChromeCastRepository>().GetClients();
             if (CCC.Count > 0) {
                 SelectedCcc = App.Current.m_window.ActiveCcc;
                 //SelectedCcc = CCC.Where(cc=>cc.Name.StartsWith("Bü")).FirstOrDefault()??CCC[0];
@@ -61,7 +62,7 @@ namespace MyHomeAudio.pages {
                 //_ = SelectedCcc.TryConnectAsync();
             }
 
-            LoggerVm = (LoggerVm) App.Current.MyHost.Services.GetService(typeof(LoggerVm));
+            LoggerVm = (LoggerVm) App.Services.GetRequiredService(typeof(LoggerVm));
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e) {
@@ -73,7 +74,32 @@ namespace MyHomeAudio.pages {
         }
 
         private void TextBlock_SizeChanged(object sender, SizeChangedEventArgs e) {
-            logScroll.ScrollToVerticalOffset(logScroll.ScrollableHeight);
+            bool scrollit = NearlyEqual(e.PreviousSize.Height, logScroll.VerticalOffset + logScroll.RenderSize.Height, 0.001);
+
+            Debug.WriteLine("TB-H: " + e.PreviousSize.Height + " SA: " + (logScroll.VerticalOffset + logScroll.RenderSize.Height).ToString() + " -> Scroll It: " + scrollit);
+
+            if (scrollit) {
+                logScroll.ScrollToVerticalOffset(logScroll.ScrollableHeight);
+            }
+            
+        }
+
+
+        public static bool NearlyEqual(double a, double b, double epsilon) {
+            const double MinNormal = 2.2250738585072014E-308d;
+            double absA = Math.Abs(a);
+            double absB = Math.Abs(b);
+            double diff = Math.Abs(a - b);
+
+            if (a.Equals(b)) { // shortcut, handles infinities
+                return true;
+            } else if (a == 0 || b == 0 || absA + absB < MinNormal) {
+                // a or b is zero or both are extremely close to it
+                // relative error is less meaningful here
+                return diff < (epsilon * MinNormal);
+            } else { // use relative error
+                return diff / (absA + absB) < epsilon;
+            }
         }
     }
 }

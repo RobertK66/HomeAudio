@@ -76,7 +76,7 @@ namespace MyHomeAudio {
         private ChromeCastClientWrapper _selectedCCC;
         public ChromeCastClientWrapper ActiveCcc { get { return _selectedCCC; } set { if (_selectedCCC != value) { _selectedCCC = value; RaisePropertyChanged(); } } }
 
-
+        private string currentConfigPath;
 
 
 
@@ -87,7 +87,7 @@ namespace MyHomeAudio {
             AppWindow.TitleBar.BackgroundColor = Colors.Bisque;
             AppWindow.TitleBar.ButtonBackgroundColor = Colors.Bisque;
 
-            LoggerVm = App.Current.MyHost.Services.GetService<LoggerVm>();
+            LoggerVm = App.Services.GetRequiredService<LoggerVm>();
 
             var isLeft = ApplicationData.Current.LocalSettings.Values[AppSettingKeys.IsLeftMode];
             if (isLeft == null || ((bool)isLeft == true)) {
@@ -105,26 +105,27 @@ namespace MyHomeAudio {
                 }
             }
 
-            var repPath = ApplicationData.Current.LocalSettings.Values[AppSettingKeys.ReposPath]?.ToString();
-            if (repPath == null) {
-                repPath = ApplicationData.Current.LocalFolder.Path;
-            }
+            var repPath = App.Services.GetRequiredService<AppSettings>().ReposPath;
+
             FooterCategories.Add(new Category() { Glyph = Symbol.AlignLeft, Name = "ChromeCast", Tag = "CC" });
             BuildMenue(repPath);
         }
 
         public void BuildMenue(string repPath) {
-            Categories.Clear();
-            int i = 0;
-            foreach (var f in Directory.GetFiles(repPath, "*.json")) {
-                if (File.ReadAllText(f).Contains("\"Tracks\"")) {
-                    string reposid = "CD-" + i++;
-                    Categories.Add(new Category() { Glyph = Symbol.Target, Name = System.IO.Path.GetFileName(f), Tag = reposid });
-                    App.Current.MyHost.Services.GetRequiredService<MediaRepository>().AddCdRepos(reposid, f);
-                } else {
-                    string reposid = "Radio-" + i++;
-                    Categories.Add(new Category() { Glyph = Symbol.Scan, Name = System.IO.Path.GetFileName(f), Tag = reposid });
-                    App.Current.MyHost.Services.GetRequiredService<MediaRepository>().AddRadioRepos(reposid, f);
+            if (!repPath.Equals(currentConfigPath)) {
+                currentConfigPath = repPath;
+                Categories.Clear();
+                int i = 0;
+                foreach (var f in Directory.GetFiles(repPath, "*.json")) {
+                    if (File.ReadAllText(f).Contains("\"Tracks\"")) {
+                        string reposid = "CD-" + i++;
+                        Categories.Add(new Category() { Glyph = Symbol.Target, Name = System.IO.Path.GetFileName(f), Tag = reposid });
+                        App.Services.GetRequiredService<MediaRepository>().AddCdRepos(reposid, f);
+                    } else {
+                        string reposid = "Radio-" + i++;
+                        Categories.Add(new Category() { Glyph = Symbol.Scan, Name = System.IO.Path.GetFileName(f), Tag = reposid });
+                        App.Services.GetRequiredService<MediaRepository>().AddRadioRepos(reposid, f);
+                    }
                 }
             }
         }

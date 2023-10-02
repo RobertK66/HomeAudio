@@ -18,8 +18,8 @@ namespace MyHomeAudio.model {
         Dictionary<String, ObservableCollection<Cd>> CdRepositories = new Dictionary<string, ObservableCollection<Cd>>();
         Dictionary<String, ObservableCollection<NamedUrl>> RadioRepositories = new Dictionary<string, ObservableCollection<NamedUrl>>();
 
-        public MediaRepository(ILoggerFactory lf) {
-            Log = lf.CreateLogger(typeof(MediaRepository));
+        public MediaRepository(ILogger<MediaRepository> l) {
+            Log = l;
         }
 
         internal void AddCdRepos(string reposid, string path) {
@@ -32,15 +32,20 @@ namespace MyHomeAudio.model {
             }
 
             if (File.Exists(path)) {
-                var cont = JsonSerializer.Deserialize<List<Cd>>(File.ReadAllText(path));
-                foreach (var item in cont) {
-                    rep.Add(item);
+                try {
+                    var cont = JsonSerializer.Deserialize<List<Cd>>(File.ReadAllText(path));
+                    foreach (var item in cont) {
+                        rep.Add(item);
+                    }
+                    Log.LogDebug("Added {count} cds from {path}", cont.Count, path);
+                } catch (Exception ex) {
+                    Log.LogError("Exception beim Laden eines Repositories: {repName}, {ex}", path, ex);
                 }
-                Log.LogDebug("Added {count} cds from {path}", cont.Count, path);
             }
-
-            
+           
         }
+
+
 
         internal void AddRadioRepos(string reposid, string path) {
             var rep = new ObservableCollection<NamedUrl>();
@@ -59,10 +64,10 @@ namespace MyHomeAudio.model {
                     }
                     Log.LogDebug("Added {count} webradios from {path}", cont.Count, path);
                 } catch (Exception ex) {
-                    Debug.WriteLine(ex.Message);
+                    Log.LogError("Exception beim Laden eines Repositories: {repName}, {ex}", path, ex);
                 }
             }
-            
+
         }
 
         internal ObservableCollection<Cd> GetCdRepository(string reposid) {

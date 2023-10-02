@@ -39,7 +39,7 @@ namespace MyHomeAudio.pages {
         
         protected override void OnNavigatedTo(NavigationEventArgs e) {
             var p = e.Parameter;
-            ListOfRadios = App.Current.MyHost.Services.GetRequiredService<MediaRepository>().GetRadioRepository(e.Parameter.ToString());
+            ListOfRadios = App.Services.GetRequiredService<MediaRepository>().GetRadioRepository(e.Parameter.ToString());
             base.OnNavigatedTo(e);
         }
 
@@ -47,7 +47,7 @@ namespace MyHomeAudio.pages {
             NamedUrl? radio = (args.InvokedItem as NamedUrl);
             if (radio != null) {
                 Debug.WriteLine(radio.Name);
-                App.Current.ChromeCastRepos.PlayRadio(radio);
+                App.Services.GetRequiredService<ChromeCastRepository>().PlayRadio(radio);
             }
         }
     }

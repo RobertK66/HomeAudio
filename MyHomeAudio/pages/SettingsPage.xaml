@@ -29,18 +29,9 @@
         </Style>
     </Page.Resources>
     <Grid x:Name="RootGrid">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-        </Grid.RowDefinitions>
-        <TextBlock
-           x:Name="PageHeader"
-           Margin="36,24,36,0"
-           Style="{StaticResource TitleTextBlockStyle}"
-           Text="{x:Bind SettingsTitleString, Mode=TwoWay}" />
+        
         <ScrollViewer
            x:Name="contentSV"
-           Grid.Row="1"
            Padding="36,0,36,0"
            IsTabStop="False"
            UseSystemFocusVisuals="False"

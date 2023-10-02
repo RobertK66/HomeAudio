@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Dispatching;
 using Sharpcaster.Models;
+using Sharpcaster.Models.Protobuf;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -13,25 +14,29 @@ namespace MyHomeAudio.model
 {
     public class ChromeCastRepository {
 
-        private ChromeCastClientWrapper _activeClient = null;
+        private ChromeCastClientWrapper? _activeClient = null;
         private ObservableCollection<ChromeCastClientWrapper> KnownChromecasts = new ObservableCollection<ChromeCastClientWrapper>();
         private string? _autoConnectName;
         private string _appId;
-        private ILoggerFactory _loggerFactory;  
+        private ILoggerFactory _loggerFactory;
+        private ILogger<ChromeCastRepository> Log;
 
-        public ChromeCastRepository(string? autoConnectName, string appId, Microsoft.Extensions.Logging.ILoggerFactory loggerFactory) {
-            _autoConnectName = autoConnectName;
-            _appId = appId;
+        public ChromeCastRepository(AppSettings appSettings, Microsoft.Extensions.Logging.ILoggerFactory loggerFactory) {
+            _autoConnectName = appSettings.AutoConnectName;
+            _appId = appSettings.AppId;
             _loggerFactory = loggerFactory;
+            Log = loggerFactory.CreateLogger<ChromeCastRepository>();
         }
 
         public void Add(ChromecastReceiver e) {
+            Log.LogInformation("Receiver '{CcrName}' found at {CcrUri}", e.Name, e.DeviceUri);
             var dq = DispatcherQueue.GetForCurrentThread();
             var ccc = new ChromeCastClientWrapper(e, dq, _loggerFactory);
             KnownChromecasts.Add(ccc);
             
 
-            if ((_autoConnectName != null) && e.Name.StartsWith(_autoConnectName)) {
+            if (!String.IsNullOrEmpty(_autoConnectName) && e.Name.StartsWith(_autoConnectName)) {
+                Log.LogInformation("Initiate AutoConnect for Receiver '{CcrName}'", e.Name);
                 _ = TryConnectAsync(ccc);
             }
         }

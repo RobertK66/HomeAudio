@@ -1,4 +1,6 @@
 using CommunityToolkit.WinUI.Controls;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -9,6 +11,7 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.VisualBasic;
+using Sharpcaster.Models.Protobuf;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -38,6 +41,10 @@ namespace MyHomeAudio.pages {
     /// </summary>
     public sealed partial class SettingsPage : VmPage {
 
+        private ILogger Log;
+        private AppSettings Settings;
+
+        
         private static int loadcount = 0;
         private static int constcount = 0;
         //private static int navigatecount = 0;
@@ -45,20 +52,20 @@ namespace MyHomeAudio.pages {
 
         public string EaVersion {
             get {
-                var version = System.Reflection.Assembly.GetEntryAssembly().GetName().Version;
-                return string.Format("{0}.{1}.{2}.{3}", version.Major, version.Minor, version.Build, version.Revision);
+                var version = System.Reflection.Assembly.GetEntryAssembly()?.GetName().Version;
+                return string.Format("{0}.{1}.{2}.{3}", version?.Major, version?.Minor, version?.Build, version?.Revision);
             }
         }
 
         public string EaName {
             get {
-                return System.Reflection.Assembly.GetEntryAssembly().FullName;
+                return System.Reflection.Assembly.GetEntryAssembly()?.FullName ?? "<null>";
             }
         }
 
         public string EaDecription {
             get {
-                return System.Reflection.Assembly.GetEntryAssembly().Location;
+                return System.Reflection.Assembly.GetEntryAssembly()?.Location ?? "unknown";
             }
         }
 
@@ -73,85 +80,44 @@ namespace MyHomeAudio.pages {
             }
         }
 
-        private String _sts ="<not set>";
-        public String SettingsTitleString {
-            get {
-                return _sts;
-            }
 
-            set {
-                if (_sts != value) {
-                    _sts = value;
-                    RaisePropertyChanged();
-                }
-            }
-        }
-
-        private String _repospath = ApplicationData.Current.LocalFolder.Path;
         public String RepositoryPath {
             get {
-                return _repospath;
+                return Settings.ReposPath;
             }
 
             set {
-                if (_repospath != value) {
-                    _repospath = value;
+                if (!Object.Equals(Settings.ReposPath,value)) {
+                    Settings.ReposPath = value;
                     RaisePropertyChanged();
                 }
             }
         }
 
-        private String _autoConnectionName = "Büro";
-        public String AutoConnectName {
+        public String? AutoConnectName {
             get {
-                return _autoConnectionName;
+                return Settings.AutoConnectName;
             }
 
             set {
-                if (_autoConnectionName != value) {
-                    _autoConnectionName = value;
+                if (Settings.AutoConnectName != value) {
+                    Settings.AutoConnectName = value;
                     RaisePropertyChanged();
-                    NewAutoConnect();
                 }
             }
         }
-
-        private String _usedAppId = "CC1AD845";
+      
         public String UsedAppId {
             get {
-                return _usedAppId;
+                return Settings.AppId;
             }
 
             set {
-                if (_usedAppId != value) {
-                    _usedAppId = value;
+                if (Settings.AppId != value) {
+                    Settings.AppId = value;
                     RaisePropertyChanged();
-                    NewAppId();
                 }
             }
-        }
-
-        private void NewAppId() {
-            ApplicationData.Current.LocalSettings.Values[AppSettingKeys.AppId] = UsedAppId;
-        }
-
-        private void NewAutoConnect() {
-            ApplicationData.Current.LocalSettings.Values[AppSettingKeys.AutoConnect] = AutoConnectName;
-            // TODO - Switch it now....
-        }
-
-        private int ListReposFiles() {
-            int i = 0;
-            try {
-                RepositoryFiles.Clear();
-                foreach (var s in Directory.GetFiles(RepositoryPath, "*.json")) {
-                    RepositoryFiles.Add(s);
-                    i++;
-                }
-            } catch (Exception ex) {
-                Debug.WriteLine(ex);
-            }
-            return i;
         }
 
         private ObservableCollection<String> _reposfiles = new ObservableCollection<String>();
@@ -179,42 +145,46 @@ namespace MyHomeAudio.pages {
 
         public SettingsPage() {
             DateTime startTime = DateTime.Now;
+            Log = App.Services.GetRequiredService<ILogger<SettingsPage>>();
+            Settings = App.Services.GetRequiredService<AppSettings>();
 
             this.InitializeComponent();
 
-            foreach (var a in System.Reflection.Assembly.GetEntryAssembly()?.GetReferencedAssemblies()) {
-                try {
-                    var asm = Assembly.Load(a);
-                    this.VersionExpander.Items.Add(new SettingsCard() {
-                        Header = a.FullName,
-                        Content = string.Format("{0}.{1}.{2}.{3} ", a.Version.Major, a.Version.Minor, a.Version.Build, a.Version.Revision),
-                        Description = asm.Location
-                    });
-                } catch { }
+            var aa = Assembly.GetEntryAssembly()?.GetReferencedAssemblies();
+            if (aa != null) {
+                foreach (var a in aa) {
+                    try {
+                        if (a != null) { 
+                            var asm = Assembly.Load(a);
+                            this.VersionExpander.Items.Add(new SettingsCard() {
+                                Header = a.FullName,
+                                Content = string.Format("{0}.{1}.{2}.{3} ", a.Version?.Major, a.Version?.Minor, a.Version?.Build, a.Version?.Revision),
+                                Description = asm.Location
+                            });
+                        }
+                    } catch { }
+                }
             }
-
-            //var c = ApplicationData.Current;
-
-            //this.VersionExpander.Items.Add(new SettingsCard() {
-            //    Header = c.LocalFolder?.Path,
-            //    Content = c.RoamingFolder?.Path,
-            //    Description = c.SharedLocalFolder?.Path
-            //});
-
+         
             loadTime = DateTime.Now - startTime;
             constcount++;
-            SettingsTitleString = string.Format("Settings Page constructed: {0}, loaded: {1} time: {2} ms.", constcount, loadcount, loadTime.Value.TotalMilliseconds);
 
-            var configPath = ApplicationData.Current.LocalSettings.Values[AppSettingKeys.ReposPath]?.ToString();
-            if (configPath != null) {
-                RepositoryPath = configPath;
-            }
             CreateFileList();
+            Log.LogDebug(string.Format("Settings Page constructed: {0}, loaded: {1} time: {2} ms.", constcount, loadcount, loadTime.Value.TotalMilliseconds));
+        }
 
-            var aotoConnect = ApplicationData.Current.LocalSettings.Values[AppSettingKeys.AutoConnect]?.ToString();
-            if (!string.IsNullOrEmpty(aotoConnect)) {
-                AutoConnectName = aotoConnect;
+        private int ListReposFiles() {
+            int i = 0;
+            try {
+                RepositoryFiles.Clear();
+                foreach (var s in Directory.GetFiles(RepositoryPath, "*.json")) {
+                    RepositoryFiles.Add(s);
+                    i++;
+                }
+            } catch (Exception ex) {
+                Log.LogError("Exception reading repos files {ex}", ex);
             }
+            return i;
         }
 
         private void themeMode_SelectionChanged_1(object sender, SelectionChangedEventArgs e) {
@@ -222,7 +192,7 @@ namespace MyHomeAudio.pages {
             if (selectedTheme != null) {
                 var t = App.GetEnum<ElementTheme>(selectedTheme);
 
-                if (App.Current.m_window.Content is FrameworkElement rootElement) {
+                if (App.Current.m_window?.Content is FrameworkElement rootElement) {
                     rootElement.RequestedTheme = t;
                     ApplicationData.Current.LocalSettings.Values[AppSettingKeys.UiTheme] = t.ToString();
                 }
@@ -231,20 +201,21 @@ namespace MyHomeAudio.pages {
         }
 
         private void navigationLocation_SelectionChanged_1(object sender, SelectionChangedEventArgs e) {
-            NavigationView navPane = App.Current.m_window.MainNavPane;
-
-            if (navigationLocation.SelectedIndex == 0) {
-                navPane.PaneDisplayMode = NavigationViewPaneDisplayMode.Auto;
-                ApplicationData.Current.LocalSettings.Values[AppSettingKeys.IsLeftMode] = true;
-            } else {
-                navPane.PaneDisplayMode = NavigationViewPaneDisplayMode.Top;
-                ApplicationData.Current.LocalSettings.Values[AppSettingKeys.IsLeftMode] = false;
+            NavigationView? navPane = App.Current.m_window?.MainNavPane;
+            if (navPane != null) {
+                if (navigationLocation.SelectedIndex == 0) {
+                    navPane.PaneDisplayMode = NavigationViewPaneDisplayMode.Auto;
+                    ApplicationData.Current.LocalSettings.Values[AppSettingKeys.IsLeftMode] = true;
+                } else {
+                    navPane.PaneDisplayMode = NavigationViewPaneDisplayMode.Top;
+                    ApplicationData.Current.LocalSettings.Values[AppSettingKeys.IsLeftMode] = false;
+                }
             }
         }
 
         private void Page_Loaded(object sender, RoutedEventArgs e) {
             loadcount++;
-            SettingsTitleString = string.Format("Settings Page constructed: {0}, loaded: {1} time: {2} ms.", constcount, loadcount, loadTime.Value.TotalMilliseconds);
+            Log.LogDebug(string.Format("Settings Page constructed: {0}, loaded: {1} ", constcount, loadcount));
 
             var isLeft = ApplicationData.Current.LocalSettings.Values[AppSettingKeys.IsLeftMode];
             if (isLeft == null || ((bool)isLeft == true)) {
@@ -254,7 +225,7 @@ namespace MyHomeAudio.pages {
             }
 
             ElementTheme currentTheme = ElementTheme.Light;
-            if (App.Current.m_window.Content is FrameworkElement rootElement) {
+            if (App.Current.m_window?.Content is FrameworkElement rootElement) {
                 currentTheme = rootElement.RequestedTheme;
             }
             switch (currentTheme) {
@@ -280,17 +251,7 @@ namespace MyHomeAudio.pages {
 
         private void CreateFileList() {
             if (ListReposFiles() > 0) {
-                String configPath = ApplicationData.Current.LocalSettings.Values[AppSettingKeys.ReposPath]?.ToString();
-                if (configPath != null) {
-                    if (!RepositoryPath.Equals(configPath)) {
-                        // it really changend and there are valid files!
-                        ApplicationData.Current.LocalSettings.Values[AppSettingKeys.ReposPath] = RepositoryPath;
-                        App.Current.ReconfigureMainWindow(RepositoryPath);
-                    }
-                } else {
-                    ApplicationData.Current.LocalSettings.Values[AppSettingKeys.ReposPath] = RepositoryPath;
-                    App.Current.ReconfigureMainWindow(RepositoryPath);
-                }
+                App.Current.ReconfigureMainWindow(RepositoryPath);
             }
         }
 

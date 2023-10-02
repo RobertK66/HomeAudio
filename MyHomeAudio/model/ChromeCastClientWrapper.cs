@@ -1,4 +1,4 @@
-﻿using ABI.System;
+﻿//using ABI.System;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Dispatching;
 using QueueCaster;
@@ -33,7 +33,7 @@ namespace MyHomeAudio.model {
 
         DispatcherQueue _dispatcherQueue;
         String _connectionAppId;
-        ChromecastClient ConnectedClient = null;
+        ChromecastClient? ConnectedClient = null;
 
 
         private ChromecastReceiver cr;
@@ -44,6 +44,8 @@ namespace MyHomeAudio.model {
         private bool _isConnected;
         private ILoggerFactory _loggerFactory;
 
+        private ILogger Log;
+
         private int _volume;
 
         public ChromeCastClientWrapper(ChromecastReceiver cr, DispatcherQueue dc, ILoggerFactory lf) {
@@ -52,6 +54,7 @@ namespace MyHomeAudio.model {
             Status = cr.Status;
             _dispatcherQueue = dc;
             _loggerFactory = lf;
+            Log = lf.CreateLogger<ChromeCastClientWrapper>();
         }
 
         public String Name { get { return _name; } set { _name = value; RaisePropertyChanged(); } }
@@ -64,30 +67,54 @@ namespace MyHomeAudio.model {
         public async Task<bool> TryConnectAsync(string appId) {
             //bool connected = false;
             IsConnected = false;
-            _connectionAppId = appId;
+            QueueMediaChannel? mediaChannel = null;
+            StatusChannel<ReceiverStatusMessage, ChromecastStatus>?  rcChannel = null;
+            try {
+                _connectionAppId = appId;
 
-            ConnectedClient = QueueCaster.ChromecastClient.CreateQueueCasterClient(_loggerFactory);
+                ConnectedClient = QueueCaster.ChromecastClient.CreateQueueCasterClient(_loggerFactory);
 
-            //cr.DeviceUri = new System.Uri("http://localhost:123/base");
-            var st = await ConnectedClient.ConnectChromecast(cr);
-            //Log.LogDebug("Connected available App[0]: {appid}", (((st?.Applications?.Count ?? 0) > 0) ? st?.Applications[0].AppId : "<null>"));
-            var mediaChannel = ConnectedClient.GetChannel<QueueMediaChannel>();
-            if (mediaChannel != null) {
-                mediaChannel.QueueMediaStatusChanged += MediaChannel_QueueMediaStatusChanged; ;
-                var rcChannel = ConnectedClient.GetChannel<StatusChannel<ReceiverStatusMessage, ChromecastStatus>>();
-                if (rcChannel != null) {
-                    rcChannel.StatusChanged += RcChannel_StatusChanged;
+                //cr.DeviceUri = new System.Uri("http://localhost:123/base");
+                var st = await ConnectedClient.ConnectChromecast(cr);
+
+                string? oldAppid = null;
+                if ((st?.Applications?.Count ?? 0) > 0) {
+                    oldAppid = st?.Applications[0].AppId;
                 }
-                st = await ConnectedClient.LaunchApplicationAsync(appId, true);   
-                
-                ConnectedClient.Disconnected += ConnectedClient_Disconnected;
-                IsConnected = true;
-                //Log.LogDebug("Launched/joined App[0]: {appId}", (((st?.Applications?.Count ?? 0) > 0) ? st?.Applications[0].AppId : "<null>"));
+                Log.LogDebug("Connected - available App[0]: {appid}", oldAppid);
+
+                mediaChannel = ConnectedClient.GetChannel<QueueMediaChannel>();
+                if (mediaChannel != null) {
+                    mediaChannel.QueueMediaStatusChanged += MediaChannel_QueueMediaStatusChanged; ;
+                    rcChannel = ConnectedClient.GetChannel<StatusChannel<ReceiverStatusMessage, ChromecastStatus>>();
+                    if (rcChannel != null) {
+                        rcChannel.StatusChanged += RcChannel_StatusChanged;
+                    }
+                    st = await ConnectedClient.LaunchApplicationAsync(appId, true);
+                    Log.LogDebug("************Launched/Joined App[0]: {appid}", (((st?.Applications?.Count ?? 0) > 0) ? st?.Applications[0].AppId : "<null>"));
+
+                    ConnectedClient.Disconnected += ConnectedClient_Disconnected;
+                    IsConnected = true;
+
+                }
+            } catch (Exception ex) {
+                Log.LogError("Exception while trying to connect chromecast: {ex}", ex);
+                if (mediaChannel != null) {
+                    mediaChannel.QueueMediaStatusChanged -= MediaChannel_QueueMediaStatusChanged;
+                }
+                if (rcChannel != null) {
+                    rcChannel.StatusChanged -= RcChannel_StatusChanged;
+                }
+                if (ConnectedClient != null) {
+                    ConnectedClient.Disconnected -= ConnectedClient_Disconnected;
+                    _ = ConnectedClient.DisconnectAsync();
+                    ConnectedClient = null;
+                }
             }
             return IsConnected;
         }
 
-        private void ConnectedClient_Disconnected(object sender, EventArgs e) {
+        private void ConnectedClient_Disconnected(object? sender, EventArgs e) {
             // This client is done now -> reconnect a new one.
             _dispatcherQueue.TryEnqueue(async () => {
                 IsConnected = false;
@@ -97,9 +124,9 @@ namespace MyHomeAudio.model {
             });
         }
 
-        private void RcChannel_StatusChanged(object sender, EventArgs e) {
+        private void RcChannel_StatusChanged(object? sender, EventArgs e) {
             //throw new NotImplementedException();
-            StatusChannel<ReceiverStatusMessage, ChromecastStatus> sc = sender as StatusChannel<ReceiverStatusMessage, ChromecastStatus>;
+            StatusChannel<ReceiverStatusMessage, ChromecastStatus>? sc = sender as StatusChannel<ReceiverStatusMessage, ChromecastStatus>;
             if (sc != null) {
                 //Log.LogTrace("Status changed: " + sc.Status.Volume.Level.ToString());
 
@@ -115,8 +142,8 @@ namespace MyHomeAudio.model {
             }
         }
 
-        private void MediaChannel_QueueMediaStatusChanged(object sender, MediaStatusChangedEventArgs e) {
-            QueueMediaChannel mc = sender as QueueMediaChannel;
+        private void MediaChannel_QueueMediaStatusChanged(object? sender, MediaStatusChangedEventArgs e) {
+            QueueMediaChannel? mc = sender as QueueMediaChannel;
             if (mc != null) {
                 _dispatcherQueue.TryEnqueue(() => {
                     MediaStatus = e.Status.FirstOrDefault()?.PlayerState.ToString();
