@@ -56,8 +56,8 @@ namespace MyHomeAudio {
 
     public sealed partial class MainWindow : Window, INotifyPropertyChanged {
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        public void RaisePropertyChanged([CallerMemberName] string propertyName = null) {
+        public event PropertyChangedEventHandler? PropertyChanged;
+        public void RaisePropertyChanged([CallerMemberName] string propertyName = "") {
             if (PropertyChanged != null) {
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
@@ -73,10 +73,10 @@ namespace MyHomeAudio {
         public ObservableCollection<CategoryBase> FooterCategories = new ObservableCollection<CategoryBase>();
 
 
-        private ChromeCastClientWrapper _selectedCCC;
-        public ChromeCastClientWrapper ActiveCcc { get { return _selectedCCC; } set { if (_selectedCCC != value) { _selectedCCC = value; RaisePropertyChanged(); } } }
+        private ChromeCastClientWrapper? _selectedCCC;
+        public ChromeCastClientWrapper? ActiveCcc { get { return _selectedCCC; } set { if (_selectedCCC != value) { _selectedCCC = value; RaisePropertyChanged(); } } }
 
-        private string currentConfigPath;
+        private string currentConfigPath = "";
 
 
 
@@ -153,7 +153,7 @@ namespace MyHomeAudio {
 
         private void Window_Activated(object sender, WindowActivatedEventArgs args) {
             if (ContentFrame?.Content == null) {
-                ContentFrame.Navigate(typeof(RadioPage), ((Category)Categories.Where(c => ((Category)c).Tag.StartsWith("Radio")).FirstOrDefault())?.Tag);
+                ContentFrame?.Navigate(typeof(RadioPage), ((Category?)Categories.Where(c => ((Category)c).Tag.StartsWith("Radio")).FirstOrDefault())?.Tag);
             }
         }
     }

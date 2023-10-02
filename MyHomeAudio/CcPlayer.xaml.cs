@@ -23,8 +23,8 @@ namespace MyHomeAudio {
             this.InitializeComponent();
         }
 
-        public event EventHandler VolumeUp;
-        public event EventHandler VolumeDown;
+        public event EventHandler? VolumeUp;
+        public event EventHandler? VolumeDown;
 
 
         public string PlayerName {

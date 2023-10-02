@@ -9,8 +9,8 @@ using System.Threading.Tasks;
 
 namespace MyHomeAudio.pages {
     public partial class VmPage : Page, INotifyPropertyChanged {
-        public event PropertyChangedEventHandler PropertyChanged;
-        public void RaisePropertyChanged([CallerMemberName] string propertyName = null) {
+        public event PropertyChangedEventHandler? PropertyChanged;
+        public void RaisePropertyChanged([CallerMemberName] string propertyName = "") {
             if (PropertyChanged != null) {
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }

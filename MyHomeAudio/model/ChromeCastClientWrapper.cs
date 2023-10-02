@@ -24,8 +24,8 @@ namespace MyHomeAudio.model {
     public class ChromeCastClientWrapper : INotifyPropertyChanged {
         private SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        public void RaisePropertyChanged([CallerMemberName] string propertyName = null) {
+        public event PropertyChangedEventHandler? PropertyChanged;
+        public void RaisePropertyChanged([CallerMemberName] string propertyName = "") {
             if (PropertyChanged != null) {
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
@@ -131,10 +131,10 @@ namespace MyHomeAudio.model {
                 //Log.LogTrace("Status changed: " + sc.Status.Volume.Level.ToString());
 
                 _dispatcherQueue.TryEnqueue(() => {
-                    if (sc.Status?.Volume != null) {
-                        Volume = (int)(sc.Status?.Volume?.Level * 200);
+                    if (sc.Status.Volume.Level != null) {
+                        Volume = (int)(sc.Status.Volume.Level * 200);
                     }
-                    Status = sc.Status?.Applications?.FirstOrDefault()?.StatusText;
+                    Status = sc.Status?.Applications?.FirstOrDefault()?.StatusText ?? "<no status>";
                     AppId = sc.Status?.Applications?.FirstOrDefault()?.AppId +  "/" + sc.Status?.Applications?.FirstOrDefault()?.DisplayName;
                 });
 
@@ -146,7 +146,7 @@ namespace MyHomeAudio.model {
             QueueMediaChannel? mc = sender as QueueMediaChannel;
             if (mc != null) {
                 _dispatcherQueue.TryEnqueue(() => {
-                    MediaStatus = e.Status.FirstOrDefault()?.PlayerState.ToString();
+                    MediaStatus = e.Status.FirstOrDefault()?.PlayerState.ToString() ?? "<leer>";
                 });
 
                 //Log.LogTrace("MediaChanel Status changed: " + e.Status.FirstOrDefault()?.CurrentTime.ToString() ?? "<->");

@@ -34,10 +34,12 @@ namespace MyHomeAudio.model {
             if (File.Exists(path)) {
                 try {
                     var cont = JsonSerializer.Deserialize<List<Cd>>(File.ReadAllText(path));
-                    foreach (var item in cont) {
-                        rep.Add(item);
+                    if (cont != null) {
+                        foreach (var item in cont) {
+                            rep.Add(item);
+                        }
                     }
-                    Log.LogDebug("Added {count} cds from {path}", cont.Count, path);
+                    Log.LogDebug("Added {count} cds from {path}", cont?.Count, path);
                 } catch (Exception ex) {
                     Log.LogError("Exception beim Laden eines Repositories: {repName}, {ex}", path, ex);
                 }
@@ -59,10 +61,12 @@ namespace MyHomeAudio.model {
             if (File.Exists(path)) {
                 try {
                     var cont = JsonSerializer.Deserialize<List<NamedUrl>>(File.ReadAllText(path));
-                    foreach (var item in cont) {
-                        rep.Add(item);
+                    if (cont != null) {
+                        foreach (var item in cont) {
+                            rep.Add(item);
+                        }
                     }
-                    Log.LogDebug("Added {count} webradios from {path}", cont.Count, path);
+                    Log.LogDebug("Added {count} webradios from {path}", cont?.Count, path);
                 } catch (Exception ex) {
                     Log.LogError("Exception beim Laden eines Repositories: {repName}, {ex}", path, ex);
                 }

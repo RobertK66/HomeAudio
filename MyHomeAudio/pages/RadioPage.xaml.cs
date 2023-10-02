@@ -30,7 +30,7 @@ namespace MyHomeAudio.pages {
     /// </summary>
     public sealed partial class RadioPage : VmPage {
 
-        private ObservableCollection<NamedUrl>  _ListOfRadios;
+        private ObservableCollection<NamedUrl>  _ListOfRadios = new ObservableCollection<NamedUrl>();
         public ObservableCollection<NamedUrl> ListOfRadios { get { return _ListOfRadios; } set { if (_ListOfRadios != value) { _ListOfRadios = value; RaisePropertyChanged(); } } }
         
         public RadioPage() {
@@ -39,7 +39,7 @@ namespace MyHomeAudio.pages {
         
         protected override void OnNavigatedTo(NavigationEventArgs e) {
             var p = e.Parameter;
-            ListOfRadios = App.Services.GetRequiredService<MediaRepository>().GetRadioRepository(e.Parameter.ToString());
+            ListOfRadios = App.Services.GetRequiredService<MediaRepository>().GetRadioRepository(e?.Parameter?.ToString() ?? "X");
             base.OnNavigatedTo(e);
         }
 

@@ -14,8 +14,6 @@
         
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" >
         <Grid.Resources>
-            
-            
             <mynav:MenuItemTemplateSelector x:Key="selector">
                 <mynav:MenuItemTemplateSelector.ItemTemplate>
                     <DataTemplate x:DataType="mynav:Category" >

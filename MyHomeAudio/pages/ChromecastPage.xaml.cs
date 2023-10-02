@@ -36,7 +36,7 @@ namespace MyHomeAudio.pages {
         public ChromeCastClientWrapper SelectedCcc { get { return _selectedCCC; } set { if (_selectedCCC != value) { _selectedCCC = value; RaisePropertyChanged(); } } }
 
 
-        private ObservableCollection<ChromeCastClientWrapper> _ccc = null;
+        private ObservableCollection<ChromeCastClientWrapper> _ccc = new ObservableCollection<ChromeCastClientWrapper>();
         public ObservableCollection<ChromeCastClientWrapper> CCC {
             get {
                 return _ccc;
