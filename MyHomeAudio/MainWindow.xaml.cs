@@ -82,6 +82,9 @@ namespace MyHomeAudio {
 
         public MainWindow() {
             this.InitializeComponent();
+
+            AppSettings appSettings = App.Services.GetRequiredService<AppSettings>();
+
             AppWindow.Title = "My Audio - Cast Application";
             AppWindow.TitleBar.IconShowOptions = IconShowOptions.HideIconAndSystemMenu;
             AppWindow.TitleBar.BackgroundColor = Colors.Bisque;
@@ -89,26 +92,19 @@ namespace MyHomeAudio {
 
             LoggerVm = App.Services.GetRequiredService<LoggerVm>();
 
-            var isLeft = ApplicationData.Current.LocalSettings.Values[AppSettingKeys.IsLeftMode];
-            if (isLeft == null || ((bool)isLeft == true)) {
+            if (appSettings.IsLeftMode) {
                 MainNavView.PaneDisplayMode = NavigationViewPaneDisplayMode.Auto;
             } else {
                 MainNavView.PaneDisplayMode = NavigationViewPaneDisplayMode.Top;
             }
 
-            String theme = ApplicationData.Current.LocalSettings.Values[AppSettingKeys.UiTheme]?.ToString();
-            if (theme != null) {
-                var t = App.GetEnum<ElementTheme>(theme);
-
-                if (this.Content is FrameworkElement rootElement) {
-                    rootElement.RequestedTheme = t;
-                }
+            var t = App.GetEnum<ElementTheme>(appSettings.UiTheme);
+            if (this.Content is FrameworkElement rootElement) {
+                rootElement.RequestedTheme = t;
             }
 
-            var repPath = App.Services.GetRequiredService<AppSettings>().ReposPath;
-
             FooterCategories.Add(new Category() { Glyph = Symbol.AlignLeft, Name = "ChromeCast", Tag = "CC" });
-            BuildMenue(repPath);
+            BuildMenue(appSettings.ReposPath);
         }
 
         public void BuildMenue(string repPath) {

@@ -15,6 +15,8 @@ namespace MyHomeAudio {
     }
 
     internal class AppSetting {
-        internal const String DefaultAppId = "CC1AD845";    //Default Nedia Player
+        internal static string DefaultAppId = "CC1AD845";    //Default Nedia Player
+        internal static string DefaultUiTheme = "Default";
+        internal static bool DefaultIsLeftMode = true;
     }
 }

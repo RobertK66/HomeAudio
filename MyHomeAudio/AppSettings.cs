@@ -25,21 +25,28 @@ namespace MyHomeAudio {
             set { if (!Object.Equals(_ReposPath, value)) { _ReposPath = value; ApplicationData.Current.LocalSettings.Values[AppSettingKeys.ReposPath] = value; } }
         }
 
+        private string _UiTheme;
+        public string UiTheme {
+            get { return _UiTheme; }
+            set { if (!Object.Equals(_UiTheme, value)) { _UiTheme = value; ApplicationData.Current.LocalSettings.Values[AppSettingKeys.UiTheme] = value; } }
+        }
+
+        private bool _IsLeftMode;
+        public bool IsLeftMode {
+            get { return _IsLeftMode; }
+            set { if (!Object.Equals(_IsLeftMode, value)) { _IsLeftMode = value; ApplicationData.Current.LocalSettings.Values[AppSettingKeys.IsLeftMode] = value; } }
+        }
 
         public AppSettings() {
-            _AppId = (string)ApplicationData.Current.LocalSettings.Values[AppSettingKeys.AppId];
-            if (string.IsNullOrEmpty(_AppId)) {
-                _AppId = AppSetting.DefaultAppId;
+            _AutoConnectName = (ApplicationData.Current.LocalSettings.Values[AppSettingKeys.AutoConnect] as string);
+
+            _AppId = (ApplicationData.Current.LocalSettings.Values[AppSettingKeys.AppId] as string) ?? AppSetting.DefaultAppId;
+            if (String.IsNullOrWhiteSpace(_AppId)) {    // Overwrite Empty strings with default again
+                AppId = AppSetting.DefaultAppId;
             }
-
-            _ReposPath = (string)ApplicationData.Current.LocalSettings.Values[AppSettingKeys.ReposPath];
-            if (string.IsNullOrEmpty(_ReposPath)) {
-                _ReposPath = ApplicationData.Current.LocalFolder.Path;
-            }
-
-            AutoConnectName = (string)ApplicationData.Current.LocalSettings.Values[AppSettingKeys.AutoConnect];
-
-
+            _ReposPath = (ApplicationData.Current.LocalSettings.Values[AppSettingKeys.ReposPath] as string) ?? ApplicationData.Current.LocalFolder.Path;
+            _UiTheme = (ApplicationData.Current.LocalSettings.Values[AppSettingKeys.UiTheme] as string) ?? AppSetting.DefaultUiTheme;
+            _IsLeftMode = (ApplicationData.Current.LocalSettings.Values[AppSettingKeys.IsLeftMode] as bool?) ?? AppSetting.DefaultIsLeftMode;
         }
     }
 }
