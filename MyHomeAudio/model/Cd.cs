@@ -11,10 +11,15 @@ namespace MyHomeAudio.model {
         public string Artist { get; set; }
         public string CDID { get; set; }
 
+        private string _pp;
         public string Picpath {
-          
+            
+            get {
+                return _pp;
+            }
             set {
                 if (value != null) {
+                    _pp = value;
                     Image = new BitmapImage(new Uri(value));
                 }
             }

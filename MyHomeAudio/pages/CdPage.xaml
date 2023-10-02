@@ -14,7 +14,14 @@
     <Page.Resources>
         <DataTemplate x:Key="ImageTemplate" x:DataType="localm:Cd">
             <ItemContainer HorizontalAlignment="Left" Width="160" Height="160">
-                <Grid >
+                <Grid>
+                    <Grid.ContextFlyout>
+                         <Flyout >
+                             <StackPanel Width="200">
+                                <TextBlock Style="{ThemeResource BaseTextBlockStyle}" Text="{x:Bind Picpath}" Margin="0,0,0,12" />
+                             </StackPanel>
+                         </Flyout>
+                    </Grid.ContextFlyout>
                     <Image Source="{x:Bind Image}" />
                     <TextBlock Text="{x:Bind Artist}" VerticalAlignment="Top" HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorPrimaryBrush}" TextWrapping="Wrap"/>
                     <TextBlock Text="{x:Bind Name}" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorPrimaryBrush}" TextWrapping="Wrap"/> 
