@@ -12,10 +12,9 @@ using System.Threading;
 using System;
 using System.Collections.Generic;
 using ConGui.Controls;
-using AudioCollection;
-using System.Xml.Linq;
-
 using static ConGui.StaticAudioCollection;
+using AudioCollectionApi;
+using AudioCollectionImpl;
 
 namespace ConGui {
     public class Program : IHostedService, IInputListener {
@@ -24,12 +23,14 @@ namespace ConGui {
 
         //private CCStarter myCC;
         private readonly ITabedAudioCollection MyCollection;
+        private readonly IMediaRepository MyNewCollection;
         private readonly IChromeCastWrapper MyCCW;
 
         public static async Task Main(string[] args) {
             IHostBuilder host = Host.CreateDefaultBuilder(args)
                                     .ConfigureServices((hostContext, services) => {
                                         services.AddSingleton<ITabedAudioCollection, StaticAudioCollection>();
+                                        services.AddSingleton<IMediaRepository, JsonMediaRepository>();
 
                                         // In order to get a hosted service able to be injected in a constructor, we register both a singelton and a service!
                                         services.AddSingleton<IChromeCastWrapper, ChromeCastWrapper>();
@@ -52,6 +53,7 @@ namespace ConGui {
             Log = logger;
             Log.LogDebug("Program - Constructor called.");
             MyCollection = audioCollection;
+            //MyNewCollection = nc;
             MyCCW = ccw;
             MyCCW.StatusChanged += MyCC_StatusChanged;
         }

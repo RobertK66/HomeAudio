@@ -29,6 +29,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using MyHomeAudio.logger;
 using Microsoft.Extensions.DependencyInjection;
+using AudioCollectionApi;
 
 //using AppUIBasics.Common;
 //using AppUIBasics.Data;
@@ -48,7 +49,8 @@ using Microsoft.Extensions.DependencyInjection;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace MyHomeAudio {
+namespace MyHomeAudio
+{
     /// <summary>
     /// An empty window that can be used on its own or navigated to within a Frame.
     /// </summary>
@@ -111,18 +113,17 @@ namespace MyHomeAudio {
             if (!repPath.Equals(currentConfigPath)) {
                 currentConfigPath = repPath;
                 Categories.Clear();
-                int i = 0;
-                foreach (var f in Directory.GetFiles(repPath, "*.json")) {
-                    if (File.ReadAllText(f).Contains("\"Tracks\"")) {
-                        string reposid = "CD-" + i++;
-                        Categories.Add(new Category() { Glyph = Symbol.Target, Name = System.IO.Path.GetFileName(f), Tag = reposid });
-                        App.Services.GetRequiredService<MediaRepository>().AddCdRepos(reposid, f);
-                    } else {
-                        string reposid = "Radio-" + i++;
-                        Categories.Add(new Category() { Glyph = Symbol.Scan, Name = System.IO.Path.GetFileName(f), Tag = reposid });
-                        App.Services.GetRequiredService<MediaRepository>().AddRadioRepos(reposid, f);
-                    }
+                IMediaRepository mr = App.Services.GetRequiredService<IMediaRepository>();
+                mr.LoadAll(repPath);
+                
+                foreach(var c in mr.GetRadioCategories()) {
+                    Categories.Add(new Category() { Glyph = Symbol.Target, Name = c.Name, Tag = c.Id });
                 }
+
+                foreach (var c in mr.GetCdCategories()) {
+                    Categories.Add(new Category() { Glyph = Symbol.Target, Name = c.Name, Tag = c.Id });
+                }
+           
             }
         }
 

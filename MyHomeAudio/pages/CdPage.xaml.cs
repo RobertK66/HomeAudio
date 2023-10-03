@@ -1,4 +1,5 @@
-using ABI.System;
+//using ABI.System;
+using AudioCollectionApi;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
@@ -6,6 +7,7 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Navigation;
 using MyHomeAudio.model;
 using System;
@@ -13,6 +15,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -27,7 +30,26 @@ using Windows.Media.Playback;
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace MyHomeAudio.pages {
+namespace MyHomeAudio.pages
+{
+    public sealed class StringToImageConverter : IValueConverter {
+        public object Convert(object value, Type targetType,
+                              object parameter, string culture) {
+            try {
+                if (value != null) {
+                    return new BitmapImage(new Uri((string)value));
+                }
+                return new BitmapImage();
+            } catch {
+                return new BitmapImage();
+            }
+        }
+
+        object IValueConverter.ConvertBack(object value, Type targetType, object parameter, string language) {
+            throw new NotImplementedException();
+        }
+    }
+
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
@@ -44,7 +66,7 @@ namespace MyHomeAudio.pages {
      
         protected override void OnNavigatedTo(NavigationEventArgs e) {
             var p = e.Parameter;
-            ListOfCDs = App.Services.GetRequiredService<MediaRepository>().GetCdRepository(e.Parameter.ToString());
+            ListOfCDs = App.Services.GetRequiredService<IMediaRepository>().GetCdRepository(e.Parameter.ToString());
             base.OnNavigatedTo(e);
         }
 

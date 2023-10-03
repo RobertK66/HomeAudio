@@ -4,7 +4,7 @@
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:MyHomeAudio.pages"
-    xmlns:localm="using:MyHomeAudio.model"
+    xmlns:localm="using:AudioCollectionApi"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
@@ -12,6 +12,8 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Page.Resources>
+        <local:StringToImageConverter x:Key="StringToImageConverter"></local:StringToImageConverter>
+
         <DataTemplate x:Key="ImageTemplate" x:DataType="localm:Cd">
             <ItemContainer HorizontalAlignment="Left" Width="160" Height="160">
                 <Grid>
@@ -22,7 +24,9 @@
                              </StackPanel>
                          </Flyout>
                     </Grid.ContextFlyout>
-                    <Image Source="{x:Bind Image}" />
+                    <Image Source="{x:Bind Picpath, Converter={StaticResource StringToImageConverter}}" />
+
+
                     <TextBlock Text="{x:Bind Artist}" VerticalAlignment="Top" HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorPrimaryBrush}" TextWrapping="Wrap"/>
                     <TextBlock Text="{x:Bind Name}" VerticalAlignment="Bottom" HorizontalAlignment="Center" Foreground="{ThemeResource TextFillColorPrimaryBrush}" TextWrapping="Wrap"/> 
                 </Grid>

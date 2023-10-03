@@ -1,11 +1,13 @@
-﻿using AudioCollection;
+﻿using AudioCollectionApi;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
+using Sharpcaster.Models.Media;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
@@ -61,29 +63,11 @@ namespace ConGui {
         readonly List<IAudioTab> MediaTabs = new();
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0090:\"new(...)\" verwenden", Justification = "mag ich hier lieber lesbarere mit Klassennamen davor")]
-        public StaticAudioCollection(IConfiguration conf, ILogger<StaticAudioCollection> logger) {
+        public StaticAudioCollection(IConfiguration conf, ILogger<StaticAudioCollection> logger, IMediaRepository mr) {
             Log = logger;
-            //var AlbumsConf = conf.GetSection("CdRepos");
-            //foreach (var album in AlbumsConf.GetChildren()) {
-            //    List<(string url, string name)> tracks = new();
-            //    IConfiguration? tr = album.GetSection("Tracks");
-            //    if (tr != null) {
-            //        foreach (var t in tr.GetChildren()) {
-            //            tracks.Add(new(t.GetValue<string>("ContentUrl") ?? "<unknown>", t.GetValue<string>("Name") ?? "<unknown>"));
-            //        }
-            //    }
-            //    Albums.Add(new(album.GetValue<string>("Name") ?? "<unknown>",
-            //                    tracks,
-            //                    album.GetValue<string>("Artist") ?? "<unknown>",
-            //                    album.GetValue<string>("CDID") ?? "<unknown>"));
-            //}
 
-            //var WebRadiosConf = conf.GetSection("WebRadio");
-            //foreach (var station in WebRadiosConf.GetChildren()) {
-            //    WebRadios.Add(new(station.GetValue<string>("Name") ?? "<unknown>",
-            //                      station.GetValue<string>("ContentUrl") ?? "<unknown>"));
-            //}
-            //Log.LogDebug("Collection with {albumCount} Albums and {stationCount} stations created", Albums.Count, WebRadios.Count);
+            var rootPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".\\";
+            mr.LoadAll(rootPath);
 
             var TabedAudioConf = conf.GetSection("MediaTabs");
             foreach (var tab in TabedAudioConf.GetChildren()) {
@@ -94,15 +78,36 @@ namespace ConGui {
                 String? contentFilePath = tab.GetValue<string>("Content");
                 if (!String.IsNullOrEmpty(contentFilePath)) {
 
-                    using (StreamReader file = File.OpenText(contentFilePath)) {
-                        JsonSerializer serializer = new JsonSerializer();
-                        AudioEntry[]? entries = (AudioEntry[]?)serializer.Deserialize(file, typeof(AudioEntry[]));
-                        if (entries != null && entries.Length > 0) {
-                            foreach (var item in entries) {
-                                at.AddAudioEntry(item);
+                    string name = Path.GetFileNameWithoutExtension(contentFilePath);
+                    MediaCategory? mc = mr.GetCdCategories().Where(c=>c.Name.Equals(name)).FirstOrDefault();
+                    if (mc != null) {
+                        foreach(var cd in mr.GetCdRepository(mc.Id)) {
+                            AudioEntry entry = new AudioEntry();
+                            entry.Name = cd.Name;
+                            foreach(var tr in cd.Tracks) {
+                                entry.Tracks.Add(new AudioEntry() { Name = tr.Name, ContentUrl=tr.ContentUrl });
                             }
+                            at.AddAudioEntry(entry);
                         }
                     }
+                    mc = mr.GetRadioCategories().Where(c => c.Name.Equals(name)).FirstOrDefault();
+                    if (mc != null) {
+                        foreach (var radio in mr.GetRadioRepository(mc.Id)) {
+                            AudioEntry entry = new AudioEntry();
+                            entry.Name = radio.Name;
+                            entry.ContentUrl = radio.ContentUrl;
+                            at.AddAudioEntry(entry);
+                        }
+                    }
+                    //using (StreamReader file = File.OpenText(contentFilePath)) {
+                    //    JsonSerializer serializer = new JsonSerializer();
+                    //    AudioEntry[]? entries = (AudioEntry[]?)serializer.Deserialize(file, typeof(AudioEntry[]));
+                    //    if (entries != null && entries.Length > 0) {
+                    //        foreach (var item in entries) {
+                    //            at.AddAudioEntry(item);
+                    //        }
+                    //    }
+                    //}
                     MediaTabs.Add(at);
                 }
             }

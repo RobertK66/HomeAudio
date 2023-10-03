@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AudioCollection\AudioCollection.csproj" />
+    <ProjectReference Include="..\AudioCollection\AudioCollectionApi.csproj" />
   </ItemGroup>
 	
 

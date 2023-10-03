@@ -32,11 +32,14 @@ using Microsoft.UI.Dispatching;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using System.Net.Security;
+using AudioCollectionApi;
+using AudioCollectionImpl;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace MyHomeAudio {
+namespace MyHomeAudio
+{
 
     /// <summary>
     /// Provides application-specific behavior to supplement the default Application class.
@@ -67,7 +70,7 @@ namespace MyHomeAudio {
                          CreateDefaultBuilder().
                          ConfigureServices((context, services) => {
                              services.AddSingleton(logVm);
-                             services.AddSingleton<MediaRepository>();
+                             services.AddSingleton<IMediaRepository, JsonMediaRepository>();
                              services.AddSingleton<AppSettings>();
                              services.AddSingleton<ChromeCastRepository>();
                              services.AddLogging(logging => {
