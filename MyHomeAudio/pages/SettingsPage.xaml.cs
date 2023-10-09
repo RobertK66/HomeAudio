@@ -257,6 +257,7 @@ namespace MyHomeAudio.pages {
 
         private void Button_Click(object sender, RoutedEventArgs e) {
             RepositoryPath = ApplicationData.Current.LocalFolder.Path;
+            CreateFileList();
         }
 
         private async void Button_Click_1(object sender, RoutedEventArgs e) {

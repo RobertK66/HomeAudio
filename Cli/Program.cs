@@ -56,25 +56,26 @@ public class Program : IHostedService {
     public async Task StartAsync(CancellationToken cancellationToken) {
         Console.WriteLine("Program.StartAsync() called.");
 
-        // Start the DLNA Search ...
-        DLNAAlbumRepository DlnaRepos2 = new();
-        var waitForAlbums = DlnaRepos2.LoadAlbumsAsync();
-
-        var waitForRadioStations = DlnaRepos2.LoadRadioStationsAsync();
-
         // Start the Caster connect ...
         CCStarter ccs = new(ccName, appId);
         var waitForCaster = ccs.Connect();
 
+        // Start the DLNA Search ...
+        DLNAAlbumRepository DlnaRepos2 = new(null);
+        DlnaRepos2.LoadAll(true);
+        //var waitForAlbums = DlnaRepos2.LoadAlbumsAsync();
+        //var waitForRadioStations = DlnaRepos2.LoadRadioStationsAsync();
+
+
         if (qcCommand == "playCd") {
             // For playing CD we have to wait for both, the DLNA Repos and the connect beeing ready.
-            await Task.WhenAll(waitForCaster, waitForAlbums);
+            await Task.WhenAll(waitForCaster);//, waitForAlbums);
             var tracks = DlnaRepos2.GetCdTracks(playIdx);
             if (tracks != null) {
                 await ccs.PlayCdTracks(tracks);
             }
         } else if (qcCommand == "playRadio") {
-            await Task.WhenAll(waitForCaster, waitForRadioStations);
+            await Task.WhenAll(waitForCaster); //, waitForRadioStations);
             var media = DlnaRepos2.GetRadioStation(playIdx);
             if (!String.IsNullOrEmpty(media.url)) {
                 await ccs.PlayLive(media.url, media.name);
@@ -86,7 +87,7 @@ public class Program : IHostedService {
             await waitForCaster;
             _ = await ccs.PlayPrev();
         } else if (qcCommand == "writeCd") {
-            await Task.WhenAll(waitForAlbums);
+            //await Task.WhenAll(waitForAlbums);
             var aa = DlnaRepos2.GetAllAlbums();
             // Convert tuples to JSON objects as anonym classes -> attributes have names and not 'ItemN' when JSON serialized.
             var track = new { ContentUrl = default(string), Name = default(string) };
@@ -108,7 +109,7 @@ public class Program : IHostedService {
             string albj = JsonConvert.SerializeObject(CdRepos, Formatting.Indented);
             File.WriteAllText(outPath, albj);
         } else if (qcCommand == "writeRadio") {
-            await Task.WhenAll(waitForRadioStations);
+            //await Task.WhenAll(waitForRadioStations);
             var st = DlnaRepos2.GetAllStations();
             var station = new { Name = default(string), ContentUrl = default(string)};
             var StationArray = Array.CreateInstance(station.GetType(), st.Count);

@@ -73,6 +73,7 @@
   <ItemGroup>
     <ProjectReference Include="..\AudioCollectionImpl\AudioCollectionImpl.csproj" />
     <ProjectReference Include="..\AudioCollection\AudioCollectionApi.csproj" />
+    <ProjectReference Include="..\DLNAMediaRepos\DLNAMediaRepos.csproj" />
     <ProjectReference Include="..\QueueCaster\QueueCaster.csproj" />
   </ItemGroup>
   <ItemGroup>

@@ -12,7 +12,7 @@
     mc:Ignorable="d">
     
         
-    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" >
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Loaded="Grid_Loaded" >
         <Grid.Resources>
             <mynav:MenuItemTemplateSelector x:Key="selector">
                 <mynav:MenuItemTemplateSelector.ItemTemplate>

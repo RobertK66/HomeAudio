@@ -31,30 +31,12 @@ using MyHomeAudio.logger;
 using Microsoft.Extensions.DependencyInjection;
 using AudioCollectionApi;
 
-//using AppUIBasics.Common;
-//using AppUIBasics.Data;
-//using AppUIBasics.Helper;
-//using System.Text.RegularExpressions;
-//using System.Threading.Tasks;
-//using Windows.ApplicationModel;
-//using Windows.ApplicationModel.Activation;
-//using Windows.ApplicationModel.Core;
-//using Windows.Foundation.Metadata;
-//using Windows.System.Profile;
-//using WinUIGallery.DesktopWap.DataModel;
-//using WASDK = Microsoft.WindowsAppSDK;
-
-
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace MyHomeAudio
 {
-    /// <summary>
-    /// An empty window that can be used on its own or navigated to within a Frame.
-    /// </summary>
-
 
     public sealed partial class MainWindow : Window, INotifyPropertyChanged {
 
@@ -65,13 +47,11 @@ namespace MyHomeAudio
             }
         }
 
-
         public NavigationView MainNavPane { get => this.MainNavView; }
 
         public LoggerVm LoggerVm { get; set; }
 
         public ObservableCollection<CategoryBase> Categories = new ObservableCollection<CategoryBase>();
-
         public ObservableCollection<CategoryBase> FooterCategories = new ObservableCollection<CategoryBase>();
 
 
@@ -81,11 +61,14 @@ namespace MyHomeAudio
         private string currentConfigPath = "";
 
 
+        private AppSettings appSettings;
+
+        private IMediaRepository mr;
 
         public MainWindow() {
             this.InitializeComponent();
 
-            AppSettings appSettings = App.Services.GetRequiredService<AppSettings>();
+            appSettings = App.Services.GetRequiredService<AppSettings>();
 
             AppWindow.Title = "My Audio - Cast Application";
             AppWindow.TitleBar.IconShowOptions = IconShowOptions.HideIconAndSystemMenu;
@@ -106,25 +89,38 @@ namespace MyHomeAudio
             }
 
             FooterCategories.Add(new Category() { Glyph = Symbol.AlignLeft, Name = "ChromeCast", Tag = "CC" });
-            BuildMenue(appSettings.ReposPath);
+
+            mr = App.Services.GetRequiredService<IMediaRepository>();
+
+            mr.GetCdCategories().CollectionChanged += (s, e) => {
+                if (e.NewItems != null) {
+                    foreach (var ni in e.NewItems) {
+                        if (ni is MediaCategory mc) {
+                            Categories.Add(new Category() { Glyph = Symbol.Target, Name = mc.Name + "-Cds", Tag = mc.Id });
+                        }
+                    }
+                }
+            };
+
+            mr.GetRadioCategories().CollectionChanged += (s, e) => {
+                if (e.NewItems != null) {
+                    foreach (var ni in e.NewItems) {
+                        if (ni is MediaCategory mc) {
+                            Categories.Add(new Category() { Glyph = Symbol.Account, Name = mc.Name, Tag = mc.Id });
+                        }
+                    }
+                }
+            };
         }
 
         public void BuildMenue(string repPath) {
-            if (!repPath.Equals(currentConfigPath)) {
-                currentConfigPath = repPath;
-                Categories.Clear();
-                IMediaRepository mr = App.Services.GetRequiredService<IMediaRepository>();
-                mr.LoadAll(repPath);
-                
-                foreach(var c in mr.GetRadioCategories()) {
-                    Categories.Add(new Category() { Glyph = Symbol.Target, Name = c.Name, Tag = c.Id });
-                }
+            Categories.Clear();
 
-                foreach (var c in mr.GetCdCategories()) {
-                    Categories.Add(new Category() { Glyph = Symbol.Target, Name = c.Name, Tag = c.Id });
-                }
-           
-            }
+            IMediaRepository mr = App.Services.GetRequiredService<IMediaRepository>();
+            mr.GetCdCategories().Clear();
+            mr.GetRadioCategories().Clear();
+
+            _  = mr.LoadAllAsync(repPath);
         }
 
         private void NavigationView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args) {
@@ -156,6 +152,10 @@ namespace MyHomeAudio
             if (ContentFrame?.Content == null) {
                 ContentFrame?.Navigate(typeof(RadioPage), ((Category?)Categories.Where(c => ((Category)c).Tag.StartsWith("Radio")).FirstOrDefault())?.Tag);
             }
+        }
+
+        private void Grid_Loaded(object sender, RoutedEventArgs e) {
+            BuildMenue(appSettings.ReposPath);
         }
     }
 }

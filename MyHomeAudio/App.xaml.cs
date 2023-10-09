@@ -34,6 +34,7 @@ using Microsoft.Extensions.DependencyInjection;
 using System.Net.Security;
 using AudioCollectionApi;
 using AudioCollectionImpl;
+using DLNAMediaRepos;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -62,7 +63,7 @@ namespace MyHomeAudio
         public App() {
             this.InitializeComponent();
             
-            // Make Instance of Logger View Model here to give it the GUI Dispatcher queue.
+            // Make Instance of Logger View Model here to pass it a reference to the GUI Dispatcher queue.
             LoggerVm logVm = new LoggerVm();
             logVm.dq = DispatcherQueue.GetForCurrentThread();
 
@@ -114,10 +115,10 @@ namespace MyHomeAudio
                 _ = locator.FindReceiversAsync(CancellationToken.None);          // Fire the search process and wait for receiver found events in the handler. No await here!
 
             } catch (Exception ex) {
-                Debug.WriteLine(ex);
+                Log.LogError("Exception while launching {ex}", ex);
             }
 
-            m_window = new MainWindow(); // { LoggerVm = (LoggerVm)App.Current.MyHost.Services.GetService(typeof(LoggerVm)) };
+            m_window = new MainWindow(); 
             //m_window.ExtendsContentIntoTitleBar = true;
             m_window.Activate();
         }
