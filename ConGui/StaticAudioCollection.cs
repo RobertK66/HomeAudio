@@ -67,7 +67,7 @@ namespace ConGui {
             Log = logger;
 
             var rootPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".\\";
-            mr.LoadAll(rootPath);
+            mr.LoadAllAsync(rootPath).Wait();
 
             var TabedAudioConf = conf.GetSection("MediaTabs");
             foreach (var tab in TabedAudioConf.GetChildren()) {

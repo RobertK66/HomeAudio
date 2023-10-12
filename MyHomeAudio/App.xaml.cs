@@ -71,7 +71,8 @@ namespace MyHomeAudio
                          CreateDefaultBuilder().
                          ConfigureServices((context, services) => {
                              services.AddSingleton(logVm);
-                             services.AddSingleton<IMediaRepository, JsonMediaRepository>();
+                             //services.AddSingleton<IMediaRepository, JsonMediaRepository>();
+                             services.AddSingleton<IMediaRepository, DLNAAlbumRepository>();
                              services.AddSingleton<AppSettings>();
                              services.AddSingleton<ChromeCastRepository>();
                              services.AddLogging(logging => {

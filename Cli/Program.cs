@@ -61,24 +61,30 @@ public class Program : IHostedService {
         var waitForCaster = ccs.Connect();
 
         // Start the DLNA Search ...
-        DLNAAlbumRepository DlnaRepos2 = new(null);
-        DlnaRepos2.LoadAll(true);
+        IMediaRepository DlnaRepos2 = new DLNAAlbumRepository(null);
+        await DlnaRepos2.LoadAllAsync(true);
         //var waitForAlbums = DlnaRepos2.LoadAlbumsAsync();
         //var waitForRadioStations = DlnaRepos2.LoadRadioStationsAsync();
 
 
         if (qcCommand == "playCd") {
             // For playing CD we have to wait for both, the DLNA Repos and the connect beeing ready.
-            await Task.WhenAll(waitForCaster);//, waitForAlbums);
-            var tracks = DlnaRepos2.GetCdTracks(playIdx);
-            if (tracks != null) {
-                await ccs.PlayCdTracks(tracks);
+            //await Task.WhenAll(waitForCaster);//, waitForAlbums);
+            var cat = DlnaRepos2.GetCdCategories().FirstOrDefault();
+            if (cat != null) {
+                var tracks = DlnaRepos2.GetCdRepository(cat.Id).ElementAtOrDefault(playIdx)?.Tracks;
+                if (tracks != null) {
+                    await ccs.PlayCdTracks(tracks);
+                }
             }
         } else if (qcCommand == "playRadio") {
-            await Task.WhenAll(waitForCaster); //, waitForRadioStations);
-            var media = DlnaRepos2.GetRadioStation(playIdx);
-            if (!String.IsNullOrEmpty(media.url)) {
-                await ccs.PlayLive(media.url, media.name);
+            //await Task.WhenAll(waitForCaster); //, waitForRadioStations);
+            var cat = DlnaRepos2.GetRadioCategories().FirstOrDefault();
+            if (cat != null) {
+                var media = DlnaRepos2.GetRadioRepository(cat.Id).ElementAtOrDefault(playIdx);
+                if (!String.IsNullOrEmpty(media?.ContentUrl)) {
+                    await ccs.PlayLive(media.ContentUrl, media.Name);
+                }
             }
         } else if (qcCommand == "next") {
             await waitForCaster;
@@ -88,7 +94,8 @@ public class Program : IHostedService {
             _ = await ccs.PlayPrev();
         } else if (qcCommand == "writeCd") {
             //await Task.WhenAll(waitForAlbums);
-            var aa = DlnaRepos2.GetAllAlbums();
+            var cat = DlnaRepos2.GetCdCategories().FirstOrDefault();
+            var aa = DlnaRepos2.GetCdRepository(cat.Id).ToList();
             // Convert tuples to JSON objects as anonym classes -> attributes have names and not 'ItemN' when JSON serialized.
             var track = new { ContentUrl = default(string), Name = default(string) };
             var tracks = Array.CreateInstance(track.GetType(), 1);
@@ -97,12 +104,12 @@ public class Program : IHostedService {
             int albumIdx = 0;
             foreach (var a in aa) {
                 //Console.WriteLine(a.cdid + ":" + a.name + "[" + a.tracks.Count + "] / " + a.artist);
-                tracks = Array.CreateInstance(track.GetType(), a.tracks.Count);
+                tracks = Array.CreateInstance(track.GetType(), a.Tracks.Count);
                 int idx = 0;
-                foreach(var t in a.tracks) {
-                    tracks.SetValue(new { ContentUrl = t.url, Name = t.name }, idx++);
+                foreach(var t in a.Tracks) {
+                    tracks.SetValue(new { ContentUrl = t.ContentUrl, Name = t.Name }, idx++);
                 }
-                var alb = new { CDID = a.cdid, Name = a.name, Artist = a.artist, Tracks = tracks, Picpath=a.picpath };
+                var alb = new { CDID = a.CDID, Name = a.Name, Artist = a.Artist, Tracks = tracks, Picpath=a.Picpath };
                 CdArray.SetValue(alb, albumIdx++);
             }
             var CdRepos = new { CdRepos = CdArray };
@@ -110,12 +117,13 @@ public class Program : IHostedService {
             File.WriteAllText(outPath, albj);
         } else if (qcCommand == "writeRadio") {
             //await Task.WhenAll(waitForRadioStations);
-            var st = DlnaRepos2.GetAllStations();
+            var cat = DlnaRepos2.GetRadioCategories().FirstOrDefault();
+            var st = DlnaRepos2.GetRadioRepository(cat.Id).ToList();
             var station = new { Name = default(string), ContentUrl = default(string)};
             var StationArray = Array.CreateInstance(station.GetType(), st.Count);
             int idx = 0;
             foreach (var s in st) {
-                StationArray.SetValue(new { Name = s.name, ContentUrl = s.url}, idx++);
+                StationArray.SetValue(new { Name = s.Name, ContentUrl = s.ContentUrl}, idx++);
             }
             var WebRadio = new { WebRadio = StationArray };
             string radj = JsonConvert.SerializeObject(WebRadio, Formatting.Indented);

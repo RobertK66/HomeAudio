@@ -1,4 +1,5 @@
-﻿using QueueCaster;
+﻿using AudioCollectionApi;
+using QueueCaster;
 using QueueCaster.queue.models;
 using Sharpcaster;
 using Sharpcaster.Interfaces;
@@ -51,16 +52,16 @@ namespace Cli {
             }
         }
 
-        public async Task PlayCdTracks(List<(string url, string name)> tracks) {
+        public async Task PlayCdTracks(List<NamedUrl> tracks) {
             if (mediaChannel != null) {
                 QueueItem[]? qi = new QueueItem[tracks.Count];
                 int i = 0;
-                foreach (var (url, name) in tracks) {
+                foreach (var nu in tracks) {
                     var media = new Media {
-                        ContentUrl = url,
+                        ContentUrl = nu.ContentUrl,
                         StreamType = StreamType.Buffered,
                         ContentType = "audio/mp4",
-                        Metadata = new MediaMetadata() { Title = name }
+                        Metadata = new MediaMetadata() { Title = nu.Name }
                     };
                     qi[i] = new QueueItem() { Media = media, OrderId = i, StartTime = 0 };
                     i++;

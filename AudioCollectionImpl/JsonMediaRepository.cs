@@ -35,18 +35,17 @@ namespace AudioCollectionImpl
 
 
         private bool loading = false;
-        private String? reloadPath = null;
+        private String? reLoadPath = null;
         public async Task LoadAllAsync(object rootPath) {
             if (!loading) {
                 loading = true;
                 if (rootPath is string dirPath) {
                     int i = 0;
                     foreach (var f in Directory.GetFiles(dirPath, "*.json")) {
-                        if (reloadPath != null) {
-                            Log.LogInformation("Stop and reload...");
+                        Log.LogInformation("Next Path {path}", f);
+                        if (reLoadPath != null) {
                             break;
                         }
-                        Log.LogInformation("Next Path {path}", f);
                         await Task.Delay(2000);
                         switch (await CheckForMediaJson(f)) {
                             case MediaType.None:
@@ -67,14 +66,13 @@ namespace AudioCollectionImpl
                     }
                 }
                 loading = false;
-                if (reloadPath != null) {
-                    var p = reloadPath;
-                    reloadPath = null;
+                if (reLoadPath != null) {
+                    var p = reLoadPath;
+                    reLoadPath = null;
                     await LoadAllAsync(p);
                 }
             } else {
-                // lets buffer changed config path if requested. Last one wins!
-                reloadPath = rootPath as string;
+                reLoadPath = rootPath as string;
             }
         }
 
