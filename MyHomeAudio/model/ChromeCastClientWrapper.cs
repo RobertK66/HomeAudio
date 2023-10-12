@@ -132,7 +132,7 @@ namespace MyHomeAudio.model {
                 //Log.LogTrace("Status changed: " + sc.Status.Volume.Level.ToString());
 
                 _dispatcherQueue.TryEnqueue(() => {
-                    if (sc.Status.Volume.Level != null) {
+                    if (sc.Status?.Volume?.Level != null) {
                         Volume = (int)(sc.Status.Volume.Level * 200);
                     }
                     Status = sc.Status?.Applications?.FirstOrDefault()?.StatusText ?? "<no status>";

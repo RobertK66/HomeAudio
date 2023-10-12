@@ -73,7 +73,7 @@ namespace DLNAMediaRepos {
                     DLNADevice clonedDevice = new(device);
 
                     MediaCategory cat = new("Cd-" + (IdCnt++)) { Name = device.FriendlyName };
-                    if (CdCategories.Where(c => c.Id == cat.Id).Any()) {
+                    if (!CdCategories.Where(c => c.Name == cat.Name).Any()) {
                         CdCategories.Add(cat);
                         CdRepositories.Add(cat.Id, new ObservableCollection<Cd>());
                     }
@@ -112,7 +112,7 @@ namespace DLNAMediaRepos {
             var c = CdCategories.Where(c => c.Name.Equals(device.FriendlyName)).FirstOrDefault();
             ObservableCollection<Cd> rep = CdRepositories[c.Id];
 
-            if (rep.Where(rcd => cd.Name == rcd.Name).Any()) {
+            if (!rep.Where(rcd => cd.Name == rcd.Name).Any()) {
                 Log.LogInformation("{album} reading", cd.Name);
                 await Task.Delay(100);
                 var cdXmlDocument = new XmlDocument();
