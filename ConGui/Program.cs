@@ -23,7 +23,7 @@ namespace ConGui {
 
         //private CCStarter myCC;
         private readonly ITabedAudioCollection MyCollection;
-        private readonly IMediaRepository MyNewCollection;
+        //private readonly IMediaRepository MyNewCollection;
         private readonly IChromeCastWrapper MyCCW;
 
         public static async Task Main(string[] args) {

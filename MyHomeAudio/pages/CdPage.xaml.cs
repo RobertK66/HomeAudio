@@ -65,8 +65,7 @@ namespace MyHomeAudio.pages
 
      
         protected override void OnNavigatedTo(NavigationEventArgs e) {
-            var p = e.Parameter as string;
-            if (p != null) {
+            if (e.Parameter is string p) {
                 ListOfCDs = App.Services.GetRequiredService<IMediaRepository>().GetCdRepository(p);
             }
             base.OnNavigatedTo(e);

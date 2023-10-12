@@ -89,7 +89,7 @@ namespace DLNAMediaRepos {
 
         private async Task ParseItems(DLNADevice device, DLNAObject item) {
 
-            Log.LogTrace("ParseItem [{id}] " + item.ClassName + " - " + item.Name, item.ID);
+            Log.LogTrace("ParseItem [{id}] {name} {cname}", item.ID, item.Name, item.ClassName );
             await Task.Delay(400);
             if (item.ClassName.Equals("object.container")) {
                 var children = device.GetDeviceContent(item.ID);
@@ -144,7 +144,7 @@ namespace DLNAMediaRepos {
 
                 album.CDID = (XX % 256).ToString("x2") + YYYY.ToString("x4") + tracks.Count.ToString("x2");
 
-                if (rep.Where(cd => cd.CDID == album.CDID).Count() == 0) {
+                if (!rep.Where(cd => cd.CDID == album.CDID).Any()) {
                     Log.LogInformation("{album} added.", cd.Name);
                     rep.Add(album);
                 }

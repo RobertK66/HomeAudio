@@ -53,7 +53,7 @@ namespace MyHomeAudio
         // Non Nullable - Constructor created
         private readonly IHost MyHost;
         private readonly ILogger<App> Log;
-        private readonly AppSettings appSettings;
+        //private readonly AppSettings appSettings;
         
         //public ChromeCastRepository ChromeCastRepos;
 
@@ -72,8 +72,8 @@ namespace MyHomeAudio
                          CreateDefaultBuilder().
                          ConfigureServices((context, services) => {
                              services.AddSingleton(logVm);
-                             //services.AddSingleton<IMediaRepository, JsonMediaRepository>();
-                             services.AddSingleton<IMediaRepository, DLNAAlbumRepository>();
+                             services.AddSingleton<IMediaRepository, JsonMediaRepository>();
+                             //services.AddSingleton<IMediaRepository, DLNAAlbumRepository>();
                              services.AddSingleton<AppSettings>();
                              services.AddSingleton<ChromeCastRepository>();
                              services.AddLogging(logging => {
@@ -89,7 +89,7 @@ namespace MyHomeAudio
             Log = App.Services.GetRequiredService<ILogger<App>>();
             Log.LogTrace("Application instanciated.");
 
-            appSettings = App.Services.GetRequiredService<AppSettings>();
+            //appSettings = App.Services.GetRequiredService<AppSettings>();
 
         }
 

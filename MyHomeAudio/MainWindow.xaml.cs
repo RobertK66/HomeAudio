@@ -61,7 +61,7 @@ namespace MyHomeAudio
 
         private readonly AppSettings appSettings;
 
-        private IMediaRepository mr;
+        private readonly IMediaRepository mr;
 
         public MainWindow() {
             this.InitializeComponent();

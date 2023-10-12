@@ -23,7 +23,7 @@ using Windows.Devices.Radios;
 
 namespace MyHomeAudio.model {
     public class ChromeCastClientWrapper : INotifyPropertyChanged {
-        private readonly SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
+        private readonly SemaphoreSlim semaphoreSlim = new (1, 1);
 
         public event PropertyChangedEventHandler? PropertyChanged;
         public void RaisePropertyChanged([CallerMemberName] string propertyName = "") {
@@ -127,8 +127,7 @@ namespace MyHomeAudio.model {
 
         private void RcChannel_StatusChanged(object? sender, EventArgs e) {
             //throw new NotImplementedException();
-            StatusChannel<ReceiverStatusMessage, ChromecastStatus>? sc = sender as StatusChannel<ReceiverStatusMessage, ChromecastStatus>;
-            if (sc != null) {
+            if (sender is StatusChannel<ReceiverStatusMessage, ChromecastStatus> sc) {
                 //Log.LogTrace("Status changed: " + sc.Status.Volume.Level.ToString());
 
                 _dispatcherQueue.TryEnqueue(() => {
@@ -136,7 +135,7 @@ namespace MyHomeAudio.model {
                         Volume = (int)(sc.Status.Volume.Level * 200);
                     }
                     Status = sc.Status?.Applications?.FirstOrDefault()?.StatusText ?? "<no status>";
-                    AppId = sc.Status?.Applications?.FirstOrDefault()?.AppId +  "/" + sc.Status?.Applications?.FirstOrDefault()?.DisplayName;
+                    AppId = sc.Status?.Applications?.FirstOrDefault()?.AppId + "/" + sc.Status?.Applications?.FirstOrDefault()?.DisplayName;
                 });
 
 
@@ -144,8 +143,7 @@ namespace MyHomeAudio.model {
         }
 
         private void MediaChannel_QueueMediaStatusChanged(object? sender, MediaStatusChangedEventArgs e) {
-            QueueMediaChannel? mc = sender as QueueMediaChannel;
-            if (mc != null) {
+            if (sender is QueueMediaChannel mc) {
                 _dispatcherQueue.TryEnqueue(() => {
                     MediaStatus = e.Status.FirstOrDefault()?.PlayerState.ToString() ?? "<leer>";
                 });
@@ -181,7 +179,7 @@ namespace MyHomeAudio.model {
                 if (ConnectedClient != null) {
                     var mediaChannel = ConnectedClient.GetChannel<QueueMediaChannel>();
                     if (mediaChannel != null) {
-                        List<QueueItem> media = new List<QueueItem>();
+                        var media = new List<QueueItem>();
                         foreach (var t in cd.Tracks) {
                             var qi = new QueueItem() {
                                 Media = new Media {

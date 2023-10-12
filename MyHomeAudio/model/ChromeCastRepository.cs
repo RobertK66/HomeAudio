@@ -16,7 +16,7 @@ namespace MyHomeAudio.model
     public class ChromeCastRepository {
 
         private ChromeCastClientWrapper? _activeClient = null;
-        private ObservableCollection<ChromeCastClientWrapper> KnownChromecasts = new ObservableCollection<ChromeCastClientWrapper>();
+        private ObservableCollection<ChromeCastClientWrapper> KnownChromecasts = new();
         private string? _autoConnectName;
         private string _appId;
         private ILoggerFactory _loggerFactory;
