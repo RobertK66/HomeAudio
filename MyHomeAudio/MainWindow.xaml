@@ -52,8 +52,8 @@
                                 Volume="{x:Bind ActiveCcc.Volume, Mode=OneWay}"
                                 Status="{x:Bind ActiveCcc.Status, Mode=OneWay}"
                                 IsConnected="{x:Bind ActiveCcc.IsConnected, Mode=TwoWay}"
-                                VolumeUp="ccPlayer_VolumeUp"
-                                VolumeDown="ccPlayer_VolumeDown"
+                                VolumeUp="CcPlayer_VolumeUp"
+                                VolumeDown="CcPlayer_VolumeDown"
                                 IsTabStop="False"
                                 />
                 

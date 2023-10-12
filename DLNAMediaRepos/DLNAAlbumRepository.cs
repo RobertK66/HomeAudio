@@ -15,16 +15,16 @@ using System.Xml;
 namespace DLNAMediaRepos {
 
     public class DLNAAlbumRepository : IMediaRepository {
-        Dictionary<String, ObservableCollection<Cd>> CdRepositories = new Dictionary<string, ObservableCollection<Cd>>();
-        Dictionary<String, ObservableCollection<NamedUrl>> RadioRepositories = new Dictionary<string, ObservableCollection<NamedUrl>>();
+        Dictionary<String, ObservableCollection<Cd>> CdRepositories = new();
+        Dictionary<String, ObservableCollection<NamedUrl>> RadioRepositories = new();
 
-        private ObservableCollection<MediaCategory> CdCategories = new ObservableCollection<MediaCategory>();
-        private ObservableCollection<MediaCategory> RadioCategories = new ObservableCollection<MediaCategory>();
+        private ObservableCollection<MediaCategory> CdCategories = new();
+        private ObservableCollection<MediaCategory> RadioCategories = new();
 
         DLNAClient client; // = new();
         RadioBrowserClient radioBrowser; //= new();
 
-        private ILogger Log;
+        private readonly ILogger Log;
         private int IdCnt = 0;
 
         public DLNAAlbumRepository(ILogger<DLNAAlbumRepository> l) {
@@ -40,14 +40,14 @@ namespace DLNAMediaRepos {
 
             foreach (var st in results) {
                 if ((st.Url != null) && (st.Name != null)) {
-                    MediaCategory cat = new() { Id = "Radio-" + (IdCnt++), Name = string.IsNullOrEmpty(st.Tags[0]) ? "untagged" : st.Tags[0] };
+                    MediaCategory cat = new("Radio-" + (IdCnt++)) { Name = string.IsNullOrEmpty(st.Tags[0]) ? "untagged" : st.Tags[0] };
                     if (!RadioRepositories.ContainsKey(cat.Id)) {
                         RadioCategories.Add(cat);
                         RadioRepositories.Add(cat.Id, new ObservableCollection<NamedUrl>());
                     }
                     ObservableCollection<NamedUrl> rep = RadioRepositories[cat.Id];
-                    if (rep.Where(r => r.Name == st.Name).Count() == 0) {
-                        rep.Add(new NamedUrl() { Name = st.Name, ContentUrl = st.Url.ToString() });
+                    if (!rep.Where(r => r.Name == st.Name).Any()) {
+                        rep.Add(new NamedUrl(name: st.Name,contentUrl: st.Url.ToString()));
                     }
 
                     Log.LogInformation("{count} Stations found.", rep.Count);
@@ -72,12 +72,12 @@ namespace DLNAMediaRepos {
                 foreach (DLNADevice device in e.NewItems) {
                     DLNADevice clonedDevice = new(device);
 
-                    MediaCategory cat = new() { Id = "Cd-" + (IdCnt++), Name = device.FriendlyName };
-                    if (CdCategories.Where(c => c.Id == cat.Id).Count() == 0) {
+                    MediaCategory cat = new("Cd-" + (IdCnt++)) { Name = device.FriendlyName };
+                    if (CdCategories.Where(c => c.Id == cat.Id).Any()) {
                         CdCategories.Add(cat);
                         CdRepositories.Add(cat.Id, new ObservableCollection<Cd>());
                     }
-                    Log.LogInformation("Searching" + device.ModelName + " " + device.FriendlyName + " for album/track items...");
+                    Log.LogInformation("Searching {mName} {fName} for album/track items... ",device.ModelName,device.FriendlyName);
                     //var rootContent = clonedDevice.GetDeviceContent("0");
                     var rootContent = clonedDevice.GetDeviceContent("21");
                     rootContent.ForEach(async item => {
@@ -88,7 +88,7 @@ namespace DLNAMediaRepos {
         }
 
         private async Task ParseItems(DLNADevice device, DLNAObject item) {
-            string g;
+
             Log.LogTrace("ParseItem [{id}] " + item.ClassName + " - " + item.Name, item.ID);
             await Task.Delay(400);
             if (item.ClassName.Equals("object.container")) {
@@ -112,7 +112,7 @@ namespace DLNAMediaRepos {
             var c = CdCategories.Where(c => c.Name.Equals(device.FriendlyName)).FirstOrDefault();
             ObservableCollection<Cd> rep = CdRepositories[c.Id];
 
-            if (rep.Where(rcd => cd.Name == rcd.Name).Count() == 0) {
+            if (rep.Where(rcd => cd.Name == rcd.Name).Any()) {
                 Log.LogInformation("{album} reading", cd.Name);
                 await Task.Delay(100);
                 var cdXmlDocument = new XmlDocument();
@@ -121,7 +121,7 @@ namespace DLNAMediaRepos {
                 string art = artist?.InnerText ?? string.Empty;
                 var picpath = cdXmlDocument.GetElementsByTagName("upnp:albumArtURI").Item(0)?.FirstChild?.Value;
 
-                Cd album = new Cd() { Name = cd.Name, Artist = art, Picpath = picpath };
+                Cd album = new () { Name = cd.Name, Artist = art, Picpath = picpath };
 
                 int trackStart = 2;         // Starting second of track 1
                 int XX = 0;                 // Sum of starting seconds
@@ -134,10 +134,9 @@ namespace DLNAMediaRepos {
                     var ds = r.Attributes["duration"].Value;
                     XX += trackStart;
                     if (r != null) {
-                        album.Tracks.Add(new NamedUrl() { ContentUrl = r.InnerText, Name = track.Name });
+                        album.Tracks.Add(new NamedUrl(name: track.Name,contentUrl: r.InnerText));
                     }
-                    TimeSpan result;
-                    if (TimeSpan.TryParse(ds, CultureInfo.InvariantCulture, out result)) {
+                    if (TimeSpan.TryParse(ds, CultureInfo.InvariantCulture, out TimeSpan result)) {
                         trackStart += (int)result.TotalSeconds;             // Start second of next track
                         YYYY += (int)result.TotalSeconds;
                     }

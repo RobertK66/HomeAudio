@@ -56,7 +56,7 @@ namespace MyHomeAudio.pages
     public sealed partial class CdPage : VmPage {
 
      
-        private ObservableCollection<Cd>  _ListOfCDs;
+        private ObservableCollection<Cd>  _ListOfCDs = new();
         public ObservableCollection<Cd> ListOfCDs { get { return _ListOfCDs; } set { if (_ListOfCDs != value) { _ListOfCDs = value; RaisePropertyChanged(); } } }
         
         public CdPage() {
@@ -65,13 +65,15 @@ namespace MyHomeAudio.pages
 
      
         protected override void OnNavigatedTo(NavigationEventArgs e) {
-            var p = e.Parameter;
-            ListOfCDs = App.Services.GetRequiredService<IMediaRepository>().GetCdRepository(e.Parameter.ToString());
+            var p = e.Parameter as string;
+            if (p != null) {
+                ListOfCDs = App.Services.GetRequiredService<IMediaRepository>().GetCdRepository(p);
+            }
             base.OnNavigatedTo(e);
         }
 
         private void ItemsView_ItemInvoked(ItemsView sender, ItemsViewItemInvokedEventArgs args) {
-            Cd cd = (args.InvokedItem as Cd);
+            Cd? cd = (args.InvokedItem as Cd);
             if (cd != null) {
                 Debug.WriteLine(cd.Name);
                 App.Services.GetRequiredService<ChromeCastRepository>().PlayCed(cd);

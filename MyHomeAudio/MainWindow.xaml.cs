@@ -42,26 +42,24 @@ namespace MyHomeAudio
 
         public event PropertyChangedEventHandler? PropertyChanged;
         public void RaisePropertyChanged([CallerMemberName] string propertyName = "") {
-            if (PropertyChanged != null) {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-            }
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         public NavigationView MainNavPane { get => this.MainNavView; }
 
         public LoggerVm LoggerVm { get; set; }
 
-        public ObservableCollection<CategoryBase> Categories = new ObservableCollection<CategoryBase>();
-        public ObservableCollection<CategoryBase> FooterCategories = new ObservableCollection<CategoryBase>();
+        public ObservableCollection<CategoryBase> Categories = new();
+        public ObservableCollection<CategoryBase> FooterCategories = new ();
 
 
         private ChromeCastClientWrapper? _selectedCCC;
         public ChromeCastClientWrapper? ActiveCcc { get { return _selectedCCC; } set { if (_selectedCCC != value) { _selectedCCC = value; RaisePropertyChanged(); } } }
 
-        private string currentConfigPath = "";
+        //private string currentConfigPath = "";
 
 
-        private AppSettings appSettings;
+        private readonly AppSettings appSettings;
 
         private IMediaRepository mr;
 
@@ -106,7 +104,7 @@ namespace MyHomeAudio
                 if (e.NewItems != null) {
                     foreach (var ni in e.NewItems) {
                         if (ni is MediaCategory mc) {
-                            Categories.Add(new Category() { Glyph = Symbol.Account, Name = mc.Name, Tag = mc.Id });
+                            Categories.Add(new Category() { Glyph = Symbol.Account, Name = mc.Name??"unknown", Tag = mc.Id });
                         }
                     }
                 }
@@ -140,11 +138,11 @@ namespace MyHomeAudio
             }
         }
 
-        private void ccPlayer_VolumeUp(object sender, EventArgs e) {
+        private void CcPlayer_VolumeUp(object sender, EventArgs e) {
             ActiveCcc?.VolumeUp();
         }
 
-        private void ccPlayer_VolumeDown(object sender, EventArgs e) {
+        private void CcPlayer_VolumeDown(object sender, EventArgs e) {
             ActiveCcc?.VolumeDown();
         }
 

@@ -23,7 +23,7 @@ using Windows.Devices.Radios;
 
 namespace MyHomeAudio.model {
     public class ChromeCastClientWrapper : INotifyPropertyChanged {
-        private SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
+        private readonly SemaphoreSlim semaphoreSlim = new SemaphoreSlim(1, 1);
 
         public event PropertyChangedEventHandler? PropertyChanged;
         public void RaisePropertyChanged([CallerMemberName] string propertyName = "") {
@@ -32,16 +32,16 @@ namespace MyHomeAudio.model {
             }
         }
 
-        DispatcherQueue _dispatcherQueue;
-        String _connectionAppId;
-        ChromecastClient? ConnectedClient = null;
+        private readonly DispatcherQueue _dispatcherQueue;
+        private String _connectionAppId = "";
+        private ChromecastClient? ConnectedClient = null;
 
 
         private ChromecastReceiver cr;
         private String _name;
         private String _status;
-        private String _mediaStatus;
-        private String _appId;
+        private String? _mediaStatus;
+        private String? _appId;
         private bool _isConnected;
         private ILoggerFactory _loggerFactory;
 
@@ -51,8 +51,8 @@ namespace MyHomeAudio.model {
 
         public ChromeCastClientWrapper(ChromecastReceiver cr, DispatcherQueue dc, ILoggerFactory lf) {
             this.cr = cr;
-            Name = cr.Name;
-            Status = cr.Status;
+            _name = cr.Name;
+            _status = cr.Status;
             _dispatcherQueue = dc;
             _loggerFactory = lf;
             Log = lf.CreateLogger<ChromeCastClientWrapper>();
@@ -61,8 +61,8 @@ namespace MyHomeAudio.model {
         public String Name { get { return _name; } set { _name = value; RaisePropertyChanged(); } }
         public String Status { get { return _status; } set { _status = value; RaisePropertyChanged(); } }
         public int Volume { get { return _volume; } set { _volume = value; RaisePropertyChanged(); } }
-        public String MediaStatus { get { return _mediaStatus; } set { _mediaStatus = value; RaisePropertyChanged(); } }
-        public String AppId { get { return _appId; } set { _appId = value; RaisePropertyChanged(); } }
+        public String? MediaStatus { get { return _mediaStatus; } set { _mediaStatus = value; RaisePropertyChanged(); } }
+        public String? AppId { get { return _appId; } set { _appId = value; RaisePropertyChanged(); } }
         public bool IsConnected { get { return _isConnected; } set { _isConnected = value; RaisePropertyChanged(); } }
 
         public async Task<bool> TryConnectAsync(string appId) {

@@ -6,7 +6,11 @@ using System.Threading.Tasks;
 
 namespace AudioCollectionApi {
     public class MediaCategory {
-        public string Id { get; set; }
-        public string Name { get; set; }
+        public string Id { get; private set; }
+        public string? Name { get; set; }
+
+        public MediaCategory(string id) {
+            Id = id;
+        }
     }
 }

@@ -21,13 +21,13 @@ namespace AudioCollectionImpl
 
         private enum MediaType { None, Cd, Radio };
 
-        private ILogger Log;
+        private readonly ILogger Log;
 
-        Dictionary<String, ObservableCollection<Cd>> CdRepositories = new Dictionary<string, ObservableCollection<Cd>>();
-        Dictionary<String, ObservableCollection<NamedUrl>> RadioRepositories = new Dictionary<string, ObservableCollection<NamedUrl>>();
+        Dictionary<String, ObservableCollection<Cd>> CdRepositories = new();
+        Dictionary<String, ObservableCollection<NamedUrl>> RadioRepositories = new ();
 
-        private ObservableCollection<MediaCategory> CdCategories = new ObservableCollection<MediaCategory>();
-        private ObservableCollection<MediaCategory> RadioCategories = new ObservableCollection<MediaCategory>();
+        private ObservableCollection<MediaCategory> CdCategories = new ();
+        private ObservableCollection<MediaCategory> RadioCategories = new ();
 
         public JsonMediaRepository(ILogger<JsonMediaRepository> l) {
             Log = l;
@@ -95,7 +95,7 @@ namespace AudioCollectionImpl
         //    }
         //}
 
-        private async Task<MediaType> CheckForMediaJson(string f) {
+        private static async Task<MediaType> CheckForMediaJson(string f) {
             MediaType retVal = MediaType.None;
 
             using (StreamReader reader = File.OpenText(f)) {
@@ -128,21 +128,20 @@ namespace AudioCollectionImpl
             }
             MediaCategory? cat = CdCategories.Where(c => c.Id == reposid).FirstOrDefault();
             if (cat == null) {
-                CdCategories.Add(new MediaCategory(){ Id = reposid, Name= System.IO.Path.GetFileNameWithoutExtension(path) });
+                CdCategories.Add(new MediaCategory(reposid){ Name= System.IO.Path.GetFileNameWithoutExtension(path) });
             } else {
                 cat.Name = System.IO.Path.GetFileNameWithoutExtension(path);
             }
             if (File.Exists(path)) {
                 try {
-                    using (Stream reader = new FileStream(path, FileMode.Open)) {
-                        var cont = await JsonSerializer.DeserializeAsync<List<Cd>>(reader);
-                        if (cont != null) {
-                            foreach (var item in cont) {
-                                rep.Add(item);
-                            }
+                    using Stream reader = new FileStream(path, FileMode.Open);
+                    var cont = await JsonSerializer.DeserializeAsync<List<Cd>>(reader);
+                    if (cont != null) {
+                        foreach (var item in cont) {
+                            rep.Add(item);
                         }
-                        Log.LogDebug("Added {count} cds from {path}", cont?.Count, path);
                     }
+                    Log.LogDebug("Added {count} cds from {path}", cont?.Count, path);
 
                 } catch (Exception ex) {
                     Log.LogError("Exception beim Laden eines Repositories: {repName}, {ex}", path, ex);
@@ -163,7 +162,7 @@ namespace AudioCollectionImpl
             }
             MediaCategory? cat = RadioCategories.Where(c => c.Id == reposid).FirstOrDefault();
             if (cat == null) {
-                RadioCategories.Add(new MediaCategory() { Id = reposid, Name = System.IO.Path.GetFileNameWithoutExtension(path) });
+                RadioCategories.Add(new MediaCategory(reposid) { Name = System.IO.Path.GetFileNameWithoutExtension(path) });
             } else {
                 cat.Name = System.IO.Path.GetFileNameWithoutExtension(path);
             }

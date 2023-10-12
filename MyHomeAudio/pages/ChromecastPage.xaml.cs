@@ -32,8 +32,8 @@ namespace MyHomeAudio.pages {
 
         public LoggerVm LoggerVm { get; set; }
 
-        private ChromeCastClientWrapper _selectedCCC;
-        public ChromeCastClientWrapper SelectedCcc { get { return _selectedCCC; } set { if (_selectedCCC != value) { _selectedCCC = value; RaisePropertyChanged(); } } }
+        private ChromeCastClientWrapper? _selectedCCC;
+        public ChromeCastClientWrapper? SelectedCcc { get { return _selectedCCC; } set { if (_selectedCCC != value) { _selectedCCC = value; RaisePropertyChanged(); } } }
 
 
         private ObservableCollection<ChromeCastClientWrapper> _ccc = new ObservableCollection<ChromeCastClientWrapper>();
@@ -56,7 +56,7 @@ namespace MyHomeAudio.pages {
 
             CCC = App.Services.GetRequiredService<ChromeCastRepository>().GetClients();
             if (CCC.Count > 0) {
-                SelectedCcc = App.Current.m_window.ActiveCcc;
+                SelectedCcc = App.Current.m_window?.ActiveCcc;
                 //SelectedCcc = CCC.Where(cc=>cc.Name.StartsWith("Bü")).FirstOrDefault()??CCC[0];
                 //App.Current.ChromeCastRepos.SetActiveClient(SelectedCcc);
                 //_ = SelectedCcc.TryConnectAsync();

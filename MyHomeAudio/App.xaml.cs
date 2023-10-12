@@ -51,9 +51,9 @@ namespace MyHomeAudio
         public static IServiceProvider Services => App.Current.MyHost.Services;
 
         // Non Nullable - Constructor created
-        private IHost MyHost;
-        private ILogger<App> Log;
-        private AppSettings appSettings;
+        private readonly IHost MyHost;
+        private readonly ILogger<App> Log;
+        private readonly AppSettings appSettings;
         
         //public ChromeCastRepository ChromeCastRepos;
 
@@ -62,10 +62,11 @@ namespace MyHomeAudio
 
         public App() {
             this.InitializeComponent();
-            
+
             // Make Instance of Logger View Model here to pass it a reference to the GUI Dispatcher queue.
-            LoggerVm logVm = new LoggerVm();
-            logVm.dq = DispatcherQueue.GetForCurrentThread();
+            var logVm = new LoggerVm {
+                Dq = DispatcherQueue.GetForCurrentThread()
+            };
 
             MyHost = Microsoft.Extensions.Hosting.Host.
                          CreateDefaultBuilder().
@@ -100,7 +101,7 @@ namespace MyHomeAudio
                 // if not done already, copy the provided examples to current executable path. 
                 string? fullpath = System.Reflection.Assembly.GetEntryAssembly()?.Location;
                 if (fullpath != null) {
-                    String path = fullpath.Substring(0, fullpath.LastIndexOf("\\"));
+                    string path = fullpath.Substring(0, fullpath.LastIndexOf("\\"));
 
                     if (!File.Exists(ApplicationData.Current.LocalFolder.Path + "\\Cds.json")) {
                         System.IO.File.Copy(path + "\\Cds.json", ApplicationData.Current.LocalFolder.Path + "\\Cds.json", true);
