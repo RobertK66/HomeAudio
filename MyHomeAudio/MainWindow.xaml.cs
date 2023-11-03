@@ -30,6 +30,7 @@ using System.Runtime.CompilerServices;
 using MyHomeAudio.logger;
 using Microsoft.Extensions.DependencyInjection;
 using AudioCollectionApi;
+using System.Threading.Tasks;
 
 
 // To learn more about WinUI, the WinUI project structure,
@@ -118,7 +119,9 @@ namespace MyHomeAudio
             mr.GetCdCategories().Clear();
             mr.GetRadioCategories().Clear();
 
-            _  = mr.LoadAllAsync(repPath);
+            
+
+            _ = mr.LoadAllAsync(repPath);
         }
 
         private void NavigationView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args) {

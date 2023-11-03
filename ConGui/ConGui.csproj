@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ConsoleGUI" Version="1.4.1" />
+    <PackageReference Include="ConsoleGUI" Version="1.4.2" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
     
   </ItemGroup>

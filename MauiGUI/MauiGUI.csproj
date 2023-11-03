@@ -52,4 +52,15 @@
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="7.0.0" />
 	</ItemGroup>
 
+	<ItemGroup>
+	  <ProjectReference Include="..\AudioCollection\AudioCollectionApi.csproj" />
+	  <ProjectReference Include="..\DLNAMediaRepos\DLNAMediaRepos.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiXaml Update="NewPage1.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	</ItemGroup>
+
 </Project>

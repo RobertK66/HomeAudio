@@ -55,8 +55,8 @@
     <PackageReference Include="CommunityToolkit.WinUI.Converters" Version="8.0.230907" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="7.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.0" />
-    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.4.230913002" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="7.0.1" />
+    <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.4.231008000" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.25936-preview" />
     <PackageReference Include="System.Configuration.ConfigurationManager" Version="8.0.0-rc.1.23419.4" />
     <Manifest Include="$(ApplicationManifest)" />

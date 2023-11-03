@@ -22,7 +22,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Projektmappenelemente", "Pr
 		.github\workflows\build-msix-pkg.yml = .github\workflows\build-msix-pkg.yml
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudioCollectionImpl", "AudioCollectionImpl\AudioCollectionImpl.csproj", "{5310463C-B266-4B2A-8CE1-91C4F5635276}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AudioCollectionImpl", "AudioCollectionImpl\AudioCollectionImpl.csproj", "{5310463C-B266-4B2A-8CE1-91C4F5635276}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestServers", "TestServers\TestServers.csproj", "{92E02CF7-57E4-4EE6-86ED-10F8AE9B9A33}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -180,6 +182,22 @@ Global
 		{5310463C-B266-4B2A-8CE1-91C4F5635276}.Release|x64.Build.0 = Release|Any CPU
 		{5310463C-B266-4B2A-8CE1-91C4F5635276}.Release|x86.ActiveCfg = Release|Any CPU
 		{5310463C-B266-4B2A-8CE1-91C4F5635276}.Release|x86.Build.0 = Release|Any CPU
+		{92E02CF7-57E4-4EE6-86ED-10F8AE9B9A33}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{92E02CF7-57E4-4EE6-86ED-10F8AE9B9A33}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{92E02CF7-57E4-4EE6-86ED-10F8AE9B9A33}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{92E02CF7-57E4-4EE6-86ED-10F8AE9B9A33}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{92E02CF7-57E4-4EE6-86ED-10F8AE9B9A33}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{92E02CF7-57E4-4EE6-86ED-10F8AE9B9A33}.Debug|x64.Build.0 = Debug|Any CPU
+		{92E02CF7-57E4-4EE6-86ED-10F8AE9B9A33}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{92E02CF7-57E4-4EE6-86ED-10F8AE9B9A33}.Debug|x86.Build.0 = Debug|Any CPU
+		{92E02CF7-57E4-4EE6-86ED-10F8AE9B9A33}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{92E02CF7-57E4-4EE6-86ED-10F8AE9B9A33}.Release|Any CPU.Build.0 = Release|Any CPU
+		{92E02CF7-57E4-4EE6-86ED-10F8AE9B9A33}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{92E02CF7-57E4-4EE6-86ED-10F8AE9B9A33}.Release|ARM64.Build.0 = Release|Any CPU
+		{92E02CF7-57E4-4EE6-86ED-10F8AE9B9A33}.Release|x64.ActiveCfg = Release|Any CPU
+		{92E02CF7-57E4-4EE6-86ED-10F8AE9B9A33}.Release|x64.Build.0 = Release|Any CPU
+		{92E02CF7-57E4-4EE6-86ED-10F8AE9B9A33}.Release|x86.ActiveCfg = Release|Any CPU
+		{92E02CF7-57E4-4EE6-86ED-10F8AE9B9A33}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

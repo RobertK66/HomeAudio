@@ -32,7 +32,7 @@ namespace DLNAMediaRepos {
         }
 
         public async Task<int> LoadRadioStationsAsync() {
-            Log.LogInformation("Starting advanced radio Search ...");
+            //Log.LogInformation("Starting advanced radio Search ...");
             radioBrowser = new RadioBrowserClient();
             var results = await radioBrowser.Search.AdvancedAsync(new AdvancedSearchOptions {
                 Country = "Austria"
@@ -50,7 +50,7 @@ namespace DLNAMediaRepos {
                         rep.Add(new NamedUrl(name: st.Name,contentUrl: st.Url.ToString()));
                     }
 
-                    Log.LogInformation("{count} Stations found.", rep.Count);
+                   // Log.LogInformation("{count} Stations found.", rep.Count);
                 }
             }
 
@@ -59,9 +59,9 @@ namespace DLNAMediaRepos {
 
 
         public async Task<int> LoadAlbumsAsync() {
-            Log.LogInformation("Starting DLNA Album search ...");
+            //Log.LogInformation("Starting DLNA Album search ...");
             client = new DLNAClient();
-            client.DLNADevices.CollectionChanged += DLNADevicesFound;
+            client.DLNADevices.CollectionChanged += DLNADevicesFound; 
             int deviceCnt = await client.SearchingDevicesAsync();
             Log.LogInformation("{deviceCnt} DLNA device(s) found.", deviceCnt);
             return deviceCnt;
@@ -77,11 +77,11 @@ namespace DLNAMediaRepos {
                         CdCategories.Add(cat);
                         CdRepositories.Add(cat.Id, new ObservableCollection<Cd>());
                     }
-                    Log.LogInformation("Searching {mName} {fName} for album/track items... ",device.ModelName,device.FriendlyName);
+                    //Log.LogInformation("Searching {mName} {fName} for album/track items... ",device.ModelName,device.FriendlyName);
                     //var rootContent = clonedDevice.GetDeviceContent("0");
                     var rootContent = clonedDevice.GetDeviceContent("21");
                     rootContent.ForEach(async item => {
-                        await ParseItems(clonedDevice, item);
+                        await ParseItems(clonedDevice, item);//.ConfigureAwait(false);
                     });
                 }
             }
@@ -89,19 +89,19 @@ namespace DLNAMediaRepos {
 
         private async Task ParseItems(DLNADevice device, DLNAObject item) {
 
-            Log.LogTrace("ParseItem [{id}] {name} {cname}", item.ID, item.Name, item.ClassName );
+            //Log.LogTrace("ParseItem [{id}] {name} {cname}", item.ID, item.Name, item.ClassName );
             await Task.Delay(400);
             if (item.ClassName.Equals("object.container")) {
                 var children = device.GetDeviceContent(item.ID);
                 foreach (var child in children) {
                     if (child.ClassName.Equals("object.container")) {
-                        await ParseItems(device, child);
+                        await ParseItems(device, child);//.ConfigureAwait(false);
                     } else if (child.ClassName.Equals("object.container.album.musicAlbum")) {
                         if (child.Name.StartsWith("= All Songs")) {
                             // '= All Songs =' is a 'virtual composed 'album' container -> do not use here !
                             continue;
                         }
-                        await AddAlbum(device, child);
+                        await AddAlbum(device, child);//.ConfigureAwait(false);
                     }
                 }
             }
@@ -113,7 +113,8 @@ namespace DLNAMediaRepos {
             ObservableCollection<Cd> rep = CdRepositories[c.Id];
 
             if (!rep.Where(rcd => cd.Name == rcd.Name).Any()) {
-                Log.LogInformation("{album} reading", cd.Name);
+                Log.LogInformation("+");
+                //Log.LogInformation("{album} reading", cd.Name);
                 await Task.Delay(100);
                 var cdXmlDocument = new XmlDocument();
                 cdXmlDocument.LoadXml(cd.XMLDump);
@@ -145,9 +146,11 @@ namespace DLNAMediaRepos {
                 album.CDID = (XX % 256).ToString("x2") + YYYY.ToString("x4") + tracks.Count.ToString("x2");
 
                 if (!rep.Where(cd => cd.CDID == album.CDID).Any()) {
-                    Log.LogInformation("{album} added.", cd.Name);
+                    //Log.LogInformation("{album} added.", cd.Name);
                     rep.Add(album);
                 }
+            } else {
+                Log.LogInformation(".");
             }
         }
 
@@ -190,10 +193,11 @@ namespace DLNAMediaRepos {
         public async Task LoadAllAsync(object PersitenceContext) {
             Log.LogInformation("DLNA wait for start ...");
             await Task.Delay(100);
-            Log.LogInformation("DLNA starting ...");
-            var t1 = LoadAlbumsAsync();
+            //Log.LogInformation("DLNA starting ...");
+            await LoadAlbumsAsync();//.ConfigureAwait(false);
+            //var t1 = LoadAlbumsAsync();
             //var t2 = LoadRadioStationsAsync();
-            await Task.WhenAll(t1); //, t2);
+            //await Task.WhenAll(t1); //, t2);
             Log.LogInformation("DLNA ready!!!!");
         }
     }

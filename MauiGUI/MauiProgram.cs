@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using AudioCollectionApi;
+using DLNAMediaRepos;
+using Microsoft.Extensions.Logging;
 
 namespace MauiGUI {
     public static class MauiProgram {
@@ -14,7 +16,7 @@ namespace MauiGUI {
 #if DEBUG
 		builder.Logging.AddDebug();
 #endif
-
+            builder.Services.AddSingleton<IMediaRepository, DLNAAlbumRepository>();
             return builder.Build();
         }
     }
