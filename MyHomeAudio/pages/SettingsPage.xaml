@@ -88,7 +88,7 @@
                 <!--  About  -->
                 <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" Text="About" />
 
-                <labs:SettingsExpander x:Name="VersionExpander" Description="© 2023 Robert'sw" Header="{StaticResource AppTitleName}" HeaderIcon="PreviewLink">
+                <labs:SettingsExpander x:Name="VersionExpander" Description="© 2023 Robert'sw" Header="lkjklöjlö jklöj klökj lk" HeaderIcon="PreviewLink">
                     <TextBlock
                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                        IsTextSelectionEnabled="True"

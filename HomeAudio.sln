@@ -24,7 +24,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Projektmappenelemente", "Pr
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AudioCollectionImpl", "AudioCollectionImpl\AudioCollectionImpl.csproj", "{5310463C-B266-4B2A-8CE1-91C4F5635276}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestServers", "TestServers\TestServers.csproj", "{92E02CF7-57E4-4EE6-86ED-10F8AE9B9A33}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestServers", "TestServers\TestServers.csproj", "{92E02CF7-57E4-4EE6-86ED-10F8AE9B9A33}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WinUiHomeAudio", "WinUiHomeAudio\WinUiHomeAudio.csproj", "{EAC26392-C96C-4871-8F86-E679370CEED5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -198,6 +200,30 @@ Global
 		{92E02CF7-57E4-4EE6-86ED-10F8AE9B9A33}.Release|x64.Build.0 = Release|Any CPU
 		{92E02CF7-57E4-4EE6-86ED-10F8AE9B9A33}.Release|x86.ActiveCfg = Release|Any CPU
 		{92E02CF7-57E4-4EE6-86ED-10F8AE9B9A33}.Release|x86.Build.0 = Release|Any CPU
+		{EAC26392-C96C-4871-8F86-E679370CEED5}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{EAC26392-C96C-4871-8F86-E679370CEED5}.Debug|Any CPU.Build.0 = Debug|x64
+		{EAC26392-C96C-4871-8F86-E679370CEED5}.Debug|Any CPU.Deploy.0 = Debug|x64
+		{EAC26392-C96C-4871-8F86-E679370CEED5}.Debug|ARM64.ActiveCfg = Debug|ARM64
+		{EAC26392-C96C-4871-8F86-E679370CEED5}.Debug|ARM64.Build.0 = Debug|ARM64
+		{EAC26392-C96C-4871-8F86-E679370CEED5}.Debug|ARM64.Deploy.0 = Debug|ARM64
+		{EAC26392-C96C-4871-8F86-E679370CEED5}.Debug|x64.ActiveCfg = Debug|x64
+		{EAC26392-C96C-4871-8F86-E679370CEED5}.Debug|x64.Build.0 = Debug|x64
+		{EAC26392-C96C-4871-8F86-E679370CEED5}.Debug|x64.Deploy.0 = Debug|x64
+		{EAC26392-C96C-4871-8F86-E679370CEED5}.Debug|x86.ActiveCfg = Debug|x86
+		{EAC26392-C96C-4871-8F86-E679370CEED5}.Debug|x86.Build.0 = Debug|x86
+		{EAC26392-C96C-4871-8F86-E679370CEED5}.Debug|x86.Deploy.0 = Debug|x86
+		{EAC26392-C96C-4871-8F86-E679370CEED5}.Release|Any CPU.ActiveCfg = Release|x64
+		{EAC26392-C96C-4871-8F86-E679370CEED5}.Release|Any CPU.Build.0 = Release|x64
+		{EAC26392-C96C-4871-8F86-E679370CEED5}.Release|Any CPU.Deploy.0 = Release|x64
+		{EAC26392-C96C-4871-8F86-E679370CEED5}.Release|ARM64.ActiveCfg = Release|ARM64
+		{EAC26392-C96C-4871-8F86-E679370CEED5}.Release|ARM64.Build.0 = Release|ARM64
+		{EAC26392-C96C-4871-8F86-E679370CEED5}.Release|ARM64.Deploy.0 = Release|ARM64
+		{EAC26392-C96C-4871-8F86-E679370CEED5}.Release|x64.ActiveCfg = Release|x64
+		{EAC26392-C96C-4871-8F86-E679370CEED5}.Release|x64.Build.0 = Release|x64
+		{EAC26392-C96C-4871-8F86-E679370CEED5}.Release|x64.Deploy.0 = Release|x64
+		{EAC26392-C96C-4871-8F86-E679370CEED5}.Release|x86.ActiveCfg = Release|x86
+		{EAC26392-C96C-4871-8F86-E679370CEED5}.Release|x86.Build.0 = Release|x86
+		{EAC26392-C96C-4871-8F86-E679370CEED5}.Release|x86.Deploy.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

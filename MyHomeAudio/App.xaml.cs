@@ -72,16 +72,16 @@ namespace MyHomeAudio
                          CreateDefaultBuilder().
                          ConfigureServices((context, services) => {
                              services.AddSingleton(logVm);
-                             //services.AddSingleton<IMediaRepository, JsonMediaRepository>();
-                             services.AddSingleton<IMediaRepository, DLNAAlbumRepository>();
+                             services.AddSingleton<IMediaRepository, JsonMediaRepository>();
+                             //services.AddSingleton<IMediaRepository, DLNAAlbumRepository>();
                              services.AddSingleton<AppSettings>();
                              services.AddSingleton<ChromeCastRepository>();
                              services.AddLogging(logging => {
                                  logging
-                                 .AddFilter(level => level >= LogLevel.Trace)
-                                 .AddWinUiLogger((con) => {       // This adds our LogPanel as possible target (configure in appsettings.json)
-                                     con.LoggerVm = logVm;
-                                 });
+                                 .AddFilter(level => level >= LogLevel.Trace);
+                                 //.AddWinUiLogger((con) => {       // This adds our LogPanel as possible target (configure in appsettings.json)
+                                 //    con.LoggerVm = logVm;
+                                 //});
                              });
                          }).
                          Build();
@@ -111,10 +111,10 @@ namespace MyHomeAudio
                     }
                 }
 
-                // start the search for CC Receivers in local network
-                IChromecastLocator locator = new Sharpcaster.MdnsChromecastLocator();
-                locator.ChromecastReceivedFound += Locator_ChromecastReceivedFound;
-                _ = locator.FindReceiversAsync(CancellationToken.None);          // Fire the search process and wait for receiver found events in the handler. No await here!
+                //// start the search for CC Receivers in local network
+                //IChromecastLocator locator = new Sharpcaster.MdnsChromecastLocator();
+                //locator.ChromecastReceivedFound += Locator_ChromecastReceivedFound;
+                //_ = locator.FindReceiversAsync(CancellationToken.None);          // Fire the search process and wait for receiver found events in the handler. No await here!
 
             } catch (Exception ex) {
                 Log.LogError("Exception while launching {ex}", ex);
