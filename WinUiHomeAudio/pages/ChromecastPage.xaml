@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<local:VmPage
+    x:Class="WinUiHomeAudio.pages.ChromecastPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:WinUiHomeAudio.pages"
+    xmlns:localm="using:WinUiHomeAudio.model"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
+    NavigationCacheMode="Required">
+    <Page.Resources>
+        <DataTemplate x:Name="CccTemplate" x:DataType="localm:ChromeCastClientWrapper">
+            <ItemContainer HorizontalAlignment="Left" >
+                <StackPanel Orientation="Horizontal">
+                    <TextBox IsEnabled="False" Text="{x:Bind Name}"/>
+                    <TextBox IsEnabled="False" Text="{x:Bind Status, Mode=OneWay}"/>
+                    <TextBox IsEnabled="False" Text="{x:Bind Volume, Mode=OneWay}"/>
+                    <TextBox IsEnabled="False" Text="{x:Bind AppId, Mode=OneWay}"/>
+                    <TextBox IsEnabled="False" Text="{x:Bind MediaStatus, Mode=OneWay}"/>
+                </StackPanel>
+            </ItemContainer>
+        </DataTemplate>
+    </Page.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition  Height="Auto"/>
+            <RowDefinition  Height="*"/>
+        </Grid.RowDefinitions>
+
+
+        <ComboBox Grid.Row="0" x:Name="ChromeCastClients" ItemsSource="{x:Bind CCC, Mode=OneWay}"
+                  ItemTemplate="{StaticResource CccTemplate}" 
+                  SelectedItem="{x:Bind SelectedCcc, Mode=TwoWay}"
+                  SelectionChanged="ChromeCastClients_SelectionChanged"
+                  PlaceholderText="&lt;No Chromecast receiver found in Network>" />
+
+        <ScrollViewer x:Name="logScroll"  Grid.Row="1" VerticalAlignment="Stretch" VerticalScrollBarVisibility="Visible" VerticalScrollMode="Enabled" >
+            <!--<TextBlock Text="{x:Bind LoggerVm.ContentText, Mode=TwoWay}" TextWrapping="Wrap" SizeChanged="TextBlock_SizeChanged"></TextBlock>-->
+        </ScrollViewer>
+    </Grid>
+</local:VmPage>

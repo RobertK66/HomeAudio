@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace WinUiHomeAudio {
     public class Category {
-        public string Name { get; set; }
-        public string Tag { get; set; }
+        public string? Name { get; set; }
+        public string? Tag { get; set; }
         public Symbol Glyph { get; set; }
     }
 }

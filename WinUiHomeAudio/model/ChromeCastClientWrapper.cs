@@ -1,4 +1,4 @@
-﻿//using ABI.System;
+﻿
 using AudioCollectionApi;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Dispatching;
@@ -20,10 +20,11 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Devices.Radios;
+using Windows.Media.Protection.PlayReady;
 
 namespace WinUiHomeAudio.model {
     public class ChromeCastClientWrapper : INotifyPropertyChanged {
-        private readonly SemaphoreSlim semaphoreSlim = new (1, 1);
+        private readonly SemaphoreSlim semaphoreSlim = new(1, 1);
 
         public event PropertyChangedEventHandler? PropertyChanged;
         public void RaisePropertyChanged([CallerMemberName] string propertyName = "") {
@@ -43,6 +44,10 @@ namespace WinUiHomeAudio.model {
         private String? _mediaStatus;
         private String? _appId;
         private bool _isConnected;
+        private bool _isOn;
+
+        private QueueCaster.MediaStatus? currentMediaStatus = null;
+
         private ILoggerFactory _loggerFactory;
 
         private ILogger Log;
@@ -55,6 +60,7 @@ namespace WinUiHomeAudio.model {
             _status = cr.Status;
             _dispatcherQueue = dc;
             _loggerFactory = lf;
+            _isOn = false;
             Log = lf.CreateLogger<ChromeCastClientWrapper>();
         }
 
@@ -63,13 +69,15 @@ namespace WinUiHomeAudio.model {
         public int Volume { get { return _volume; } set { _volume = value; RaisePropertyChanged(); } }
         public String? MediaStatus { get { return _mediaStatus; } set { _mediaStatus = value; RaisePropertyChanged(); } }
         public String? AppId { get { return _appId; } set { _appId = value; RaisePropertyChanged(); } }
-        public bool IsConnected { get { return _isConnected; } set { _isConnected = value; RaisePropertyChanged(); } }
+        public bool IsConnected { get { return _isConnected; } set {  _isConnected = value; RaisePropertyChanged(); } }
+
+        public bool IsOn { get { return _isOn; } set { _isOn = value; RaisePropertyChanged(); } }
 
         public async Task<bool> TryConnectAsync(string appId) {
             //bool connected = false;
             IsConnected = false;
             QueueMediaChannel? mediaChannel = null;
-            StatusChannel<ReceiverStatusMessage, ChromecastStatus>?  rcChannel = null;
+            StatusChannel<ReceiverStatusMessage, ChromecastStatus>? rcChannel = null;
             try {
                 _connectionAppId = appId;
 
@@ -96,7 +104,7 @@ namespace WinUiHomeAudio.model {
 
                     ConnectedClient.Disconnected += ConnectedClient_Disconnected;
                     IsConnected = true;
-
+                    IsOn=true;
                 }
             } catch (Exception ex) {
                 Log.LogError("Exception while trying to connect chromecast: {ex}", ex);
@@ -119,11 +127,15 @@ namespace WinUiHomeAudio.model {
             // This client is done now -> reconnect a new one.
             _dispatcherQueue.TryEnqueue(async () => {
                 IsConnected = false;
+                IsOn = false;
                 ConnectedClient = null;
                 await Task.Delay(3000);
-                _ = TryConnectAsync(_connectionAppId);
+                //_ = TryConnectAsync(_connectionAppId);
             });
         }
+
+
+
 
         private void RcChannel_StatusChanged(object? sender, EventArgs e) {
             //throw new NotImplementedException();
@@ -155,18 +167,18 @@ namespace WinUiHomeAudio.model {
         internal async Task PlayRadioAsync(NamedUrl url) {
             await semaphoreSlim.WaitAsync();    // Only one Play at once is routet to LoadAsync!
             try {
-                if (ConnectedClient != null) { 
-                            var mediaChannel = ConnectedClient.GetChannel<QueueMediaChannel>();
-                            if (mediaChannel != null) {
-                                var media = new Media {
-                                    ContentUrl = url.ContentUrl,
-                                    StreamType = StreamType.Live,
-                                    ContentType = "audio/mp4",
-                                    Metadata = new MediaMetadata() { Title = url.Name ?? url.ContentUrl }
-                                };
-                                //Log.LogDebug("Load Media.");
-                                await mediaChannel.LoadAsync(media);
-                            }
+                if (ConnectedClient != null) {
+                    var mediaChannel = ConnectedClient.GetChannel<QueueMediaChannel>();
+                    if (mediaChannel != null) {
+                        var media = new Media {
+                            ContentUrl = url.ContentUrl,
+                            StreamType = StreamType.Live,
+                            ContentType = "audio/mp4",
+                            Metadata = new MediaMetadata() { Title = url.Name ?? url.ContentUrl }
+                        };
+                        //Log.LogDebug("Load Media.");
+                        await mediaChannel.LoadAsync(media);
+                    }
                 }
             } finally {
                 semaphoreSlim?.Release();
@@ -194,7 +206,7 @@ namespace WinUiHomeAudio.model {
                         //Log.LogDebug("Load Cd with " + media.Count + " tracks.");
                         await mediaChannel.QueueLoadAsync(media.ToArray());
                     }
-                    
+
                 }
             } finally {
                 semaphoreSlim?.Release();
@@ -202,14 +214,14 @@ namespace WinUiHomeAudio.model {
         }
 
         internal void VolumeUp() {
-            var rcChannel =  ConnectedClient?.GetChannel<ReceiverChannel>();
+            var rcChannel = ConnectedClient?.GetChannel<ReceiverChannel>();
             if (rcChannel != null) {
                 Volume = (Volume) + 3;
                 if (Volume > 100) {
                     Volume = 100;
                 }
                 //Log?.LogDebug("Vol- [{vol}]", String.Format("{0:0.000}", Volume));
-                _ = rcChannel.SetVolume(((double)Volume)/200);
+                _ = rcChannel.SetVolume(((double)Volume) / 200);
             }
         }
 
@@ -222,6 +234,35 @@ namespace WinUiHomeAudio.model {
                 }
                 //Log?.LogDebug("Vol- [{vol}]", String.Format("{0:0.000}", Volume));
                 _ = rcChannel.SetVolume(((double)Volume) / 200);
+            }
+        }
+
+        public void Disconnect() {
+            if (ConnectedClient != null) {
+                IsConnected = false;
+                IsOn=false;
+                _ = ConnectedClient.DisconnectAsync();
+            }
+        }
+
+ 
+ 
+
+        public async Task StopMediaPlay() {
+            await semaphoreSlim.WaitAsync();    // Only one Play at once is routet to LoadAsync!
+            try {
+                if (ConnectedClient != null) {
+                    var mediaChannel = ConnectedClient.GetChannel<QueueMediaChannel>();
+                    currentMediaStatus = await mediaChannel.GetStatusAsync();
+
+                    if (currentMediaStatus != null) {
+                        //Log.LogDebug("Load Media.");
+                        await mediaChannel.StopAsync(currentMediaStatus.MediaSessionId);
+                    }
+                    
+                }
+            } finally {
+                semaphoreSlim?.Release();
             }
         }
     }

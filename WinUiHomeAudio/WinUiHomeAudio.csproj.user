@@ -8,7 +8,13 @@
     <Page Update="MainPage.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="uc\CcPlayer.xaml">
+    <Page Update="pages\CdPage.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="pages\ChromecastPage.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="pages\RadioPage.xaml">
       <SubType>Designer</SubType>
     </Page>
     <None Update="MainWindow.xaml">

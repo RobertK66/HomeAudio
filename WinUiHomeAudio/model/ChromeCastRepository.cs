@@ -30,17 +30,17 @@ namespace WinUiHomeAudio.model
             Log.LogTrace("ChromecastRepository Constructor finished.");
         }
 
-        public void Add(ChromecastReceiver e) {
-            Log.LogInformation("Receiver '{CcrName}' found at {CcrUri}", e.Name, e.DeviceUri);
+        public ChromeCastClientWrapper Add(ChromecastReceiver e) {
+            Log.LogInformation("Receiver '{CcrName}' found at {CcrUri} {tostr}", e.Name, e.DeviceUri, e.Port);
             var dq = DispatcherQueue.GetForCurrentThread();
             var ccc = new ChromeCastClientWrapper(e, dq, _loggerFactory);
             KnownChromecasts.Add(ccc);
-            
+            return ccc;
 
-            if (!String.IsNullOrEmpty(_autoConnectName) && e.Name.StartsWith(_autoConnectName)) {
-                Log.LogInformation("Initiate AutoConnect for Receiver '{CcrName}'", e.Name);
-                _ = TryConnectAsync(ccc);
-            }
+            //if (!String.IsNullOrEmpty(_autoConnectName) && e.Name.StartsWith(_autoConnectName)) {
+            //    Log.LogInformation("Initiate AutoConnect for Receiver '{CcrName}'", e.Name);
+            //    _ = TryConnectAsync(ccc);
+            //}
         }
 
         public async Task TryConnectAsync(ChromeCastClientWrapper ccc) {
@@ -62,11 +62,8 @@ namespace WinUiHomeAudio.model
             _activeClient?.PlayRadioAsync(url);
         }
 
-        internal void SetActiveClient(ChromeCastClientWrapper selectedCcc) {
+        internal void SetActiveClient(ChromeCastClientWrapper? selectedCcc) {
             _activeClient = selectedCcc;
-            //if ((App.Current as App).m_window != null) {
-            //    (App.Current as App).m_window.ActiveCcc = selectedCcc;
-            //}
         }
 
         internal void VolumeUp() {

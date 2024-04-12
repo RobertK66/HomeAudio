@@ -46,7 +46,7 @@ namespace AudioCollectionImpl
                         if (reLoadPath != null) {
                             break;
                         }
-                        await Task.Delay(2000);
+                        //await Task.Delay(2000);
                         switch (await CheckForMediaJson(f)) {
                             case MediaType.None:
                             default:

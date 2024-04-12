@@ -216,6 +216,17 @@ namespace ConGui {
             return Task.CompletedTask;
         }
 
+        //public async Task PlayStop() {
+        //    if (mediaChannel != null) {
+        //        Log?.LogDebug("Stop Media");
+        //        currentMediaStatus ??= await mediaChannel.GetStatusAsync();
+        //        if (currentMediaStatus != null) {
+        //            await mediaChannel.StopAsync(currentMediaStatus.MediaSessionId);
+        //        }
+        //    }
+        //}
+
+
         public async Task PlayNext() {
             if (mediaChannel != null) {
                 Log?.LogDebug("Play Next");

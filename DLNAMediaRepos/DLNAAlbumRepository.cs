@@ -90,7 +90,7 @@ namespace DLNAMediaRepos {
         private async Task ParseItems(DLNADevice device, DLNAObject item) {
 
             //Log.LogTrace("ParseItem [{id}] {name} {cname}", item.ID, item.Name, item.ClassName );
-            await Task.Delay(400);
+            //await Task.Delay(400);
             if (item.ClassName.Equals("object.container")) {
                 var children = device.GetDeviceContent(item.ID);
                 foreach (var child in children) {

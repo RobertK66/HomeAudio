@@ -7,33 +7,34 @@
     xmlns:mod="using:WinUiHomeAudio.model"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:converters="using:CommunityToolkit.WinUI.Converters"
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
-    <Grid>
-        <Grid.Resources>
-            <local:MenuItemTemplateSelector x:Key="selector">
-                <local:MenuItemTemplateSelector.ItemTemplate>
-                    <DataTemplate x:DataType="local:Category" >
-                        <NavigationViewItem Tag="{x:Bind Tag}" Content="{x:Bind Name}">
-                            <NavigationViewItem.Icon>
-                                <SymbolIcon Symbol="{x:Bind Glyph}" />
-                            </NavigationViewItem.Icon>
-                        </NavigationViewItem>
-                    </DataTemplate>
-                </local:MenuItemTemplateSelector.ItemTemplate >
+    <Page.Resources>
+        <converters:BoolToObjectConverter x:Key="BoolToColorConverter" TrueValue="Green" FalseValue="Red"/>
+        <local:MenuItemTemplateSelector x:Key="selector">
+            <local:MenuItemTemplateSelector.ItemTemplate>
+                <DataTemplate x:DataType="local:Category" >
+                    <NavigationViewItem Tag="{x:Bind Tag}" Content="{x:Bind Name}">
+                        <NavigationViewItem.Icon>
+                            <SymbolIcon Symbol="{x:Bind Glyph}" />
+                        </NavigationViewItem.Icon>
+                    </NavigationViewItem>
+                </DataTemplate>
+            </local:MenuItemTemplateSelector.ItemTemplate >
 
-                <!--<mynav:MenuItemTemplateSelector.SeperatorTemplate>
+            <!--<mynav:MenuItemTemplateSelector.SeperatorTemplate>
             <DataTemplate x:DataType="mynav:Separator" >
                 <NavigationViewItem IsEnabled="False"></NavigationViewItem>                
             </DataTemplate>
         </mynav:MenuItemTemplateSelector.SeperatorTemplate >-->
-            </local:MenuItemTemplateSelector>
-        </Grid.Resources>
-
-
+        </local:MenuItemTemplateSelector>
+    </Page.Resources>
+    
+    <Grid>
         <NavigationView x:Name="MainNavView" ItemInvoked="NavigationView_ItemInvoked" 
-                 IsBackButtonVisible="Collapsed" Header="This is Header Text" 
+                 IsBackButtonVisible="Collapsed"  Header=" "
                  MenuItemsSource="{x:Bind Categories, Mode=TwoWay}"
                  FooterMenuItemsSource="{x:Bind FooterCategories, Mode=TwoWay}"
                  MenuItemTemplateSelector="{StaticResource selector}"
@@ -45,25 +46,46 @@
                     <RowDefinition  Height="*"/>
                 </Grid.RowDefinitions>
 
-                <ListView ItemsSource="{x:Bind ccRepos.KnownChromecasts}">
-
-                    <ListView.ItemTemplate>
+                <ComboBox ItemsSource="{x:Bind Path=ccRepos.KnownChromecasts}"
+                          SelectedItem="{x:Bind Path=SelectedChromecast , Mode=TwoWay}"
+                          >
+                    <ComboBox.ItemTemplate>
                         <DataTemplate x:DataType="mod:ChromeCastClientWrapper">
-                            <local:CcPlayer Grid.Row="0" x:Name="ccPlayer" HorizontalAlignment="Stretch" 
-                                PlayerName="{x:Bind Path=Name, Mode=OneWay}"
-                                AppId="{x:Bind Path=AppId, Mode=OneWay }"
-                                MediaStatus="{x:Bind Path=MediaStatus, Mode=OneWay}"
-                                Volume="{x:Bind Path=Volume, Mode=OneWay}"
-                                Status="{x:Bind Path=Status, Mode=OneWay}"
-                                IsConnected="{x:Bind Path=IsConnected, Mode=TwoWay}"
-                                VolumeUp="CcPlayer_VolumeUp"
-                                VolumeDown="CcPlayer_VolumeDown"
-                                ConnectToggeled="ccPlayer_ConnectToggeled"
-                                IsTabStop="False"
-                            />
+                            <ItemContainer HorizontalAlignment="Left" Margin="4">
+                                <Border BorderBrush="{x:Bind Path=IsConnected, Mode=OneWay, Converter={StaticResource BoolToColorConverter}}"
+                                        Visibility="Visible" 
+                                        BorderThickness="2">
+                                    <StackPanel Orientation="Horizontal" Padding="4,0,4,0">
+                                        <ToggleSwitch x:Name="ConnectToggle"
+                                                      Toggled="ccPlayer_ConnectToggeled"
+                                                      Width="120"
+                                                      MinWidth="0"
+                                                      OnContent="Connected"
+                                                      OffContent="Offline"
+                                                      IsOn="{x:Bind Path=IsOn, Mode=OneWay}" />
+                                        <Button x:Name="VolDown" Content="vol-" VerticalAlignment="Top"  Click="CcPlayer_VolumeDown" >
+                                            <Button.KeyboardAccelerators>
+                                                <KeyboardAccelerator Modifiers="None" Key="Subtract" />
+                                            </Button.KeyboardAccelerators>
+                                        </Button>
+                                        <Button x:Name="VolUp" Content="vol+" VerticalAlignment="Top"  Click="CcPlayer_VolumeUp" >
+                                            <Button.KeyboardAccelerators>
+                                                <KeyboardAccelerator Modifiers="None" Key="Add" />
+                                            </Button.KeyboardAccelerators>
+                                        </Button>
+                                        <TextBox IsEnabled="False" Text="{x:Bind Name, Mode=OneWay}"/>
+                                        <TextBox IsEnabled="False" Text="{x:Bind Status, Mode=OneWay }"/>
+                                        <TextBox IsEnabled="False" Text="{x:Bind Volume, Mode=OneWay }"/>
+                                        <TextBox IsEnabled="False" Text="{x:Bind AppId, Mode=OneWay  }"/>
+                                        <TextBox IsEnabled="False" Text="{x:Bind MediaStatus, Mode=OneWay }"/>
+                                        <Button x:Name="Stop" Content="Stop" VerticalAlignment="Top"  Click="Stop_Click" >
+                                        </Button>
+                                    </StackPanel>
+                                </Border>
+                            </ItemContainer>
                         </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
+                    </ComboBox.ItemTemplate>
+                </ComboBox>
 
                 <Frame Grid.Row="1" x:Name="ContentFrame" VerticalAlignment="Stretch"/>
             </Grid>
