@@ -51,7 +51,7 @@ namespace QueueCaster {
             return returnVal;
         }
 
-        public new async Task<MediaStatus?> StopAsync(long mediaSessionId) {
+        public async Task<MediaStatus?> StopAsync(long mediaSessionId) {
             MediaStatus? returnVal = null;
             var status = Client.GetChromecastStatus();
             var app = status?.Applications?.FirstOrDefault();
