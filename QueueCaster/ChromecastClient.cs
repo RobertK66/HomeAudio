@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
-using QueueCaster.queue.models;
 using Sharpcaster.Channels;
 using Sharpcaster.Interfaces;
 using Sharpcaster.Messages;
@@ -13,6 +12,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.ComponentModel;
+using Sharpcaster.Models.Media;
 
 namespace QueueCaster {
     public class ChromecastClient :Sharpcaster.ChromecastClient {
@@ -28,7 +28,7 @@ namespace QueueCaster {
 
             var customMessages      = new List<Assembly>();
             var customCcChannels    = new List<IChromecastChannel>();
-            customMessages.Add(typeof(QueueItem).GetTypeInfo().Assembly);
+            customMessages.Add(typeof(Item).GetTypeInfo().Assembly);
 
             serviceCollection.AddTransient<IChromecastChannel, My226ConnectionChannel>();
             serviceCollection.AddTransient<IChromecastChannel, HeartbeatChannel>();
@@ -39,7 +39,7 @@ namespace QueueCaster {
             List<Type> messageTypes = new List<Type>();
 
             // first add our own IMessage classes
-            foreach (var type in (from t in typeof(QueueItem).GetTypeInfo().Assembly.GetTypes()
+            foreach (var type in (from t in typeof(Item).GetTypeInfo().Assembly.GetTypes()
                                   where t.GetTypeInfo().IsClass && !t.GetTypeInfo().IsAbstract && messageInterfaceType.IsAssignableFrom(t) && t.GetTypeInfo().GetCustomAttribute<ReceptionMessageAttribute>() != null
                                   select t)) {
                 messageTypes.Add(type);

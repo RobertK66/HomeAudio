@@ -1,11 +1,12 @@
 ﻿using Google.Protobuf.WellKnownTypes;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using QueueCaster;
-using QueueCaster.queue.models;
+using Sharpcaster;
 using Sharpcaster.Channels;
 using Sharpcaster.Interfaces;
+using Sharpcaster.Messages;
 using Sharpcaster.Messages.Receiver;
 using Sharpcaster.Models;
 using Sharpcaster.Models.ChromecastStatus;
@@ -13,6 +14,7 @@ using Sharpcaster.Models.Media;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading;
@@ -20,7 +22,6 @@ using System.Threading.Channels;
 using System.Threading.Tasks;
 using System.Xml.Linq;
 using static Google.Protobuf.Reflection.SourceCodeInfo.Types;
-using MediaStatus = QueueCaster.MediaStatus;
 
 namespace ConGui {
     public class CCWStatusEventArgs : EventArgs {
@@ -73,7 +74,7 @@ namespace ConGui {
         private readonly String appId;
 
         private ChromecastClient? ConnectedClient = null;
-        private QueueMediaChannel? mediaChannel = null;
+        private MediaChannel? mediaChannel = null;
         private StatusChannel<ReceiverStatusMessage, ChromecastStatus>? rcChannel = null;
         private Double? currentVolume = null;
         private MediaStatus? currentMediaStatus = null;
@@ -124,14 +125,15 @@ namespace ConGui {
 
         }
 
+
         private async Task ConnectNewClient(ChromecastReceiver e) {
-            ConnectedClient = QueueCaster.ChromecastClient.CreateQueueCasterClient(loggerFactory);
+            ConnectedClient = new ChromecastClient(loggerFactory: loggerFactory); 
 
             var st = await ConnectedClient.ConnectChromecast(e);
             Log.LogDebug("Connected available App[0]: {appid}", (((st?.Applications?.Count??0) > 0)? st?.Applications[0].AppId : "<null>"));
-            mediaChannel = ConnectedClient.GetChannel<QueueMediaChannel>();
+            mediaChannel = ConnectedClient.GetChannel<MediaChannel>();
             if (mediaChannel != null) {
-                mediaChannel.QueueMediaStatusChanged += MediaChannel_StatusChanged;
+                mediaChannel.StatusChanged += MediaChannel_StatusChanged;
             }
             rcChannel = ConnectedClient.GetChannel<StatusChannel<ReceiverStatusMessage, ChromecastStatus>>();
             if (rcChannel != null) {
@@ -155,7 +157,7 @@ namespace ConGui {
                     rcChannel.StatusChanged -= StatusChannel_StatusChanged;
                 }
                 if (mediaChannel != null) {
-                    mediaChannel.QueueMediaStatusChanged -= MediaChannel_StatusChanged;
+                    mediaChannel.StatusChanged -= MediaChannel_StatusChanged;
                 }
             } finally {
                 ConnectedClient = null;
@@ -170,21 +172,23 @@ namespace ConGui {
         }
 
         private void MediaChannel_StatusChanged(object? sender, EventArgs e) {
-            if (e is MediaStatusChangedEventArgs msm) { 
-                Log.LogTrace("{cnt} changed event(s):", msm.Status.Count);      // I never got more than one here.
-                if (msm.Status.Count > 0) {
+            //if (e is StatusChangedEventArgs msm) { 
+            //    Log.LogTrace("{cnt} changed event(s):", msm.Status.Count);      // I never got more than one here.
+            IEnumerable<MediaStatus>? status = mediaChannel?.Status;  
+            if (status != null) { 
+                if (status.Count() > 0) {
                     int idx = 0;
-                    foreach (var item in msm.Status) {
+                    foreach (var item in status) {
                         currentMediaStatus = item;
                         int currentId = item.CurrentItemId;
 
-                        if (currentMediaStatus?.QueueItems != null) {
-                            if (currentMediaStatus.QueueItems.Length == 2) {
+                        if (currentMediaStatus?.Items != null) {
+                            if (currentMediaStatus.Items.Length == 2) {
                                 currentFirstTrack = false;
                                 currentLastTrack = false;
-                                if (currentMediaStatus.QueueItems[0].ItemId == currentId) {
+                                if (currentMediaStatus.Items[0].ItemId == currentId) {
                                     currentFirstTrack = true;
-                                } else if (currentMediaStatus.QueueItems[1].ItemId == currentId) {
+                                } else if (currentMediaStatus.Items[1].ItemId == currentId) {
                                     currentLastTrack = true;
                                 } 
                             } else {
@@ -225,12 +229,21 @@ namespace ConGui {
         //        }
         //    }
         //}
-
+        public async Task Pause() {
+            if (mediaChannel != null) {
+                Log?.LogDebug("PAUSE");
+                currentMediaStatus ??= mediaChannel.Status.FirstOrDefault();// GetStatusAsync();
+                if (currentMediaStatus != null) {
+                    //await mediaChannel.PauseAsync(currentMediaStatus.MediaSessionId);
+                    await mediaChannel.PauseAsync();
+                }
+            }
+        }
 
         public async Task PlayNext() {
             if (mediaChannel != null) {
                 Log?.LogDebug("Play Next");
-                currentMediaStatus ??= await mediaChannel.GetStatusAsync();
+                currentMediaStatus ??= mediaChannel.Status.FirstOrDefault();  
                 if (currentMediaStatus != null) {
                     await mediaChannel.QueueNextAsync(currentMediaStatus.MediaSessionId);
                 }
@@ -240,7 +253,7 @@ namespace ConGui {
         public async Task PlayPrev() {
             if (mediaChannel != null) {
                 Log?.LogDebug("Play Prev");
-                currentMediaStatus ??= await mediaChannel.GetStatusAsync();
+                currentMediaStatus ??= mediaChannel.Status.FirstOrDefault();
                 if (currentMediaStatus != null) {
                     await mediaChannel.QueuePrevAsync(currentMediaStatus.MediaSessionId);
                 }
@@ -272,7 +285,7 @@ namespace ConGui {
         public async Task<MediaStatus?> PlayCdTracks(List<(string url, string name)> tracks) {
             MediaStatus? status = null;
             if (mediaChannel != null) {
-                QueueItem[]? qi = new QueueItem[tracks.Count];
+                Item[]? qi = new Item[tracks.Count];
                 int i = 0;
                 foreach (var (url, name) in tracks) {
                     var media = new Media {
@@ -281,7 +294,7 @@ namespace ConGui {
                         ContentType = "audio/mp4",
                         Metadata = new MediaMetadata() { Title = name }
                     };
-                    qi[i] = new QueueItem() { Media = media, OrderId = i, StartTime = 0 };
+                    qi[i] = new Item() { Media = media, OrderId = i, StartTime = 0 };
                     i++;
                 }
                 Log.LogDebug("Queueing {trackCnt} tracks.", qi.Length);

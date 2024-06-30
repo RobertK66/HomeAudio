@@ -10,13 +10,13 @@
   <ItemGroup>
     <PackageReference Include="ConsoleGUI" Version="1.4.2" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+    <PackageReference Include="Queuecaster" Version="1.0.2" />
     
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\AudioCollectionImpl\AudioCollectionImpl.csproj" />
     <ProjectReference Include="..\AudioCollection\AudioCollectionApi.csproj" />
-    <ProjectReference Include="..\QueueCaster\QueueCaster.csproj" />
   </ItemGroup>
 
   <ItemGroup>

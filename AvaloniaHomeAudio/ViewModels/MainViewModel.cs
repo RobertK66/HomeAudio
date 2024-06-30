@@ -5,5 +5,7 @@ namespace AvaloniaHomeAudio.ViewModels;
 public partial class MainViewModel : ViewModelBase
 {
     [ObservableProperty]
-    public string _Greeting = "Welcome to Avalonia!";
+    public string _Greeting = "Welcome to MyHomeAudio!";
+
+  
 }

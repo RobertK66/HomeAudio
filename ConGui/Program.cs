@@ -82,6 +82,8 @@ namespace ConGui {
                 MyCCW.PlayPrev();
             } else if (inputEvent.Key.Key == ConsoleKey.Escape) {
                 MyCCW.Shutdown();
+            } else if (inputEvent.Key.Key == ConsoleKey.P) {
+                MyCCW.Pause();
             }
         }
 
