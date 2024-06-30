@@ -34,6 +34,7 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.240607001" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1" />
+    <PackageReference Include="Queuecaster" Version="1.0.2" />
     <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>
 
@@ -49,7 +50,6 @@
     <ProjectReference Include="..\AudioCollectionImpl\AudioCollectionImpl.csproj" />
     <ProjectReference Include="..\AudioCollection\AudioCollectionApi.csproj" />
     <ProjectReference Include="..\DLNAMediaRepos\DLNAMediaRepos.csproj" />
-    <ProjectReference Include="..\QueueCaster\QueueCaster.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="Cds.json">

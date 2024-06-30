@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net.Security;
 using System.Net.Sockets;
@@ -15,67 +16,72 @@ namespace TestServers {
         static X509Certificate? serverCertificate = null;
 
         private SslStream sslStream;
+        private bool processing = false;
 
         public async void ProcessClient(TcpClient client) {
-            Console.WriteLine("Connection accepted.");
-            if (serverCertificate == null) {
-                X509Store store = new X509Store(StoreLocation.CurrentUser);
-                store.Open(OpenFlags.ReadOnly);
-                serverCertificate = store.Certificates[0];
-            }
+            if (!processing) {
+                processing = true;
+                Console.WriteLine("Connection accepted.");
+                if (serverCertificate == null) {
+                    X509Store store = new X509Store(StoreLocation.CurrentUser);
+                    store.Open(OpenFlags.ReadOnly);
+                    serverCertificate = store.Certificates[0];
+                }
 
-            // A client has connected. Create the
-            // SslStream using the client's network stream.
-            sslStream = new SslStream( client.GetStream(), false);
+                // A client has connected. Create the
+                // SslStream using the client's network stream.
+                sslStream = new SslStream(client.GetStream(), false);
 
-            // Authenticate the server but don't require the client to authenticate.
-            try {
-                sslStream.AuthenticateAsServer(serverCertificate, clientCertificateRequired: false, checkCertificateRevocation: true);
+                // Authenticate the server but don't require the client to authenticate.
+                try {
+                    sslStream.AuthenticateAsServer(serverCertificate, clientCertificateRequired: false, checkCertificateRevocation: true);
 
-                // Display the properties and settings for the authenticated stream.
-                DisplaySecurityLevel(sslStream);
-                DisplaySecurityServices(sslStream);
-                DisplayCertificateInformation(sslStream);
-                DisplayStreamProperties(sslStream);
+                    // Display the properties and settings for the authenticated stream.
+                    DisplaySecurityLevel(sslStream);
+                    DisplaySecurityServices(sslStream);
+                    DisplayCertificateInformation(sslStream);
+                    DisplayStreamProperties(sslStream);
 
-                // Set timeouts for the read and write to 5 seconds.
-                sslStream.ReadTimeout = 5000;
-                sslStream.WriteTimeout = 5000;
-            
-                // Read a message from the client.
-                Console.WriteLine("Waiting for client message...");
-                while (true) {
-                    ProtoMessage messageData = await ReadMessage(sslStream);
-                    Console.WriteLine("*** Received: {0}", messageData);
-                    var msgjson = messageData.GetField(6)?.ToString();
-                    if (msgjson != null) {
-                        JsonNode ccMessage = JsonNode.Parse(msgjson)!;
-                        JsonNode reqId = ccMessage!["requestId"]!;
-                        JsonNode type = ccMessage!["type"]!;
-                        if (type.AsValue().GetValue<String>().StartsWith("GET_STATUS")) {
-                            await SendStatus(reqId.AsValue().GetValue<int>(), messageData);
-                        } else if (type.AsValue().GetValue<String>().StartsWith("LAUNCH")) {
-                            JsonNode appId = ccMessage!["appId"]!;
-                            await SendStatus(reqId.AsValue().GetValue<int>(), messageData, appId.AsValue().GetValue<string>());
+                    // Set timeouts for the read and write to 5 seconds.
+                    sslStream.ReadTimeout = 5000;
+                    sslStream.WriteTimeout = 5000;
+
+                    // Read a message from the client.
+                    Console.WriteLine("Waiting for client message...");
+                    while (true) {
+                        ProtoMessage messageData = await ReadMessage(sslStream);
+                        Console.WriteLine("*** Received: {0}", messageData);
+                        var msgjson = messageData.GetField(6)?.ToString();
+                        if (msgjson != null) {
+                            JsonNode ccMessage = JsonNode.Parse(msgjson)!;
+                            JsonNode reqId = ccMessage!["requestId"]!;
+                            JsonNode type = ccMessage!["type"]!;
+                            if (type.AsValue().GetValue<String>().StartsWith("GET_STATUS")) {
+                                await SendStatus(reqId.AsValue().GetValue<int>(), messageData);
+                            } else if (type.AsValue().GetValue<String>().StartsWith("LAUNCH")) {
+                                JsonNode appId = ccMessage!["appId"]!;
+                                await SendStatus(reqId.AsValue().GetValue<int>(), messageData, appId.AsValue().GetValue<string>());
+                            }
+
                         }
-
                     }
+                } catch (AuthenticationException e) {
+                    Console.WriteLine("Exception: {0}", e.Message);
+                    if (e.InnerException != null) {
+                        Console.WriteLine("Inner exception: {0}", e.InnerException.Message);
+                    }
+                    Console.WriteLine("Authentication failed - closing the connection.");
+                    sslStream.Close();
+                    client.Close();
+                    return;
+                } finally {
+                    // The client stream will be closed with the sslStream
+                    // because we specified this behavior when creating
+                    // the sslStream.
+                    sslStream.Close();
+                    client.Close();
+                    processing = false;
                 }
-            } catch (AuthenticationException e) {
-                Console.WriteLine("Exception: {0}", e.Message);
-                if (e.InnerException != null) {
-                    Console.WriteLine("Inner exception: {0}", e.InnerException.Message);
-                }
-                Console.WriteLine("Authentication failed - closing the connection.");
-                sslStream.Close();
-                client.Close();
-                return;
-            } finally {
-                // The client stream will be closed with the sslStream
-                // because we specified this behavior when creating
-                // the sslStream.
-                sslStream.Close();
-                client.Close();
             }
         }
         private async Task<ProtoMessage> ReadMessage(SslStream sslStream) {

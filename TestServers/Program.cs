@@ -34,6 +34,7 @@ namespace TestServers {
             var mdns = new MulticastService((li) => {
                 List<NetworkInterface> filtered = new List<NetworkInterface>();
                 foreach (var ni in li) {
+                    Console.WriteLine(ni.Name);
                     if (ni.Name.StartsWith("WLAN")) {
                         filtered.Add(ni);
                         foreach (UnicastIPAddressInformation ip in ni.GetIPProperties().UnicastAddresses) {
