@@ -2,14 +2,15 @@
 using AudioCollectionApi;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Dispatching;
-using QueueCaster;
-using QueueCaster.queue.models;
+using Sharpcaster;
 using Sharpcaster.Channels;
 using Sharpcaster.Interfaces;
 using Sharpcaster.Messages.Receiver;
 using Sharpcaster.Models;
 using Sharpcaster.Models.ChromecastStatus;
 using Sharpcaster.Models.Media;
+using Sharpcaster.Models.Queue;
+
 using Sharpcaster.Models.Protobuf;
 using System;
 using System.Collections.Generic;
@@ -68,12 +69,12 @@ namespace MyHomeAudio.model {
         public async Task<bool> TryConnectAsync(string appId) {
             //bool connected = false;
             IsConnected = false;
-            QueueMediaChannel? mediaChannel = null;
+            MediaChannel? mediaChannel = null;
             StatusChannel<ReceiverStatusMessage, ChromecastStatus>?  rcChannel = null;
             try {
                 _connectionAppId = appId;
 
-                ConnectedClient = QueueCaster.ChromecastClient.CreateQueueCasterClient(_loggerFactory);
+                ConnectedClient = new ChromecastClient(_loggerFactory);
 
                 //cr.DeviceUri = new System.Uri("http://localhost:123/base");
                 var st = await ConnectedClient.ConnectChromecast(cr);
@@ -84,9 +85,9 @@ namespace MyHomeAudio.model {
                 }
                 Log.LogDebug("Connected - available App[0]: {appid}", oldAppid);
 
-                mediaChannel = ConnectedClient.GetChannel<QueueMediaChannel>();
+                mediaChannel = ConnectedClient.GetChannel<MediaChannel>();
                 if (mediaChannel != null) {
-                    mediaChannel.QueueMediaStatusChanged += MediaChannel_QueueMediaStatusChanged; ;
+                    mediaChannel.StatusChanged += MediaChannel_StatusChanged; // += MediaChannel_QueueMediaStatusChanged; ;
                     rcChannel = ConnectedClient.GetChannel<StatusChannel<ReceiverStatusMessage, ChromecastStatus>>();
                     if (rcChannel != null) {
                         rcChannel.StatusChanged += RcChannel_StatusChanged;
@@ -101,7 +102,7 @@ namespace MyHomeAudio.model {
             } catch (Exception ex) {
                 Log.LogError("Exception while trying to connect chromecast: {ex}", ex);
                 if (mediaChannel != null) {
-                    mediaChannel.QueueMediaStatusChanged -= MediaChannel_QueueMediaStatusChanged;
+                    mediaChannel.StatusChanged -= MediaChannel_StatusChanged; //  MediaChannel_QueueMediaStatusChanged;
                 }
                 if (rcChannel != null) {
                     rcChannel.StatusChanged -= RcChannel_StatusChanged;
@@ -114,6 +115,7 @@ namespace MyHomeAudio.model {
             }
             return IsConnected;
         }
+
 
         private void ConnectedClient_Disconnected(object? sender, EventArgs e) {
             // This client is done now -> reconnect a new one.
@@ -142,10 +144,11 @@ namespace MyHomeAudio.model {
             }
         }
 
-        private void MediaChannel_QueueMediaStatusChanged(object? sender, MediaStatusChangedEventArgs e) {
-            if (sender is QueueMediaChannel mc) {
+        private void MediaChannel_StatusChanged(object? sender, EventArgs e) {
+            
+            if (sender is MediaChannel mc) {
                 _dispatcherQueue.TryEnqueue(() => {
-                    MediaStatus = e.Status.FirstOrDefault()?.PlayerState.ToString() ?? "<leer>";
+                    MediaStatus = mc.Status.FirstOrDefault()?.PlayerState.ToString() ?? "<leer>";
                 });
 
                 //Log.LogTrace("MediaChanel Status changed: " + e.Status.FirstOrDefault()?.CurrentTime.ToString() ?? "<->");
@@ -156,7 +159,7 @@ namespace MyHomeAudio.model {
             await semaphoreSlim.WaitAsync();    // Only one Play at once is routet to LoadAsync!
             try {
                 if (ConnectedClient != null) { 
-                            var mediaChannel = ConnectedClient.GetChannel<QueueMediaChannel>();
+                            var mediaChannel = ConnectedClient.GetChannel<MediaChannel>();
                             if (mediaChannel != null) {
                                 var media = new Media {
                                     ContentUrl = url.ContentUrl,
@@ -177,7 +180,7 @@ namespace MyHomeAudio.model {
             await semaphoreSlim.WaitAsync();    // Only one Play at once is routet to LoadAsync!
             try {
                 if (ConnectedClient != null) {
-                    var mediaChannel = ConnectedClient.GetChannel<QueueMediaChannel>();
+                    var mediaChannel = ConnectedClient.GetChannel<MediaChannel>();
                     if (mediaChannel != null) {
                         var media = new List<QueueItem>();
                         foreach (var t in cd.Tracks) {
