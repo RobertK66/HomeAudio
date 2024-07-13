@@ -21,92 +21,142 @@ using MyHomeAudio.pages;
 using Windows.Storage;
 using System.Diagnostics;
 using Microsoft.UI.Xaml.Shapes;
-
-//using AppUIBasics.Common;
-//using AppUIBasics.Data;
-//using AppUIBasics.Helper;
-//using System.Text.RegularExpressions;
-//using System.Threading.Tasks;
-//using Windows.ApplicationModel;
-//using Windows.ApplicationModel.Activation;
-//using Windows.ApplicationModel.Core;
-//using Windows.Foundation.Metadata;
-//using Windows.System.Profile;
-//using WinUIGallery.DesktopWap.DataModel;
-//using WASDK = Microsoft.WindowsAppSDK;
-
+using MyHomeAudio.nav;
+using System.Collections.ObjectModel;
+using System.Collections;
+using MyHomeAudio.model;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
+using MyHomeAudio.logger;
+using Microsoft.Extensions.DependencyInjection;
+using AudioCollectionApi;
+using System.Threading.Tasks;
 
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace MyHomeAudio {
-    /// <summary>
-    /// An empty window that can be used on its own or navigated to within a Frame.
-    /// </summary>
+namespace MyHomeAudio
+{
 
+    public sealed partial class MainWindow : Window, INotifyPropertyChanged {
 
-    public sealed partial class MainWindow : Window {
+        public event PropertyChangedEventHandler? PropertyChanged;
+        public void RaisePropertyChanged([CallerMemberName] string propertyName = "") {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
 
         public NavigationView MainNavPane { get => this.MainNavView; }
 
+        public LoggerVm LoggerVm { get; set; }
+
+        public ObservableCollection<CategoryBase> Categories = new();
+        public ObservableCollection<CategoryBase> FooterCategories = new ();
+
+
+        private ChromeCastClientWrapper? _selectedCCC;
+        public ChromeCastClientWrapper? ActiveCcc { get { return _selectedCCC; } set { if (_selectedCCC != value) { _selectedCCC = value; RaisePropertyChanged(); } } }
+
+        //private string currentConfigPath = "";
+
+
+        private readonly AppSettings appSettings;
+
+        private readonly IMediaRepository mr;
+
         public MainWindow() {
             this.InitializeComponent();
+
+            appSettings = App.Services.GetRequiredService<AppSettings>();
+
             AppWindow.Title = "My Audio - Cast Application";
             AppWindow.TitleBar.IconShowOptions = IconShowOptions.HideIconAndSystemMenu;
             AppWindow.TitleBar.BackgroundColor = Colors.Bisque;
             AppWindow.TitleBar.ButtonBackgroundColor = Colors.Bisque;
 
-            var isLeft = ApplicationData.Current.LocalSettings.Values[AppSettingKeys.IsLeftMode];
-            if (isLeft == null || ((bool)isLeft == true)) {
+            LoggerVm = App.Services.GetRequiredService<LoggerVm>();
+
+            if (appSettings.IsLeftMode) {
                 MainNavView.PaneDisplayMode = NavigationViewPaneDisplayMode.Auto;
             } else {
                 MainNavView.PaneDisplayMode = NavigationViewPaneDisplayMode.Top;
             }
 
-            String theme = ApplicationData.Current.LocalSettings.Values[AppSettingKeys.UiTheme]?.ToString();
-            if (theme != null) {
-                var t = App.GetEnum<ElementTheme>(theme);
+            var t = App.GetEnum<ElementTheme>(appSettings.UiTheme);
+            if (this.Content is FrameworkElement rootElement) {
+                rootElement.RequestedTheme = t;
+            }
 
-                if (this.Content is FrameworkElement rootElement) {
-                    rootElement.RequestedTheme = t;
+            FooterCategories.Add(new Category() { Glyph = Symbol.AlignLeft, Name = "ChromeCast", Tag = "CC" });
+
+            mr = App.Services.GetRequiredService<IMediaRepository>();
+
+            mr.GetCdCategories().CollectionChanged += (s, e) => {
+                if (e.NewItems != null) {
+                    foreach (var ni in e.NewItems) {
+                        if (ni is MediaCategory mc) {
+                            Categories.Add(new Category() { Glyph = Symbol.Target, Name = mc.Name + "-Cds", Tag = mc.Id });
+                        }
+                    }
                 }
-            }
+            };
 
-            var repPath = ApplicationData.Current.LocalSettings.Values[AppSettingKeys.ReposPath]?.ToString();
-            if (repPath == null) {
-                repPath = ApplicationData.Current.LocalFolder.Path;
-            }
-            BuildMenue(repPath);
-
-
+            mr.GetRadioCategories().CollectionChanged += (s, e) => {
+                if (e.NewItems != null) {
+                    foreach (var ni in e.NewItems) {
+                        if (ni is MediaCategory mc) {
+                            Categories.Add(new Category() { Glyph = Symbol.Account, Name = mc.Name??"unknown", Tag = mc.Id });
+                        }
+                    }
+                }
+            };
         }
 
         public void BuildMenue(string repPath) {
-            MainNavView.MenuItems.Clear();
-            int i = 0;
-            foreach(var f in Directory.GetFiles(repPath, "*.json")) {
-                if (File.ReadAllText(f).Contains("\"Tracks\"")) {
-                    MainNavView.MenuItems.Add(new NavigationViewItem() { Icon = new FontIcon() { Glyph = "\uEA3F" }, Content= System.IO.Path.GetFileName(f), Tag = "CD-" + i++ });
-                } else {
-                    MainNavView.MenuItems.Add(new NavigationViewItem() { Icon = new FontIcon() { Glyph = "\uE704" }, Content = System.IO.Path.GetFileName(f), Tag = "Radio-" + i++ });
-                }
-            }
+            Categories.Clear();
+
+            IMediaRepository mr = App.Services.GetRequiredService<IMediaRepository>();
+            mr.GetCdCategories().Clear();
+            mr.GetRadioCategories().Clear();
+
+            
+
+            _ = mr.LoadAllAsync(repPath);
         }
 
         private void NavigationView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args) {
             if (args.IsSettingsInvoked) {
-                sender.AlwaysShowHeader = false;
+                //this.ccPlayer.Visibility = Visibility.Collapsed;
                 ContentFrame.Navigate(typeof(SettingsPage));
-                //ContentFrame.Content = new SettingsPage();
             } else {
-                sender.AlwaysShowHeader = true;
+                //this.ccPlayer.Visibility = Visibility.Visible;
                 string selectedItem = (String)args.InvokedItem;
-                sender.Header = "Sample Page " + selectedItem;
-                ContentFrame.Navigate(typeof(ContentPage), selectedItem);
-                //ContentFrame.Content = new ContentPage();
+                if (selectedItem.Equals("ChromeCast")) {
+                    ContentFrame.Navigate(typeof(ChromecastPage));
+                } else if (selectedItem.Contains("Cd")) {
+                    ContentFrame.Navigate(typeof(CdPage), args.InvokedItemContainer.Tag.ToString());
+                } else {
+                    ContentFrame.Navigate(typeof(RadioPage), args.InvokedItemContainer.Tag.ToString());
+                }
             }
         }
 
+        private void CcPlayer_VolumeUp(object sender, EventArgs e) {
+            ActiveCcc?.VolumeUp();
+        }
+
+        private void CcPlayer_VolumeDown(object sender, EventArgs e) {
+            ActiveCcc?.VolumeDown();
+        }
+
+        private void Window_Activated(object sender, WindowActivatedEventArgs args) {
+            if (ContentFrame?.Content == null) {
+                ContentFrame?.Navigate(typeof(RadioPage), ((Category?)Categories.Where(c => ((Category)c).Tag.StartsWith("Radio")).FirstOrDefault())?.Tag);
+            }
+        }
+
+        private void Grid_Loaded(object sender, RoutedEventArgs e) {
+            BuildMenue(appSettings.ReposPath);
+        }
     }
 }

@@ -16,9 +16,9 @@
       "commandName": "Project",
       "commandLineArgs": "--qcCmd playRadio --qcIdx 21"
     },
-    "Cli Write Stations": {
+    "Cli Write Cds": {
       "commandName": "Project",
-      "commandLineArgs": "--qcCmd writeRadio --out ./WebRadio.json"
+      "commandLineArgs": "--qcCmd writeCd --out ./WebCd.json"
     }
   }
 }

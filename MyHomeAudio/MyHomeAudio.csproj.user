@@ -3,20 +3,29 @@
   <PropertyGroup>
     <UapAppxPackageBuildMode>SideloadOnly</UapAppxPackageBuildMode>
     <AppxShowAllApps>False</AppxShowAllApps>
-    <AppxBuildConfigurationSelection>x86|x64</AppxBuildConfigurationSelection>
+    <AppxBuildConfigurationSelection>x64</AppxBuildConfigurationSelection>
     <PackageOptionalProjectsInIdeBuilds>False</PackageOptionalProjectsInIdeBuilds>
   </PropertyGroup>
   <ItemGroup>
     <None Update="App.xaml">
       <SubType>Designer</SubType>
     </None>
+    <Page Update="CcPlayer.xaml">
+      <SubType>Designer</SubType>
+    </Page>
     <None Update="MainWindow.xaml">
       <SubType>Designer</SubType>
     </None>
     <None Update="Package.appxmanifest">
       <SubType>Designer</SubType>
     </None>
-    <Page Update="pages\ContentPage.xaml">
+    <Page Update="pages\RadioPage.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="pages\CdPage.xaml">
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Update="pages\ChromecastPage.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="pages\SettingsPage.xaml">

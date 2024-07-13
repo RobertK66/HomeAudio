@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "WinUiHomeAudio (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "WinUiHomeAudio (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

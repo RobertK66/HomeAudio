@@ -1,20 +1,21 @@
-﻿using QueueCaster;
-using QueueCaster.queue.models;
+﻿using AudioCollectionApi;
 using Sharpcaster;
+using Sharpcaster.Channels;
 using Sharpcaster.Interfaces;
 using Sharpcaster.Models.Media;
+using Sharpcaster.Models.Queue;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using MediaStatus = QueueCaster.MediaStatus;
+//using MediaStatus = Qu.MediaStatus;
 
 namespace Cli {
     public class CCStarter {
         private string ccName;
         private string appId;
-        private QueueCaster.QueueMediaChannel? mediaChannel;
+        private MediaChannel? mediaChannel;
 
         public CCStarter(string ccName, string appId) {
             this.ccName = ccName;
@@ -30,11 +31,11 @@ namespace Cli {
             if (cc != null) {
                 Console.WriteLine("**** Status: " + cc.Status);
 
-                var client = QueueCaster.ChromecastClient.CreateQueueCasterClient(null);
+                var client = new ChromecastClient();
                 var st = await client.ConnectChromecast(cc);
                 st = await client.LaunchApplicationAsync(appId, true);
 
-                mediaChannel = client.GetChannel<QueueMediaChannel>();
+                mediaChannel = client.GetChannel<MediaChannel>();
             }
         }
 
@@ -51,16 +52,16 @@ namespace Cli {
             }
         }
 
-        public async Task PlayCdTracks(List<(string url, string name)> tracks) {
+        public async Task PlayCdTracks(List<NamedUrl> tracks) {
             if (mediaChannel != null) {
                 QueueItem[]? qi = new QueueItem[tracks.Count];
                 int i = 0;
-                foreach (var (url, name) in tracks) {
+                foreach (var nu in tracks) {
                     var media = new Media {
-                        ContentUrl = url,
+                        ContentUrl = nu.ContentUrl,
                         StreamType = StreamType.Buffered,
                         ContentType = "audio/mp4",
-                        Metadata = new MediaMetadata() { Title = name }
+                        Metadata = new MediaMetadata() { Title = nu.Name }
                     };
                     qi[i] = new QueueItem() { Media = media, OrderId = i, StartTime = 0 };
                     i++;
@@ -85,7 +86,7 @@ namespace Cli {
 
         public async Task<MediaStatus?> PlayNext() {
             if (mediaChannel != null) {
-                var st1 = await mediaChannel.GetStatusAsync();
+                var st1 = mediaChannel.Status?.FirstOrDefault();
                 if (st1 != null) {
                     return await mediaChannel.QueueNextAsync(st1.MediaSessionId);
                 }
@@ -95,7 +96,7 @@ namespace Cli {
 
         public async Task<MediaStatus?> PlayPrev() {
             if (mediaChannel != null) {
-                var st1 = await mediaChannel.GetStatusAsync();
+                var st1 = mediaChannel.Status?.FirstOrDefault();
                 if (st1 != null) {
                     return await mediaChannel.QueuePrevAsync(st1.MediaSessionId);
                 }

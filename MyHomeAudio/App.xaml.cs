@@ -1,4 +1,5 @@
-﻿using Microsoft.UI.Xaml;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Data;
@@ -6,13 +7,20 @@ using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Xaml.Shapes;
+using MyHomeAudio.logger;
+using MyHomeAudio.model;
+using Sharpcaster.Interfaces;
+using Sharpcaster.Models;
+using Sharpcaster.Models.Protobuf;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices.WindowsRuntime;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.ApplicationModel;
 using Windows.ApplicationModel.Activation;
@@ -20,66 +28,117 @@ using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Foundation.Metadata;
 using Windows.Storage;
-using WASDK = Microsoft.WindowsAppSDK;
-
+using Microsoft.UI.Dispatching;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using System.Net.Security;
+using AudioCollectionApi;
+using AudioCollectionImpl;
+using DLNAMediaRepos;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
-namespace MyHomeAudio {
+namespace MyHomeAudio
+{
+
     /// <summary>
     /// Provides application-specific behavior to supplement the default Application class.
     /// </summary>
     public partial class App : Application {
-        /// <summary>
-        /// Initializes the singleton application object.  This is the first line of authored code
-        /// executed, and as such is the logical equivalent of main() or WinMain().
-        /// </summary>
+
+        public new static App Current => (App)Application.Current;
+        public static IServiceProvider Services => App.Current.MyHost.Services;
+
+        // Non Nullable - Constructor created
+        private readonly IHost MyHost;
+        private readonly ILogger<App> Log;
+        //private readonly AppSettings appSettings;
+        
+        //public ChromeCastRepository ChromeCastRepos;
+
+        // Nullable created in OnLaunched
+        public MainWindow? m_window;
+
         public App() {
             this.InitializeComponent();
+
+            // Make Instance of Logger View Model here to pass it a reference to the GUI Dispatcher queue.
+            var logVm = new LoggerVm {
+                Dq = DispatcherQueue.GetForCurrentThread()
+            };
+
+            MyHost = Microsoft.Extensions.Hosting.Host.
+                         CreateDefaultBuilder().
+                         ConfigureServices((context, services) => {
+                             services.AddSingleton(logVm);
+                             services.AddSingleton<IMediaRepository, JsonMediaRepository>();
+                             //services.AddSingleton<IMediaRepository, DLNAAlbumRepository>();
+                             services.AddSingleton<AppSettings>();
+                             services.AddSingleton<ChromeCastRepository>();
+                             services.AddLogging(logging => {
+                                 logging
+                                 .AddFilter(level => level >= LogLevel.Trace);
+                                 //.AddWinUiLogger((con) => {       // This adds our LogPanel as possible target (configure in appsettings.json)
+                                 //    con.LoggerVm = logVm;
+                                 //});
+                             });
+                         }).
+                         Build();
+
+            Log = App.Services.GetRequiredService<ILogger<App>>();
+            Log.LogTrace("Application instanciated.");
+
+            //appSettings = App.Services.GetRequiredService<AppSettings>();
+
         }
 
-        /// <summary>
-        /// Invoked when the application is launched.
-        /// </summary>
-        /// <param name="args">Details about the launch request and process.</param>
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args) {
 
             try {
-                String fullpath = System.Reflection.Assembly.GetEntryAssembly().Location;
-                String path = fullpath.Substring(0, fullpath.LastIndexOf("\\"));
+                Log.LogInformation("Application loaded.");
 
-                if (!File.Exists(ApplicationData.Current.LocalFolder.Path + "\\Cds.json")) {
-                    System.IO.File.Copy(path + "\\Cds.json", ApplicationData.Current.LocalFolder.Path + "\\Cds.json");
+                // if not done already, copy the provided examples to current executable path. 
+                string? fullpath = System.Reflection.Assembly.GetEntryAssembly()?.Location;
+                if (fullpath != null) {
+                    string path = fullpath.Substring(0, fullpath.LastIndexOf("\\"));
+
+                    if (!File.Exists(ApplicationData.Current.LocalFolder.Path + "\\Cds.json")) {
+                        System.IO.File.Copy(path + "\\Cds.json", ApplicationData.Current.LocalFolder.Path + "\\Cds.json", true);
+                    }
+                    if (!File.Exists(ApplicationData.Current.LocalFolder.Path + "\\WebRadios.json")) {
+                        System.IO.File.Copy(path + "\\WebRadios.json", ApplicationData.Current.LocalFolder.Path + "\\WebRadios.json");
+                    }
                 }
-                if (!File.Exists(ApplicationData.Current.LocalFolder.Path + "\\WebRadios.json")) {
-                    System.IO.File.Copy(path + "\\WebRadios.json", ApplicationData.Current.LocalFolder.Path + "\\WebRadios.json");
-                }
+
+                //// start the search for CC Receivers in local network
+                //IChromecastLocator locator = new Sharpcaster.MdnsChromecastLocator();
+                //locator.ChromecastReceivedFound += Locator_ChromecastReceivedFound;
+                //_ = locator.FindReceiversAsync(CancellationToken.None);          // Fire the search process and wait for receiver found events in the handler. No await here!
 
             } catch (Exception ex) {
-                Debug.WriteLine(ex);
+                Log.LogError("Exception while launching {ex}", ex);
             }
 
-            m_window = new MainWindow();
+            m_window = new MainWindow(); 
             //m_window.ExtendsContentIntoTitleBar = true;
             m_window.Activate();
-
-
         }
 
-        public MainWindow m_window;
+        
+        private void Locator_ChromecastReceivedFound(object? sender, Sharpcaster.Models.ChromecastReceiver e) {
+            App.Services.GetRequiredService<ChromeCastRepository>().Add(e);
+        }
 
-
-        public new static App Current => (App)Application.Current;
 
         public static string WinAppSdkDetails {
-            get => string.Format("Windows App SDK {0}.{1}.{2}{3}",
-            WASDK.Release.Major, WASDK.Release.Minor, WASDK.Release.Patch, WASDK.Release.VersionTag);
+            get => "?? ?? ?? ??";
+            //WASDK.Release.Major, WASDK.Release.Minor, WASDK.Release.Patch, WASDK.Release.VersionTag);
         }
 
         public static string WinAppSdkRuntimeDetails {
             get {
-                var details = WinAppSdkDetails + WASDK.Runtime.Version.DotQuadString;
+                var details = WinAppSdkDetails + "WASDK.Runtime.Version.DotQuadString";
                 return details;
             }
         }
@@ -92,8 +151,9 @@ namespace MyHomeAudio {
         }
 
         internal void ReconfigureMainWindow(string repositoryPath) {
-            m_window.BuildMenue(repositoryPath);
-
+            m_window?.BuildMenue(repositoryPath);
         }
+
+        
     }
 }

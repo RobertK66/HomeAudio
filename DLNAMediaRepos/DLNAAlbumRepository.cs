@@ -1,8 +1,10 @@
-﻿using AudioCollection;
+﻿using AudioCollectionApi;
+using Microsoft.Extensions.Logging;
 using RadioBrowser;
 using RadioBrowser.Models;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
@@ -12,78 +14,116 @@ using System.Xml;
 
 namespace DLNAMediaRepos {
 
-    public class DLNAAlbumRepository  {
-        Dictionary<string, (string albumName, List<(string url, string title)> tracks, string artist, string cdid)> CdAlbums = new();
-        Dictionary<string, string> RadioStations = new();
+    public class DLNAAlbumRepository : IMediaRepository {
+        Dictionary<String, ObservableCollection<Cd>> CdRepositories = new();
+        Dictionary<String, ObservableCollection<NamedUrl>> RadioRepositories = new();
 
-        DLNAClient client = new();
-        RadioBrowserClient radioBrowser = new();
+        private ObservableCollection<MediaCategory> CdCategories = new();
+        private ObservableCollection<MediaCategory> RadioCategories = new();
 
-        public DLNAAlbumRepository() {
-            client.DLNADevices.CollectionChanged += DLNADevicesFound;
+        DLNAClient client; // = new();
+        RadioBrowserClient radioBrowser; //= new();
 
+        private readonly ILogger? Log;
+        private int IdCnt = 0;
+
+        public DLNAAlbumRepository(ILogger<DLNAAlbumRepository>? l) {
+            Log = l;
         }
 
         public async Task<int> LoadRadioStationsAsync() {
+            //Log.LogInformation("Starting advanced radio Search ...");
+            radioBrowser = new RadioBrowserClient();
             var results = await radioBrowser.Search.AdvancedAsync(new AdvancedSearchOptions {
                 Country = "Austria"
             });
 
             foreach (var st in results) {
-                if (!RadioStations.ContainsKey(st.Url.ToString())) {
-                    RadioStations.Add(st.Name, st.Url.ToString());
+                if ((st.Url != null) && (st.Name != null)) {
+                    MediaCategory cat = new("Radio-" + (IdCnt++)) { Name = string.IsNullOrEmpty(st.Tags[0]) ? "untagged" : st.Tags[0] };
+                    if (!RadioRepositories.ContainsKey(cat.Id)) {
+                        RadioCategories.Add(cat);
+                        RadioRepositories.Add(cat.Id, new ObservableCollection<NamedUrl>());
+                    }
+                    ObservableCollection<NamedUrl> rep = RadioRepositories[cat.Id];
+                    if (!rep.Where(r => r.Name == st.Name).Any()) {
+                        rep.Add(new NamedUrl(name: st.Name,contentUrl: st.Url.ToString()));
+                    }
+
+                   // Log.LogInformation("{count} Stations found.", rep.Count);
                 }
             }
-            Console.WriteLine($"{RadioStations.Count} Stations found.");
+
             return results.Count;
         }
 
 
         public async Task<int> LoadAlbumsAsync() {
+            //Log.LogInformation("Starting DLNA Album search ...");
+            client = new DLNAClient();
+            client.DLNADevices.CollectionChanged += DLNADevicesFound; 
             int deviceCnt = await client.SearchingDevicesAsync();
-            Console.WriteLine($"{CdAlbums.Count} Albums found in {deviceCnt} DLNA device(s).");
-
-            return CdAlbums.Count;
+            Log?.LogInformation("{deviceCnt} DLNA device(s) found.", deviceCnt);
+            return deviceCnt;
         }
 
         private void DLNADevicesFound(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e) {
             if (e.NewItems != null) {
                 foreach (DLNADevice device in e.NewItems) {
                     DLNADevice clonedDevice = new(device);
-                    Console.WriteLine("Searching" + device.ModelName + " " + device.FriendlyName + " for album/track items...");
-                    var rootContent = clonedDevice.GetDeviceContent("0");
-                    rootContent.ForEach(item => {
-                        ParseItems(clonedDevice, item);
+
+                    MediaCategory cat = new("Cd-" + (IdCnt++)) { Name = device.FriendlyName };
+                    if (!CdCategories.Where(c => c.Name == cat.Name).Any()) {
+                        CdCategories.Add(cat);
+                        CdRepositories.Add(cat.Id, new ObservableCollection<Cd>());
+                    }
+                    //Log.LogInformation("Searching {mName} {fName} for album/track items... ",device.ModelName,device.FriendlyName);
+                    //var rootContent = clonedDevice.GetDeviceContent("0");
+                    var rootContent = clonedDevice.GetDeviceContent("21");
+                    rootContent.ForEach(async item => {
+                        await ParseItems(clonedDevice, item);//.ConfigureAwait(false);
                     });
                 }
             }
         }
 
-        private void ParseItems(DLNADevice device, DLNAObject item) {
-            Console.WriteLine(item.ClassName + " - " + item.Name);
+        private async Task ParseItems(DLNADevice device, DLNAObject item) {
+
+            //Log.LogTrace("ParseItem [{id}] {name} {cname}", item.ID, item.Name, item.ClassName );
+            //await Task.Delay(400);
             if (item.ClassName.Equals("object.container")) {
                 var children = device.GetDeviceContent(item.ID);
                 foreach (var child in children) {
                     if (child.ClassName.Equals("object.container")) {
-                        ParseItems(device, child);
+                        await ParseItems(device, child);//.ConfigureAwait(false);
                     } else if (child.ClassName.Equals("object.container.album.musicAlbum")) {
-                        AddAlbum(device, child);
+                        if (child.Name.StartsWith("= All Songs")) {
+                            // '= All Songs =' is a 'virtual composed 'album' container -> do not use here !
+                            continue;
+                        }
+                        await AddAlbum(device, child);//.ConfigureAwait(false);
                     }
                 }
             }
 
         }
 
-        private void AddAlbum(DLNADevice device, DLNAObject cd) {
-            if (!CdAlbums.ContainsKey(cd.Name)) {
-                Console.Write(".");
+        private async Task AddAlbum(DLNADevice device, DLNAObject cd) {
+            var c = CdCategories.Where(c => c.Name.Equals(device.FriendlyName)).FirstOrDefault();
+            ObservableCollection<Cd> rep = CdRepositories[c.Id];
+
+            if (!rep.Where(rcd => cd.Name == rcd.Name).Any()) {
+                Log?.LogInformation("+");
+                //Log.LogInformation("{album} reading", cd.Name);
+                await Task.Delay(100);
                 var cdXmlDocument = new XmlDocument();
                 cdXmlDocument.LoadXml(cd.XMLDump);
                 var artist = cdXmlDocument.GetElementsByTagName("upnp:artist").Item(0);
                 string art = artist?.InnerText ?? string.Empty;
+                var picpath = cdXmlDocument.GetElementsByTagName("upnp:albumArtURI").Item(0)?.FirstChild?.Value;
 
-                (string albumName, List<(string url, string title)> tracks, string artist, string cdid) album = (cd.Name, new List<(string url, string title)>(), art, "");
-               
+                Cd album = new () { Name = cd.Name, Artist = art, Picpath = picpath };
+
                 int trackStart = 2;         // Starting second of track 1
                 int XX = 0;                 // Sum of starting seconds
                 int YYYY = 0;               // Totasl Sum of track length
@@ -95,79 +135,70 @@ namespace DLNAMediaRepos {
                     var ds = r.Attributes["duration"].Value;
                     XX += trackStart;
                     if (r != null) {
-                        album.tracks.Add((r.InnerText, track.Name));
+                        album.Tracks.Add(new NamedUrl(name: track.Name,contentUrl: r.InnerText));
                     }
-                    TimeSpan result;
-                    if (TimeSpan.TryParse(ds, CultureInfo.InvariantCulture, out result)) {
+                    if (TimeSpan.TryParse(ds, CultureInfo.InvariantCulture, out TimeSpan result)) {
                         trackStart += (int)result.TotalSeconds;             // Start second of next track
-                        YYYY += (int)result.TotalSeconds;           
+                        YYYY += (int)result.TotalSeconds;
                     }
                 });
-                album.cdid = (XX % 256).ToString("x2") + YYYY.ToString("x4") + tracks.Count.ToString("x2");
-                //Console.Write(album.cdid);
-                //if (!CdAlbums.ContainsKey(album.cdid)) {
-                    CdAlbums.Add(album.albumName, album);
-                    //Console.WriteLine();
-                //} else {
-                //    //Console.WriteLine(" !!!");
-                //}
+
+                album.CDID = (XX % 256).ToString("x2") + YYYY.ToString("x4") + tracks.Count.ToString("x2");
+
+                if (!rep.Where(cd => cd.CDID == album.CDID).Any()) {
+                    //Log.LogInformation("{album} added.", cd.Name);
+                    rep.Add(album);
+                }
+            } else {
+                Log?.LogInformation(".");
             }
         }
 
-        public List<(string, string)> GetCdTracks(int playIdx) {
-            List<(string, string)> tracks = new ();
-            var keys = CdAlbums.Keys.ToArray();
-            if (keys.Length > 0) {
-                playIdx %= keys.Length;
-                var cd = CdAlbums[keys[playIdx]];
-                tracks = cd.tracks;
-                Console.WriteLine($"Retreived {tracks.Count} tracks fromo Album '{cd.albumName}'.");
+
+
+        //public void LoadAll(object PersitenceContext) {
+        //    var waitForAlbums = LoadAlbumsAsync();
+        //    //var waitForRadioStations = LoadRadioStationsAsync();
+
+        //    //if (PersitenceContext is bool waitForLoading) {
+        //    //    //var t = Task.WhenAll(waitForRadioStations, waitForAlbums);
+        //    //    waitForAlbums.Wait();
+        //    //} 
+        //}
+
+        public ObservableCollection<Cd> GetCdRepository(string collectionid) {
+            if (CdRepositories.ContainsKey(collectionid)) {
+                return CdRepositories[collectionid];
+            } else {
+                return new ObservableCollection<Cd>();
             }
-            return (tracks);
         }
 
-        public (string name, string url) GetRadioStation(int playIdx) {
-
-            (string url, string name) webradio = new("https://orf-live.ors-shoutcast.at/oe1-q2a", "st x");
-            var keys = RadioStations.Keys.ToArray();
-            if (keys.Length > 0) {
-                playIdx %= keys.Length;
-                webradio.url = RadioStations[keys[playIdx]];
-                webradio.name = keys[playIdx];
+        public ObservableCollection<NamedUrl> GetRadioRepository(string collectionid) {
+            if (RadioRepositories.ContainsKey(collectionid)) {
+                return RadioRepositories[collectionid];
+            } else {
+                return new ObservableCollection<NamedUrl>();
             }
-            return webradio;
         }
 
-        public List<(string name, List<(string url, string name)> tracks, string artist, string cdid)> GetAllAlbums() {
-            return CdAlbums.Values.OrderBy(a=>a.artist).ToList();
+        public ObservableCollection<MediaCategory> GetRadioCategories() {
+            return RadioCategories;
         }
 
-        public List<(string name, string url)> GetAllStations() {
-            List< (string url, string name)> retVal = new List<(string url, string name)> ();
-            var keys = RadioStations.Keys.ToArray();
-            foreach ( var key in keys) {
-                retVal.Add((RadioStations[key], key));
-            }
-            return retVal;
+        public ObservableCollection<MediaCategory> GetCdCategories() {
+            return CdCategories;
         }
 
-        public (string name, string url) GetRadioStation(string stationName) {
-            (string url, string name) webradio = new();
-            if (RadioStations.ContainsKey(stationName)) {
-                var st = RadioStations[stationName];
-                webradio.url = RadioStations[stationName];
-                webradio.name = stationName;
-            }
-            return webradio;
-        }
-
-        public List<(string url, string name)> GetCdTracks(string cdid) {
-            List<(string, string)> tracks = new();
-            if (CdAlbums.ContainsKey(cdid)) {
-                var cd = CdAlbums[cdid];
-                tracks = cd.tracks;
-            }
-            return tracks;
+        public async Task LoadAllAsync(object PersitenceContext) {
+            Log?.LogInformation("DLNA wait for start ...");
+            await Task.Delay(100);
+            //Log.LogInformation("DLNA starting ...");
+            await LoadAlbumsAsync();//.ConfigureAwait(false);
+            //var t1 = LoadAlbumsAsync();
+            //var t2 = LoadRadioStationsAsync();
+            //await Task.WhenAll(t1); //, t2);
+            Log?.LogInformation("DLNA ready!!!!");
         }
     }
 }

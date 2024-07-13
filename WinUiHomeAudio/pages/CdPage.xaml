@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<local:VmPage
+    x:Class="WinUiHomeAudio.pages.CdPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:WinUiHomeAudio.pages"
+    xmlns:localm="using:AudioCollectionApi"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    NavigationCacheMode="Required"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Page.Resources>
+        <local:StringToImageConverter x:Key="StringToImageConverter"></local:StringToImageConverter>
+
+        <DataTemplate x:Key="ImageTemplate" x:DataType="localm:Cd">
+            <ItemContainer HorizontalAlignment="Left"  MaxHeight="160" MaxWidth="160"  >
+                <Border BorderBrush="CornflowerBlue" BorderThickness="2"   Visibility="Visible"  Margin="5" CornerRadius="3">
+                <Grid>
+                    <Grid.ContextFlyout>
+                         <Flyout >
+                             <StackPanel Width="200">
+                                <TextBlock Style="{ThemeResource BaseTextBlockStyle}" Text="{x:Bind Picpath}" Margin="0,0,0,12" />
+                             </StackPanel>
+                         </Flyout>
+                    </Grid.ContextFlyout>
+                    <Image Source="{x:Bind Picpath, Converter={StaticResource StringToImageConverter}}" Margin="15,15,15,15"/>
+                    <TextBlock Text="{x:Bind Artist}" VerticalAlignment="Top" HorizontalAlignment="Center" 
+                               Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                               TextWrapping="Wrap"
+                               FontWeight="Bold"
+                               FontSize="10" />
+                    <TextBlock Text="{x:Bind Name}" VerticalAlignment="Bottom" HorizontalAlignment="Center"
+                               Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                               TextWrapping="WrapWholeWords" 
+                               FontSize="12" />
+                </Grid>
+                </Border>
+            </ItemContainer>
+        </DataTemplate>
+    </Page.Resources>
+    <Grid>
+        <ItemsView  ItemsSource="{x:Bind ListOfCDs, Mode=TwoWay}" 
+                    ItemTemplate="{StaticResource ImageTemplate}" 
+                    IsItemInvokedEnabled="True"
+                    ItemInvoked="ItemsView_ItemInvoked">
+            <ItemsView.Layout>
+                <ColumnMajorUniformToLargestGridLayout MaxColumns="10"/>
+            </ItemsView.Layout>
+            
+        </ItemsView>
+    </Grid>
+</local:VmPage>

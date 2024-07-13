@@ -2,20 +2,21 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net7.0</TargetFramework>
+    <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="ConsoleGUI" Version="1.4.1" />
-    <PackageReference Include="Microsoft.Extensions.Hosting" Version="7.0.1" />
+    <PackageReference Include="ConsoleGUI" Version="1.4.2" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
+    <PackageReference Include="Sharpcaster" Version="1.1.2" />
     
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AudioCollection\AudioCollection.csproj" />
-    <ProjectReference Include="..\QueueCaster\QueueCaster.csproj" />
+    <ProjectReference Include="..\AudioCollectionImpl\AudioCollectionImpl.csproj" />
+    <ProjectReference Include="..\AudioCollection\AudioCollectionApi.csproj" />
   </ItemGroup>
 
   <ItemGroup>

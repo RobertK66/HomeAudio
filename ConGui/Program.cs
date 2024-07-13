@@ -12,24 +12,26 @@ using System.Threading;
 using System;
 using System.Collections.Generic;
 using ConGui.Controls;
-using AudioCollection;
-using System.Xml.Linq;
-using System.Diagnostics;
 using static ConGui.StaticAudioCollection;
+using AudioCollectionApi;
+using AudioCollectionImpl;
 
 namespace ConGui {
     public class Program : IHostedService, IInputListener {
 
+        private static readonly LogPanel myLogPanel = new();    // This is the component used as Logging target from ConGuiLogger,
         private readonly ILogger<Program> Log;
 
         //private CCStarter myCC;
         private readonly ITabedAudioCollection MyCollection;
+        //private readonly IMediaRepository MyNewCollection;
         private readonly IChromeCastWrapper MyCCW;
 
         public static async Task Main(string[] args) {
             IHostBuilder host = Host.CreateDefaultBuilder(args)
                                     .ConfigureServices((hostContext, services) => {
                                         services.AddSingleton<ITabedAudioCollection, StaticAudioCollection>();
+                                        services.AddSingleton<IMediaRepository, JsonMediaRepository>();
 
                                         // In order to get a hosted service able to be injected in a constructor, we register both a singelton and a service!
                                         services.AddSingleton<IChromeCastWrapper, ChromeCastWrapper>();
@@ -40,7 +42,7 @@ namespace ConGui {
                                     })
                                     .ConfigureLogging((cl) => {
                                         cl.ClearProviders();                // This avoids logging output to console.
-                                        cl.AddConGuiLogger((con) => {       // This adds our LogPanel as possible target (configure in appsettings.json)
+                                        cl.AddConGuiLogger((con) => {       // This adds our LogPanel as possible target (configure log levels in appsettings.json)
                                             con.LogPanel = myLogPanel;
                                         });
                                         cl.AddDebug();                      // This gives Logging in the Debug Console of VS. (configure in appsettings.json)
@@ -52,6 +54,7 @@ namespace ConGui {
             Log = logger;
             Log.LogDebug("Program - Constructor called.");
             MyCollection = audioCollection;
+            //MyNewCollection = nc;
             MyCCW = ccw;
             MyCCW.StatusChanged += MyCC_StatusChanged;
         }
@@ -65,7 +68,7 @@ namespace ConGui {
 
         private Thread? tuiThread;
         private IInputListener[]? input;
-        private static readonly LogPanel myLogPanel = new();
+        //private static readonly LogPanel myLogPanel = new();
         private readonly TabPanel tabPanel = new();
         private readonly TextBlock ccStatusText = new() { Text = "Unknown" };
 
@@ -80,6 +83,8 @@ namespace ConGui {
                 MyCCW.PlayPrev();
             } else if (inputEvent.Key.Key == ConsoleKey.Escape) {
                 MyCCW.Shutdown();
+            } else if (inputEvent.Key.Key == ConsoleKey.P) {
+                MyCCW.Pause();
             }
         }
 
