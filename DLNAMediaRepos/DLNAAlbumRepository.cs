@@ -24,10 +24,10 @@ namespace DLNAMediaRepos {
         DLNAClient client; // = new();
         RadioBrowserClient radioBrowser; //= new();
 
-        private readonly ILogger Log;
+        private readonly ILogger? Log;
         private int IdCnt = 0;
 
-        public DLNAAlbumRepository(ILogger<DLNAAlbumRepository> l) {
+        public DLNAAlbumRepository(ILogger<DLNAAlbumRepository>? l) {
             Log = l;
         }
 
@@ -63,7 +63,7 @@ namespace DLNAMediaRepos {
             client = new DLNAClient();
             client.DLNADevices.CollectionChanged += DLNADevicesFound; 
             int deviceCnt = await client.SearchingDevicesAsync();
-            Log.LogInformation("{deviceCnt} DLNA device(s) found.", deviceCnt);
+            Log?.LogInformation("{deviceCnt} DLNA device(s) found.", deviceCnt);
             return deviceCnt;
         }
 
@@ -113,7 +113,7 @@ namespace DLNAMediaRepos {
             ObservableCollection<Cd> rep = CdRepositories[c.Id];
 
             if (!rep.Where(rcd => cd.Name == rcd.Name).Any()) {
-                Log.LogInformation("+");
+                Log?.LogInformation("+");
                 //Log.LogInformation("{album} reading", cd.Name);
                 await Task.Delay(100);
                 var cdXmlDocument = new XmlDocument();
@@ -150,7 +150,7 @@ namespace DLNAMediaRepos {
                     rep.Add(album);
                 }
             } else {
-                Log.LogInformation(".");
+                Log?.LogInformation(".");
             }
         }
 
@@ -191,14 +191,14 @@ namespace DLNAMediaRepos {
         }
 
         public async Task LoadAllAsync(object PersitenceContext) {
-            Log.LogInformation("DLNA wait for start ...");
+            Log?.LogInformation("DLNA wait for start ...");
             await Task.Delay(100);
             //Log.LogInformation("DLNA starting ...");
             await LoadAlbumsAsync();//.ConfigureAwait(false);
             //var t1 = LoadAlbumsAsync();
             //var t2 = LoadRadioStationsAsync();
             //await Task.WhenAll(t1); //, t2);
-            Log.LogInformation("DLNA ready!!!!");
+            Log?.LogInformation("DLNA ready!!!!");
         }
     }
 }
