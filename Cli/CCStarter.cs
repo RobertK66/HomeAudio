@@ -3,6 +3,7 @@ using Sharpcaster;
 using Sharpcaster.Channels;
 using Sharpcaster.Interfaces;
 using Sharpcaster.Models.Media;
+using Sharpcaster.Models.Queue;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -30,7 +31,7 @@ namespace Cli {
             if (cc != null) {
                 Console.WriteLine("**** Status: " + cc.Status);
 
-                var client = new ChromecastClient(null);
+                var client = new ChromecastClient();
                 var st = await client.ConnectChromecast(cc);
                 st = await client.LaunchApplicationAsync(appId, true);
 
@@ -53,7 +54,7 @@ namespace Cli {
 
         public async Task PlayCdTracks(List<NamedUrl> tracks) {
             if (mediaChannel != null) {
-                Item[]? qi = new Item[tracks.Count];
+                QueueItem[]? qi = new QueueItem[tracks.Count];
                 int i = 0;
                 foreach (var nu in tracks) {
                     var media = new Media {
@@ -62,7 +63,7 @@ namespace Cli {
                         ContentType = "audio/mp4",
                         Metadata = new MediaMetadata() { Title = nu.Name }
                     };
-                    qi[i] = new Item() { Media = media, OrderId = i, StartTime = 0 };
+                    qi[i] = new QueueItem() { Media = media, OrderId = i, StartTime = 0 };
                     i++;
                 }
                 await mediaChannel.QueueLoadAsync(qi);

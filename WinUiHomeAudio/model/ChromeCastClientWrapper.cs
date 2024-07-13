@@ -14,6 +14,7 @@ using Windows.Devices.Radios;
 using Windows.Media.Protection.PlayReady;
 using Sharpcaster;
 using Sharpcaster.Models.Media;
+using Sharpcaster.Models.Queue;
 using Sharpcaster.Models;
 using Sharpcaster.Channels;
 
@@ -186,9 +187,9 @@ namespace WinUiHomeAudio.model {
                 if (ConnectedClient != null) {
                     var mediaChannel = ConnectedClient.GetChannel<MediaChannel>();
                     if (mediaChannel != null) {
-                        var media = new List<Item>();
+                        var media = new List<QueueItem>();
                         foreach (var t in cd.Tracks) {
-                            var qi = new Item() {
+                            var qi = new QueueItem() {
                                 Media = new Media {
                                     ContentUrl = t.ContentUrl,
                                     StreamType = StreamType.Buffered,

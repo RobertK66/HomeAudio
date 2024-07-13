@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
-    <PackageReference Include="Queuecaster" Version="1.0.4" />
+    <PackageReference Include="Sharpcaster" Version="1.1.2" />
   </ItemGroup>
 
   <ItemGroup>
