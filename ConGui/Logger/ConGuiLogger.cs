@@ -34,41 +34,40 @@ namespace ConGui.Logger {
 
             ConGuiLoggerConfiguration config = _getCurrentConfig();
 
-            //LogLevel configured = Microsoft.Extensions.Logging.LogLevel.Information;
-
-            //if (config.LogLevel.ContainsKey("Default")) {
-            //    configured = config.LogLevel["Default"];
-            //}
-            //foreach (var key in config.LogLevel.Keys) {
-            //    if (key.StartsWith(_name)) {                // TODO: make correct hirachy!!!!
-            //        configured = config.LogLevel[key];
-            //    }
-            //}    
-
-            //if (configured <= logLevel) { 
-            string? threadTxt = Thread.CurrentThread.Name;
-            //if (Thread.CurrentThread.IsThreadPoolThread) {
-            //    threadTxt = "TP";
-            //} 
-            //int unmanagedId = AppDomain.GetCurrentThreadId();
-            //ProcessThread? myThread = (from ProcessThread entry in Process.GetCurrentProcess().Threads
-            //                          where entry.Id == unmanagedId
-            //                          select entry).FirstOrDefault();
-            // threadTxt += "-" + Environment.CurrentManagedThreadId.ToString() + " " + unmanagedId.ToString() + ((myThread?.ToString())??"u")  + " ";
-
-            threadTxt += "-" + Environment.CurrentManagedThreadId.ToString() + " ";
-
-            // threadTxt += Thread.CurrentThread.ExecutionContext?.GetType();
-            // threadTxt += "xx";
-            string eventTxt = $"[{logLevel.ToString()}]";
-            
-            if (!String.IsNullOrWhiteSpace(eventId.Name)) {
-                eventTxt += $", [{eventId.Name}]";
+            LogLevel configured = Microsoft.Extensions.Logging.LogLevel.Information;
+            if (config.LogLevel.ContainsKey("Default")) {
+                configured = config.LogLevel["Default"];
             }
-            var mymessage = formatter(state, exception);
-            config.LogPanel?.Add($"{eventTxt}: {_name} - {mymessage}");
+            foreach (var key in config.LogLevel.Keys) {
+                if (key.StartsWith(_name)) {                
+                    configured = config.LogLevel[key];
+                }
+            }
 
-            //}
+            if (configured <= logLevel) { 
+                //string? threadTxt = Thread.CurrentThread.Name;
+                ////if (Thread.CurrentThread.IsThreadPoolThread) {
+                ////    threadTxt = "TP";
+                ////} 
+                ////int unmanagedId = AppDomain.GetCurrentThreadId();
+                ////ProcessThread? myThread = (from ProcessThread entry in Process.GetCurrentProcess().Threads
+                ////                          where entry.Id == unmanagedId
+                ////                          select entry).FirstOrDefault();
+                //// threadTxt += "-" + Environment.CurrentManagedThreadId.ToString() + " " + unmanagedId.ToString() + ((myThread?.ToString())??"u")  + " ";
+
+                //threadTxt += "-" + Environment.CurrentManagedThreadId.ToString() + " ";
+
+                // threadTxt += Thread.CurrentThread.ExecutionContext?.GetType();
+                // threadTxt += "xx";
+                string eventTxt = $"[{logLevel.ToString()}]";
+            
+                if (!String.IsNullOrWhiteSpace(eventId.Name)) {
+                    eventTxt += $", [{eventId.Name}]";
+                }
+                var mymessage = formatter(state, exception);
+                config.LogPanel?.Add($"{eventTxt}: {_name} - {mymessage}");
+
+            }
         }
     }
 }

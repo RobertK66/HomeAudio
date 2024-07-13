@@ -13,7 +13,8 @@ namespace ConGui.Logger {
         //public int EventId { get; set; }
 
         public Dictionary<string, LogLevel> LogLevel { get; set; } = new() {
-            ["Default"] = Microsoft.Extensions.Logging.LogLevel.Error
+            ["Default"] = Microsoft.Extensions.Logging.LogLevel.Trace,
+            ["Sharpcaster.Channels.HeartbeatChannel"] = Microsoft.Extensions.Logging.LogLevel.Error
         };
     }
 }

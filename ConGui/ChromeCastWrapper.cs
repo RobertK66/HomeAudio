@@ -11,6 +11,7 @@ using Sharpcaster.Messages.Receiver;
 using Sharpcaster.Models;
 using Sharpcaster.Models.ChromecastStatus;
 using Sharpcaster.Models.Media;
+using Sharpcaster.Models.Queue;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -113,7 +114,7 @@ namespace ConGui {
         }
 
         private async void Locator_ChromecastReceivedFound(object? sender, ChromecastReceiver e) {
-            Log.LogDebug("found {name}", e.Name);
+            Log.LogDebug("found {name} {uri}", e.Name, e.DeviceUri);
             Receivers.Add(e);
 
             if (ConnectedClient == null) {
@@ -285,7 +286,7 @@ namespace ConGui {
         public async Task<MediaStatus?> PlayCdTracks(List<(string url, string name)> tracks) {
             MediaStatus? status = null;
             if (mediaChannel != null) {
-                Item[]? qi = new Item[tracks.Count];
+                QueueItem[]? qi = new QueueItem[tracks.Count];
                 int i = 0;
                 foreach (var (url, name) in tracks) {
                     var media = new Media {
@@ -294,7 +295,7 @@ namespace ConGui {
                         ContentType = "audio/mp4",
                         Metadata = new MediaMetadata() { Title = name }
                     };
-                    qi[i] = new Item() { Media = media, OrderId = i, StartTime = 0 };
+                    qi[i] = new QueueItem() { Media = media, OrderId = i, StartTime = 0 };
                     i++;
                 }
                 Log.LogDebug("Queueing {trackCnt} tracks.", qi.Length);

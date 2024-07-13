@@ -51,11 +51,12 @@ namespace TestServers {
                 return filtered;
             });
 
-
+            Task.Delay(2000);
 
             var sd = new ServiceDiscovery(mdns);
-            var sp = new ServiceProfile("googlecast", "_googlecast._tcp", port);
-            sp.AddProperty("fn", "Buero");
+            var sp = new ServiceProfile("googlecast", "_googlecast._tcp", port, new List<IPAddress>() { ipa });
+            Console.WriteLine("service profile content:" + ipa.ToString());
+            sp.AddProperty("fn", "XBuero");
             sp.AddProperty("md", "MyModel");
             sp.AddProperty("ve", "my vers");
             sp.AddProperty("rs", "my status");
@@ -81,8 +82,10 @@ namespace TestServers {
 
                 while (true) {
                     TcpClient client = listener.AcceptTcpClient();
-                    CcStub cc = new();
-                    Task.Run(() => cc.ProcessClient(client));
+                    Console.WriteLine("client arrived " + client.ToString());
+                    //CcStub cc = new();
+
+                    //Task.Run(() => cc.ProcessClient(client));
                 }
 
             } catch (Exception e) {

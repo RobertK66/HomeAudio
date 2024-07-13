@@ -19,6 +19,7 @@ namespace TestServers {
         private bool processing = false;
 
         public async void ProcessClient(TcpClient client) {
+            Console.WriteLine("process client.");
             if (!processing) {
                 processing = true;
                 Console.WriteLine("Connection accepted.");
