@@ -12,9 +12,9 @@ namespace ConGui.Logger {
         public LogPanel? LogPanel { get; set; } = null;
         //public int EventId { get; set; }
 
+        // This dictionary is only used if nothing is configured at all somewhere else (e.g. in appsettings.json)
         public Dictionary<string, LogLevel> LogLevel { get; set; } = new() {
-            ["Default"] = Microsoft.Extensions.Logging.LogLevel.Trace,
-            ["Sharpcaster.Channels.HeartbeatChannel"] = Microsoft.Extensions.Logging.LogLevel.Error
+            ["Default"] = Microsoft.Extensions.Logging.LogLevel.Information,
         };
     }
 }

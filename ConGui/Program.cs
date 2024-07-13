@@ -19,6 +19,7 @@ using AudioCollectionImpl;
 namespace ConGui {
     public class Program : IHostedService, IInputListener {
 
+        private static readonly LogPanel myLogPanel = new();    // This is the component used as Logging target from ConGuiLogger,
         private readonly ILogger<Program> Log;
 
         //private CCStarter myCC;
@@ -41,7 +42,7 @@ namespace ConGui {
                                     })
                                     .ConfigureLogging((cl) => {
                                         cl.ClearProviders();                // This avoids logging output to console.
-                                        cl.AddConGuiLogger((con) => {       // This adds our LogPanel as possible target (configure in appsettings.json)
+                                        cl.AddConGuiLogger((con) => {       // This adds our LogPanel as possible target (configure log levels in appsettings.json)
                                             con.LogPanel = myLogPanel;
                                         });
                                         cl.AddDebug();                      // This gives Logging in the Debug Console of VS. (configure in appsettings.json)
@@ -67,7 +68,7 @@ namespace ConGui {
 
         private Thread? tuiThread;
         private IInputListener[]? input;
-        private static readonly LogPanel myLogPanel = new();
+        //private static readonly LogPanel myLogPanel = new();
         private readonly TabPanel tabPanel = new();
         private readonly TextBlock ccStatusText = new() { Text = "Unknown" };
 
