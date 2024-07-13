@@ -1,4 +1,4 @@
-name: Build and Test HomeAudio
+name: Build ConGui for Win&Linux
 
 on:
   #push:
