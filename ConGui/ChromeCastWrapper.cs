@@ -85,9 +85,9 @@ namespace ConGui {
 
         public event EventHandler? StatusChanged;
 
-        //private StatusChannel<MediaStatusMessage, IEnumerable<MediaStatus>>? mediaStatusChannel = null;
-
-
+        private CancellationTokenSource CancelReceiversTask;
+        private IChromecastLocator locator;
+   
         public ChromeCastWrapper(IConfiguration conf, ILoggerFactory logFactory) { 
             this.loggerFactory = logFactory;
             Log = logFactory.CreateLogger<ChromeCastWrapper>();
@@ -99,14 +99,15 @@ namespace ConGui {
             Log.LogDebug("using cc filter:{name}* and appId {appId}", ccName , appId);
         }
 
-        //private IChromecastLocator locator = new Sharpcaster.MdnsChromecastLocator();
 
         public Task StartAsync(CancellationToken cancellationToken) {
             Log.LogDebug("StartAsync called");
 
-            IChromecastLocator locator = new Sharpcaster.MdnsChromecastLocator();
+            locator = new Sharpcaster.MdnsChromecastLocator();
             locator.ChromecastReceivedFound += Locator_ChromecastReceivedFound;
-            _ = locator.FindReceiversAsync(CancellationToken.None);         // Fire the search process and wait for receiver found events!
+
+            CancelReceiversTask = new CancellationTokenSource();
+            _ = locator.FindReceiversAsync(CancelReceiversTask.Token);      // Fire the search process and wait for receiver found events!
 
             //Receivers = (await locator.FindReceiversAsync()).ToList();    // This blocks for 2000ms here!
             //Log.LogDebug("found " + Receivers.Count() + " receivers.");
@@ -121,6 +122,9 @@ namespace ConGui {
                 if (e.Name.StartsWith(ccName, StringComparison.OrdinalIgnoreCase)) {
                     Log.LogDebug("{name}[{status}] fits the filter -> connect client", e.Name, e.Status);
                     await ConnectNewClient(e);
+                    await CancelReceiversTask.CancelAsync();
+                    locator.ChromecastReceivedFound -= Locator_ChromecastReceivedFound;
+                    Log.LogDebug("Canceled the Receiver search Task");
                 }
             }
 
@@ -128,7 +132,7 @@ namespace ConGui {
 
 
         private async Task ConnectNewClient(ChromecastReceiver e) {
-            ConnectedClient = new ChromecastClient(loggerFactory: loggerFactory); 
+            ConnectedClient = new ChromecastClient(loggerFactory); 
 
             var st = await ConnectedClient.ConnectChromecast(e);
             Log.LogDebug("Connected available App[0]: {appid}", (((st?.Applications?.Count??0) > 0)? st?.Applications[0].AppId : "<null>"));
