@@ -42,12 +42,12 @@ jobs:
           # Pack files
           if [ "${{ matrix.target }}" == "win-x64" ]; then
             # Pack to zip for Windows
-            7z a -tzip "${release_name}.zip" "./myX64/*"
+            7z a -tzip "${release_name}.zip" "./win/*"
           else
-          tar czvf "${release_name}.tar.gz" "mylx"
+          tar czvf "${release_name}.tar.gz" "lux"
           fi
           # Delete output directory
-          rm -r "mylx"
+          rm -r "lux"
     - uses: actions/upload-artifact@v3
       with:
         name: dev-build
