@@ -32,7 +32,7 @@ jobs:
         dotnet-version: 8.0.x
     - name: build with publish profile
       run: dotnet publish ConGui/ConGui.csproj ${{matrix.options}}
-    - name: Build
+    - name: Zip published dir
       shell: bash
       run: |
           tag="Dev"
