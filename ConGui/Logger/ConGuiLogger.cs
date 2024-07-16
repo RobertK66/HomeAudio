@@ -39,8 +39,9 @@ namespace ConGui.Logger {
                 configured = config.LogLevel["Default"];
             }
             foreach (var key in config.LogLevel.Keys) {
-                if (key.StartsWith(_name)) {                
+                if (_name.StartsWith(key)) {                
                     configured = config.LogLevel[key];
+                    break;
                 }
             }
 

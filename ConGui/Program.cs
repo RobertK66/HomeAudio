@@ -15,6 +15,7 @@ using ConGui.Controls;
 using static ConGui.StaticAudioCollection;
 using AudioCollectionApi;
 using AudioCollectionImpl;
+using System.Reflection;
 
 namespace ConGui {
     public class Program : IHostedService, IInputListener {
@@ -52,7 +53,9 @@ namespace ConGui {
 
         public Program(ILogger<Program> logger, ITabedAudioCollection audioCollection, IChromeCastWrapper ccw) {
             Log = logger;
-            Log.LogDebug("Program - Constructor called.");
+
+            
+            Log.LogDebug("Running '" + Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyProductAttribute>()?.Product +"' from " + Assembly.GetExecutingAssembly().GetName());
             MyCollection = audioCollection;
             //MyNewCollection = nc;
             MyCCW = ccw;
