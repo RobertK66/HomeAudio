@@ -52,5 +52,5 @@ jobs:
     - uses: actions/upload-artifact@v3
       with:
         name: dev-build
-        path: App*
+        path: ConGui/bin/Release/net8.0/publish/App*
     
