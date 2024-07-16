@@ -48,8 +48,6 @@ jobs:
           ls
           tar czvf "${release_name}.tar.gz" "ConGui/bin/Release/net8.0/publish/lux"
           fi
-          # Delete output directory
-          rm -r "lux"
     - uses: actions/upload-artifact@v3
       with:
         name: dev-build
