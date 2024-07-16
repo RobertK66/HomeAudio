@@ -37,16 +37,17 @@ jobs:
       run: |
           tag="Dev"
           release_name="App-$tag-${{ matrix.target }}"
+          cd ConGui/bin/Release/net8.0/publish/
           # Build everything
           # dotnet publish ConGui/ConGui.csproj --framework net7.0 --self-contained --runtime "${{ matrix.target }}" -c Release -o "$release_name" "${{ matrix.options }}"
           # Pack files
           if [ "${{ matrix.target }}" == "win-x64" ]; then
             # Pack to zip for Windows
             dir
-            7z a -tzip "${release_name}.zip" "./ConGui/bin/Release/net8.0/publish/win/*"
+            7z a -tzip "${release_name}.zip" "./win/*"
           else
             ls
-            tar czvf "${release_name}.tar.gz" "ConGui/bin/Release/net8.0/publish/lux"
+            tar czvf "${release_name}.tar.gz" "lux"
           fi
     - uses: actions/upload-artifact@v3
       with:
