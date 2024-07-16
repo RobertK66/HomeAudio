@@ -5,6 +5,8 @@ on:
   #  branches: [ main ]
   #pull_request:
   #  branches: [ main ]
+  release:
+    types: [published]
   workflow_dispatch:
 
 jobs:
@@ -54,3 +56,14 @@ jobs:
         name: dev-build
         path: ConGui/bin/Release/net8.0/publish/App*
     
+    - name: make release
+      if: github.event_name == 'release' && github.event.action == 'published'
+      uses: softprops/action-gh-release@v1
+      with:
+          files: "ConGui/bin/Release/net8.0/publish/App*"
+      env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
+
+
