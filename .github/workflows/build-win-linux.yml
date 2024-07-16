@@ -31,7 +31,7 @@ jobs:
       with:
         dotnet-version: 8.0.x
     - name: build with publish profile
-      run: dotnet publish ConGui/ConGui.csproj ${{matrix.option}}
+      run: dotnet publish ConGui/ConGui.csproj ${{matrix.options}}
     - name: Build
       shell: bash
       run: |
