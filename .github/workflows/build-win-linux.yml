@@ -18,11 +18,11 @@ jobs:
             - kind: linux
               os: ubuntu-latest
               target: linux-x64
-              options: /p:PublishProfile="FolderProfileLinux.pubxml"
+              options: /p:PublishProfile="FolderProfileLinux" /p:PublishProfileRootFolder="ConGui/Properties/PublishProfiles"
             - kind: windows
               os: windows-latest
               target: win-x64
-              options: /p:PublishProfile="FolderProfileWin.pubxml"
+              options: /p:PublishProfile="FolderProfileWin" /p:PublishProfileRootFolder="ConGui/Properties/PublishProfiles"
 
     steps:
     - uses: actions/checkout@v3
