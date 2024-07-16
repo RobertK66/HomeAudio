@@ -42,9 +42,11 @@ jobs:
           # Pack files
           if [ "${{ matrix.target }}" == "win-x64" ]; then
             # Pack to zip for Windows
-            7z a -tzip "${release_name}.zip" "./win/*"
+            dir
+            7z a -tzip "${release_name}.zip" "./publish/win/*"
           else
-          tar czvf "${release_name}.tar.gz" "lux"
+          ls
+          tar czvf "${release_name}.tar.gz" "publish/lux"
           fi
           # Delete output directory
           rm -r "lux"
