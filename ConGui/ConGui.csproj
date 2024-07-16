@@ -20,10 +20,6 @@
     <ProjectReference Include="..\AudioCollection\AudioCollectionApi.csproj" />
   </ItemGroup>
 
-	<PropertyGroup>
-		<PublishProfileRootFolder>$(MSBuildProjectDirectory)\ConGui\Properties\PublishProfiles</PublishProfileRootFolder>
-	</PropertyGroup>
-
 	<ItemGroup>
     <None Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
