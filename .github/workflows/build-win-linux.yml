@@ -43,10 +43,10 @@ jobs:
           if [ "${{ matrix.target }}" == "win-x64" ]; then
             # Pack to zip for Windows
             dir
-            7z a -tzip "${release_name}.zip" "./publish/win/*"
+            7z a -tzip "${release_name}.zip" ".ConGui/bin/Release/net8.0/publish/win/*"
           else
           ls
-          tar czvf "${release_name}.tar.gz" "publish/lux"
+          tar czvf "${release_name}.tar.gz" "ConGui/bin/Release/net8.0/publish/lux"
           fi
           # Delete output directory
           rm -r "lux"
