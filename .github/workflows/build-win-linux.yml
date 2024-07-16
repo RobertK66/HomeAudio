@@ -18,11 +18,11 @@ jobs:
             - kind: linux
               os: ubuntu-latest
               target: linux-x64
-              options: /p:PublishSingleFile=true
+              options: /p:PublishProfile="FolderProfile"
             - kind: windows
               os: windows-latest
               target: win-x64
-              options: '/p:PublishSingleFile=true'
+              options: /p:PublishProfile="FolderProfile"
 
     steps:
     - uses: actions/checkout@v3
@@ -31,14 +31,14 @@ jobs:
       with:
         dotnet-version: 8.0.x
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet publih ConGui.csproj ${{matrix.option}}
     - name: Build
       shell: bash
       run: |
           tag="Dev"
           release_name="App-$tag-${{ matrix.target }}"
           # Build everything
-          dotnet publish ConGui/ConGui.csproj --framework net7.0 --self-contained --runtime "${{ matrix.target }}" -c Release -o "$release_name" "${{ matrix.options }}"
+          # dotnet publish ConGui/ConGui.csproj --framework net7.0 --self-contained --runtime "${{ matrix.target }}" -c Release -o "$release_name" "${{ matrix.options }}"
           # Pack files
           if [ "${{ matrix.target }}" == "win-x64" ]; then
             # Pack to zip for Windows
