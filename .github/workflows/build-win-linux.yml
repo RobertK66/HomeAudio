@@ -18,11 +18,11 @@ jobs:
             - kind: linux
               os: ubuntu-latest
               target: linux-x64
-              options: /p:PublishProfile="FolderProfile"
+              options: /p:PublishProfile="FolderProfileLinux" /p:PublishProfileRootFolder="Properties/PublishProfiles"
             - kind: windows
               os: windows-latest
               target: win-x64
-              options: /p:PublishProfile="FolderProfile"
+              options: /p:PublishProfile="FolderProfileWin" /p:PublishProfileRootFolder="Properties/PublishProfiles"
 
     steps:
     - uses: actions/checkout@v3
@@ -42,12 +42,12 @@ jobs:
           # Pack files
           if [ "${{ matrix.target }}" == "win-x64" ]; then
             # Pack to zip for Windows
-            7z a -tzip "${release_name}.zip" "./${release_name}/*"
+            7z a -tzip "${release_name}.zip" "./myX64/*"
           else
-          tar czvf "${release_name}.tar.gz" "$release_name"
+          tar czvf "${release_name}.tar.gz" "mylx"
           fi
           # Delete output directory
-          rm -r "$release_name"
+          rm -r "mylx"
     - uses: actions/upload-artifact@v3
       with:
         name: dev-build
