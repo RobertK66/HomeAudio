@@ -31,7 +31,7 @@ jobs:
       with:
         dotnet-version: 8.0.x
     - name: Restore dependencies
-      run: dotnet publish ConGui.csproj ${{matrix.option}}
+      run: dotnet publish HomeAudio/ConGui/ConGui.csproj ${{matrix.option}}
     - name: Build
       shell: bash
       run: |
