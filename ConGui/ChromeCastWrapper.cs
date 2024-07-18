@@ -115,7 +115,7 @@ namespace ConGui {
         }
 
         private async void Locator_ChromecastReceivedFound(object? sender, ChromecastReceiver e) {
-            Log.LogDebug("found {name} {uri}", e.Name, e.DeviceUri);
+            Log.LogInformation("found '{name}' at {uri}", e.Name, e.DeviceUri);
             Receivers.Add(e);
 
             if (ConnectedClient == null) {
@@ -135,7 +135,7 @@ namespace ConGui {
             ConnectedClient = new ChromecastClient(loggerFactory); 
 
             var st = await ConnectedClient.ConnectChromecast(e);
-            Log.LogDebug("Connected available App[0]: {appid}", (((st?.Applications?.Count??0) > 0)? st?.Applications[0].AppId : "<null>"));
+            Log.LogInformation("Connected available App[0]: {appid} at '{name}'", (((st?.Applications?.Count??0) > 0)? st?.Applications[0].AppId : "<null>"), e.Name);
             mediaChannel = ConnectedClient.GetChannel<MediaChannel>();
             if (mediaChannel != null) {
                 mediaChannel.StatusChanged += MediaChannel_StatusChanged;
@@ -202,7 +202,7 @@ namespace ConGui {
                             }
                         }
                         StatusChanged?.Invoke(this, new CCWStatusEventArgs(rcChannel?.Status, item, currentFirstTrack, currentLastTrack));
-                        Log.LogDebug("Media-SessionId: {MediaSessionId} {PlayerState} id: {CurrentItemId} at {CurrentTime}",
+                        Log.LogInformation("Media-SessionId: {MediaSessionId} {PlayerState} id: {CurrentItemId} at {CurrentTime}",
                                      item.MediaSessionId,
                                      item.PlayerState,
                                      item.CurrentItemId,
@@ -217,7 +217,7 @@ namespace ConGui {
 
             currentVolume = rcChannel?.Status.Volume.Level;
             StatusChanged?.Invoke(this, new CCWStatusEventArgs(rcChannel?.Status, currentMediaStatus, currentFirstTrack, currentLastTrack));
-            Log.LogDebug("StatusChanged Vol: {volume}", currentVolume);
+            Log.LogInformation("StatusChanged Vol: {volume}", currentVolume);
         }
 
         public Task StopAsync(CancellationToken cancellationToken) {

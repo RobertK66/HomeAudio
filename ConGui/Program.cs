@@ -55,7 +55,7 @@ namespace ConGui {
             Log = logger;
 
             
-            Log.LogDebug("Running '" + Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyProductAttribute>()?.Product +"' from " + Assembly.GetExecutingAssembly().GetName());
+            Log.LogInformation("Running '" + Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyProductAttribute>()?.Product +"' from " + Assembly.GetExecutingAssembly().GetName());
             MyCollection = audioCollection;
             //MyNewCollection = nc;
             MyCCW = ccw;
@@ -93,7 +93,7 @@ namespace ConGui {
 
         public Task StartAsync(CancellationToken cancellationToken) {
             myLogPanel.Lock = this;
-            Log.LogInformation("Program.StartAsync() called.");
+            Log.LogDebug("Program.StartAsync() called.");
 
             Monitor.Enter(this);
             ConsoleManager.Setup();
@@ -134,7 +134,7 @@ namespace ConGui {
             };
             tuiThread.Start();
 
-            Log.LogInformation("Program.StartAsync() finished.");
+            Log.LogDebug("Program.StartAsync() finished.");
             return Task.CompletedTask;
         }
 
