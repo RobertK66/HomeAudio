@@ -16,6 +16,7 @@ namespace AudioCollectionApi
 
         //void LoadAll(object PersitenceContext);
         Task LoadAllAsync(object PersitenceContext);
+        //Task<int> LoadRadioStationsAsync();
 
         ObservableCollection<Cd> GetCdRepository(string collectionid);
         ObservableCollection<NamedUrl> GetRadioRepository(string collectionid);

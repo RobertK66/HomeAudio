@@ -1,7 +1,6 @@
 ﻿using AudioCollectionApi;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using Sharpcaster.Models.Media;
 using System;
 using System.Collections.Generic;

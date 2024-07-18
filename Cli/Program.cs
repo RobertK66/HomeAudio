@@ -3,10 +3,6 @@ using DLNAMediaRepos;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Newtonsoft.Json;
-using System.Diagnostics;
-using System.Text.Json;
-using System.Xml.Linq;
 
 namespace Cli {
     public class Program : IHostedService {
@@ -58,13 +54,14 @@ namespace Cli {
 
             // Start the Caster connect ...
             CCStarter ccs = new(ccName, appId);
-            var waitForCaster = ccs.Connect();
+            await ccs.Connect();
+            //var waitForCaster = 
 
             // Start the DLNA Search ...
             IMediaRepository DlnaRepos2 = new DLNAAlbumRepository(null);
-            await DlnaRepos2.LoadAllAsync(true);
+
             //var waitForAlbums = DlnaRepos2.LoadAlbumsAsync();
-            //var waitForRadioStations = DlnaRepos2.LoadRadioStationsAsync();
+            //await DlnaRepos2.LoadRadioStationsAsync();
 
 
             if (qcCommand == "playCd") {
@@ -78,7 +75,7 @@ namespace Cli {
                     }
                 }
             } else if (qcCommand == "playRadio") {
-                //await Task.WhenAll(waitForCaster); //, waitForRadioStations);
+                //await Task.WhenAll(waitForRadioStations); //Task.WhenAll(waitForCaster); //, waitForRadioStations);
                 var cat = DlnaRepos2.GetRadioCategories().FirstOrDefault();
                 if (cat != null) {
                     var media = DlnaRepos2.GetRadioRepository(cat.Id).ElementAtOrDefault(playIdx);
@@ -87,10 +84,10 @@ namespace Cli {
                     }
                 }
             } else if (qcCommand == "next") {
-                await waitForCaster;
+                //await waitForCaster;
                 _ = await ccs.PlayNext();
             } else if (qcCommand == "prev") {
-                await waitForCaster;
+                //await waitForCaster;
                 _ = await ccs.PlayPrev();
             } else if (qcCommand == "writeCd") {
                 //await Task.WhenAll(waitForAlbums);
@@ -114,7 +111,7 @@ namespace Cli {
                         CdArray.SetValue(alb, albumIdx++);
                     }
                     var CdRepos = new { CdRepos = CdArray };
-                    string albj = JsonConvert.SerializeObject(CdRepos, Formatting.Indented);
+                    string albj = ""; // JsonConvert.SerializeObject(CdRepos, Formatting.Indented);
                     File.WriteAllText(outPath, albj);
                 }
             } else if (qcCommand == "writeRadio") {
@@ -129,7 +126,7 @@ namespace Cli {
                         StationArray.SetValue(new { s.Name, s.ContentUrl }, idx++);
                     }
                     var WebRadio = new { WebRadio = StationArray };
-                    string radj = JsonConvert.SerializeObject(WebRadio, Formatting.Indented);
+                    string radj = "";// JsonConvert.SerializeObject(WebRadio, Formatting.Indented);
                     File.WriteAllText(outPath, radj);
                 }
             }
