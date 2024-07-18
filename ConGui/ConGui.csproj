@@ -12,7 +12,7 @@
   <ItemGroup>
     <PackageReference Include="ConsoleGUI" Version="1.4.2" />
 	<PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
-	<PackageReference Include="SharpCaster" Version="1.1.15" />
+	<PackageReference Include="SharpCaster" Version="1.1.17" />
     <PackageReference Include="System.Text.Json" Version="8.0.4" />         <!-- fix https://github.com/advisories/GHSA-hh2w-p6rv-4g7w Vulnerability -->
   </ItemGroup>
 
