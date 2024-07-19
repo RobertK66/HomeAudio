@@ -80,7 +80,7 @@ namespace Cli {
                 IEnumerable<MediaCategory> radioCategories  = DlnaRepos2.GetRadioCategories();
                 var cat = radioCategories.ElementAtOrDefault(5);
                 if ((cat != null)) {
-                    var media = cat.Entries.FirstOrDefault();
+                    var media = DlnaRepos2.GetRadioRepository(cat.Id).FirstOrDefault();
                     if (!string.IsNullOrEmpty(media?.ContentUrl)) {
                         await ccs.PlayLive(media.ContentUrl, media.Name);
                     }

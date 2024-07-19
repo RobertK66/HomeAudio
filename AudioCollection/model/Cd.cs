@@ -2,6 +2,7 @@
 using AudioCollectionApi.model;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Text;
@@ -29,12 +30,17 @@ namespace AudioCollectionApi {
 
         //public IEnumerator<IMedia> GetContent() => Tracks.GetEnumerator();
 
+
+        [SetsRequiredMembers]
         public Cd(string Id) {
             CDID = Id;
+            Name = ".";
         }
 
+        [SetsRequiredMembers]
         public Cd() {
             CDID = $"<unknown_"+(UnknownIdCont++)+">";
+            Name = ".";
         }
     }
 }

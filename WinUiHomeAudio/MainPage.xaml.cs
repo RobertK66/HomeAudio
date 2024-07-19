@@ -36,11 +36,11 @@ namespace WinUiHomeAudio {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public ObservableCollection<Category> Categories = new();
-        public ObservableCollection<Category> FooterCategories = new();
+        public ObservableCollection<Category> Categories = [];
+        public ObservableCollection<Category> FooterCategories = [];
 
         private ChromeCastRepository _ccRepos;
-        public ChromeCastRepository ccRepos { get { return _ccRepos; } set { if (_ccRepos != value) { _ccRepos = value; RaisePropertyChanged(); } } }
+        public ChromeCastRepository CcRepos { get { return _ccRepos; } set { if (_ccRepos != value) { _ccRepos = value; RaisePropertyChanged(); } } }
 
 
         private ChromeCastClientWrapper? _SelectedChromecast;
@@ -48,7 +48,7 @@ namespace WinUiHomeAudio {
                                                              set { if (_SelectedChromecast != value) {
                                                                        _SelectedChromecast = value;
                                                                        RaisePropertyChanged();
-                                                                       ccRepos.SetActiveClient(value);
+                                                                       CcRepos.SetActiveClient(value);
                                                                    } 
                                                              } }
 
@@ -121,7 +121,7 @@ namespace WinUiHomeAudio {
             }
         }
 
-        public void ccPlayer_ConnectToggeled(object sender, RoutedEventArgs e) {
+        public void CcPlayer_ConnectToggeled(object sender, RoutedEventArgs e) {
             if (sender is FrameworkElement p) {
                 if (p.DataContext is ChromeCastClientWrapper ccw) {
                     if (ccw.IsConnected != (e.OriginalSource as ToggleSwitch)?.IsOn) {
@@ -129,7 +129,7 @@ namespace WinUiHomeAudio {
                         if (ccw.IsConnected) {
                             ccw.Disconnect();
                         } else {
-                            _ = ccw.TryConnectAsync(ccRepos._appId);
+                            _ = ccw.TryConnectAsync(CcRepos._appId);
                         }
 
                     }
@@ -137,11 +137,10 @@ namespace WinUiHomeAudio {
             }
         }
 
-        private void Stop_Click(object sender, RoutedEventArgs e) {
+        private async void Stop_Click(object sender, RoutedEventArgs e) {
             if (sender is FrameworkElement p) {
                 if (p.DataContext is ChromeCastClientWrapper ccw) {
-                    ccw.StopMediaPlay();
-
+                    await ccw.StopMediaPlay();
                 }
             }
         }

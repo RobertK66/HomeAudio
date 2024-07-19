@@ -46,7 +46,7 @@
                     <RowDefinition  Height="*"/>
                 </Grid.RowDefinitions>
 
-                <ComboBox ItemsSource="{x:Bind Path=ccRepos.KnownChromecasts}"
+                <ComboBox ItemsSource="{x:Bind Path=CcRepos.KnownChromecasts}"
                           SelectedItem="{x:Bind Path=SelectedChromecast , Mode=TwoWay}"
                           >
                     <ComboBox.ItemTemplate>
@@ -57,7 +57,7 @@
                                         BorderThickness="2">
                                     <StackPanel Orientation="Horizontal" Padding="4,0,4,0">
                                         <ToggleSwitch x:Name="ConnectToggle"
-                                                      Toggled="ccPlayer_ConnectToggeled"
+                                                      Toggled="CcPlayer_ConnectToggeled"
                                                       Width="120"
                                                       MinWidth="0"
                                                       OnContent="Connected"

@@ -83,7 +83,7 @@ namespace AudioCollectionImpl
                         foreach (var item in cont) {
                             var media = item as IMedia;
                             if (media != null) {
-                                cat.Entries.Add(media);
+                                //cat.Entries.Add(media);
                                 rep.Add(media);
                             }
                         }

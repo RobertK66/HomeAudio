@@ -26,6 +26,7 @@ using Sharpcaster.Interfaces;
 using System.Threading;
 using Windows.Storage;
 using DLNAMediaRepos;
+using Sharpcaster;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -39,12 +40,12 @@ namespace WinUiHomeAudio {
     /// </summary>
     public partial class App : Application {
 
-        public static IHost Host = ((App)App.Current).MyHost;
+        public static readonly IHost Host = ((App)App.Current).MyHost;
 
         public readonly IHost MyHost;
         private readonly ILogger<App> Log;
 
-        private MainWindow m_window;
+        private MainWindow? m_window;
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
@@ -83,7 +84,7 @@ namespace WinUiHomeAudio {
             // if not done already, copy the provided examples to current executable path. 
             //string? fullpath = System.Reflection.Assembly.GetEntryAssembly()?.Location;
             if (System.Reflection.Assembly.GetEntryAssembly()?.Location is string fullpath) {
-                string path = fullpath.Substring(0, fullpath.LastIndexOf("\\"));
+                string path = fullpath[..fullpath.LastIndexOf('\\')];
 
                 if (!File.Exists(ApplicationData.Current.LocalFolder.Path + "\\Cds.json")) {
                     System.IO.File.Copy(path + "\\Cds.json", ApplicationData.Current.LocalFolder.Path + "\\Cds.json", true);
@@ -96,7 +97,7 @@ namespace WinUiHomeAudio {
 
             try {
                 // start the search for CC Receivers in local network
-                IChromecastLocator locator = new Sharpcaster.MdnsChromecastLocator();
+                MdnsChromecastLocator locator = new();
                 locator.ChromecastReceivedFound += Locator_ChromecastReceivedFound;
                 _ = locator.FindReceiversAsync(CancellationToken.None);          // Fire the search process and wait for receiver found events in the handler. No await here!
             } catch (Exception ex) {
@@ -116,7 +117,11 @@ namespace WinUiHomeAudio {
             if (!String.IsNullOrEmpty(appSettings.AutoConnectName) && e.Name.StartsWith(appSettings.AutoConnectName)) {
                 Log.LogInformation("Initiate AutoConnect for Receiver '{CcrName}'", e.Name);
                 _ = ccr.TryConnectAsync(ccc);
-                m_window.MainPage.SelectedChromecast = ccc;
+
+                if (m_window != null) {
+                    m_window.MainPage.SelectedChromecast = ccc;
+                }
+                    
             }
 
         }

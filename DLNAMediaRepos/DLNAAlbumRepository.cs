@@ -49,8 +49,8 @@ namespace DLNAMediaRepos {
                     } 
                     ObservableCollection<NamedUrl> rep = RadioRepositories[cat.Id];
                     if (!rep.Where(r => r.Name == st.Name).Any()) {
-                        var entry = new NamedUrl(name: st.Name, contentUrl: st.Url.ToString());
-                        cat.Entries.Add(entry);
+                        var entry = new NamedUrl(st.Name, st.Url.ToString());
+                        //cat.Entries.Add(entry);
                         rep.Add(entry);
                     }
 
@@ -126,7 +126,7 @@ namespace DLNAMediaRepos {
                 string art = artist?.InnerText ?? string.Empty;
                 var picpath = cdXmlDocument.GetElementsByTagName("upnp:albumArtURI").Item(0)?.FirstChild?.Value;
 
-                Cd album = new () { Name = cd.Name, Artist = art, Picpath = picpath };
+                Cd album = new Cd() { Name = cd.Name, Artist = art, Picpath = picpath };
 
                 int trackStart = 2;         // Starting second of track 1
                 int XX = 0;                 // Sum of starting seconds
@@ -139,7 +139,7 @@ namespace DLNAMediaRepos {
                     var ds = r.Attributes["duration"].Value;
                     XX += trackStart;
                     if (r != null) {
-                        album.Tracks.Add(new NamedUrl(name: track.Name,contentUrl: r.InnerText));
+                        album.Tracks.Add(new NamedUrl(name: track.Name??"cc",contentUrl: r.InnerText??"xx"));
                     }
                     if (TimeSpan.TryParse(ds, CultureInfo.InvariantCulture, out TimeSpan result)) {
                         trackStart += (int)result.TotalSeconds;             // Start second of next track

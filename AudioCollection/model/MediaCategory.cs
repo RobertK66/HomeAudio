@@ -10,7 +10,7 @@ namespace AudioCollectionApi {
         public string Id { get; private set; }
         public string? Name { get; set; }
         //public bool IsCollection => true;
-        public List<IMedia> Entries { get; set; } = new List<IMedia>();
+        //public List<IMedia> Entries { get; set; } = new List<IMedia>();
 
         //public IList<IMedia> Content => Entries;
 

@@ -10,8 +10,7 @@ using System.Threading.Tasks;
 
 namespace AudioCollectionApi
 {
-    public interface IMediaRepository
-    {
+    public interface IMediaRepository {
         //void AddCdRepos(string collectionid, string path);
         //void AddRadioRepos(string collectionid, string path);
 

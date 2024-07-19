@@ -17,7 +17,7 @@ namespace AudioCollectionImpl.Test {
             await repos.LoadAllAsync("./data");
             Assert.Equal(3, repos.GetCategories().Count);
             var cat1 = repos.GetCategories().First();
-            Assert.Equal(4, cat1.Entries.Count);
+            Assert.Equal(4, repos.GetMediaRepository(cat1.Id).Count);
         }
     }
 }
