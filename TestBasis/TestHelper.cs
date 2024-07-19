@@ -23,7 +23,7 @@ namespace TestBasis {
                 It.IsAny<EventId>(),
                 It.IsAny<It.IsAnyType>(),
                 It.IsAny<Exception>(),
-                (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()))
+                (Func<It.IsAnyType, Exception?, string>)It.IsAny<object>()))
                 .Callback(new InvocationAction(invocation => {
                     var logLevel = (LogLevel)invocation.Arguments[0]; // The first two will always be whatever is specified in the setup above
                     var eventId = (EventId)invocation.Arguments[1];  // so I'm not sure you would ever want to actually use them
@@ -32,7 +32,7 @@ namespace TestBasis {
                     var formatter = invocation.Arguments[4];
 
                     var invokeMethod = formatter.GetType().GetMethod("Invoke");
-                    var logMessage = (string)invokeMethod?.Invoke(formatter, new[] { state, exception });
+                    var logMessage = (string)((invokeMethod?.Invoke(formatter, new[] { state, exception }))??"no invoke method found");
 
                     var testingName = typeof(T).GetGenericArguments().FirstOrDefault()?.Name;
 
@@ -46,7 +46,7 @@ namespace TestBasis {
         }
 
 
-        public ILoggerFactory CreateMockedLoggerFactory(List<string> assertableLog = null) {
+        public ILoggerFactory CreateMockedLoggerFactory(List<string>? assertableLog = null) {
             AssertableTestLog = assertableLog;
 
             var loggerGeneric = new Mock<ILogger>();
@@ -55,7 +55,7 @@ namespace TestBasis {
                 It.IsAny<EventId>(),
                 It.IsAny<It.IsAnyType>(),
                 It.IsAny<Exception>(),
-                (Func<It.IsAnyType, Exception, string>)It.IsAny<object>()))
+                (Func<It.IsAnyType, Exception?, string>)It.IsAny<object>()))
                 .Callback(new InvocationAction(invocation => {
                     var logLevel = (LogLevel)invocation.Arguments[0]; // The first two will always be whatever is specified in the setup above
                     var eventId = (EventId)invocation.Arguments[1];  // so I'm not sure you would ever want to actually use them
@@ -64,7 +64,7 @@ namespace TestBasis {
                     var formatter = invocation.Arguments[4];
 
                     var invokeMethod = formatter.GetType().GetMethod("Invoke");
-                    var logMessage = (string)invokeMethod?.Invoke(formatter, new[] { state, exception });
+                    var logMessage = (string)(invokeMethod?.Invoke(formatter, new[] { state, exception })??"no invoke method found");
 
                     try {
                         output?.WriteLine(DateTime.Now.ToLongTimeString() + " GenericMocked " + logLevel + " " + logMessage);
