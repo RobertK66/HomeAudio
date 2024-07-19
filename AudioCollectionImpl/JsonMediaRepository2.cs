@@ -72,8 +72,13 @@ namespace AudioCollectionImpl
             
             if (File.Exists(path)) {
                 try {
+                    var options = new JsonSerializerOptions {
+                        ReadCommentHandling = JsonCommentHandling.Skip,
+                        AllowTrailingCommas = true,
+                    };
+
                     using Stream reader = new FileStream(path, FileMode.Open);
-                    var cont = await JsonSerializer.DeserializeAsync<List<BaseMedia>>(reader);
+                    var cont = await JsonSerializer.DeserializeAsync<List<BaseMedia>>(reader, options);
                     if (cont != null) {
                         foreach (var item in cont) {
                             var media = item as IMedia;
@@ -83,7 +88,6 @@ namespace AudioCollectionImpl
                         }
                     }
                     Log?.LogDebug("Added {count} entries from {path}", cont?.Count, path);
-
                 } catch (Exception ex) {
                     Log?.LogError("Exception beim Laden eines Repositories: {repName}, {ex}", path, ex);
                 }

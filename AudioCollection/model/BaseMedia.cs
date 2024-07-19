@@ -12,6 +12,6 @@ namespace AudioCollectionApi.model {
     [JsonDerivedType(typeof(Cd), typeDiscriminator: "cd")]
     [JsonDerivedType(typeof(NamedUrl), typeDiscriminator: "radio")]
     public class BaseMedia {
-        public string Name { get; set; }
+        public required string Name { get; set; }
     }
 }

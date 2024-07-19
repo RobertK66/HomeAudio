@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace AudioCollectionApi {
     public class NamedUrl :BaseMedia, IMedia{
-        public String ContentUrl { get; set; }
+        public required String ContentUrl { get; set; }
         //public String Name { get; set; }
 
         public bool IsCollection => false;
