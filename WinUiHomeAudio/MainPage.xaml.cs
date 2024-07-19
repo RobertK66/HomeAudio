@@ -19,6 +19,8 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using Windows.Storage;
+using AudioCollectionApi.api;
+using AudioCollectionApi.model;
 using WinUiHomeAudio.model;
 using WinUiHomeAudio.pages;
 

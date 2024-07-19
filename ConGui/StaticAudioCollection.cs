@@ -11,6 +11,8 @@ using System.Reflection.Metadata.Ecma335;
 using System.Text;
 using System.Threading.Tasks;
 using static ConGui.StaticAudioCollection;
+using AudioCollectionApi.api;
+using AudioCollectionApi.model;
 
 namespace ConGui {
 

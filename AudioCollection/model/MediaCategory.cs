@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AudioCollectionApi {
+namespace AudioCollectionApi.model {
     public class MediaCategory  {
         public string Id { get; private set; }
         public string? Name { get; set; }

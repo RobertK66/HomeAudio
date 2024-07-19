@@ -1,5 +1,6 @@
 ﻿using ABI.System;
 using AudioCollectionApi;
+using AudioCollectionApi.model;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Dispatching;
 using Sharpcaster.Models;

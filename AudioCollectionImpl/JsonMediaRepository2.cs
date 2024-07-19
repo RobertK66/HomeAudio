@@ -1,5 +1,6 @@
 ﻿using AudioCollectionApi;
 using AudioCollectionApi.api;
+using AudioCollectionApi.model;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;

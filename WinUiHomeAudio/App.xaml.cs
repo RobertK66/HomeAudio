@@ -22,6 +22,7 @@ using Windows.Foundation.Collections;
 using AudioCollectionApi;
 using AudioCollectionImpl;
 using WinUiHomeAudio.model;
+using AudioCollectionApi.api;
 using Sharpcaster.Interfaces;
 using System.Threading;
 using Windows.Storage;

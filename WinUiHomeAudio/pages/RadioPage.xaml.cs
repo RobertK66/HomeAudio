@@ -21,6 +21,7 @@ using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
 using AudioCollectionApi.api;
+using AudioCollectionApi.model;
 
 
 // To learn more about WinUI, the WinUI project structure,

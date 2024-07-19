@@ -1,4 +1,6 @@
 ﻿using AudioCollectionApi;
+using AudioCollectionApi.api;
+using AudioCollectionApi.model;
 using Microsoft.Extensions.Logging;
 using RadioBrowser;
 using RadioBrowser.Models;
@@ -14,7 +16,7 @@ using System.Xml;
 
 namespace DLNAMediaRepos {
 
-    public class DLNAAlbumRepository : IMediaRepository {
+    public class DLNAAlbumRepository : IMediaRepository2 {
         Dictionary<String, ObservableCollection<Cd>> CdRepositories = new();
         Dictionary<String, ObservableCollection<NamedUrl>> RadioRepositories = new();
 
@@ -203,6 +205,14 @@ namespace DLNAMediaRepos {
             //var t2 = LoadRadioStationsAsync();
             //await Task.WhenAll(t1); //, t2);
             Log?.LogInformation("DLNA ready!!!!");
+        }
+
+        public ObservableCollection<MediaCategory> GetCategories() {
+            throw new NotImplementedException();
+        }
+
+        public ObservableCollection<IMedia> GetMediaRepository(string categoryId) {
+            throw new NotImplementedException();
         }
     }
 }

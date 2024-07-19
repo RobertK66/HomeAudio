@@ -17,6 +17,7 @@ using Sharpcaster.Models.Media;
 using Sharpcaster.Models.Queue;
 using Sharpcaster.Models;
 using Sharpcaster.Channels;
+using AudioCollectionApi.model;
 
 namespace WinUiHomeAudio.model {
     public class ChromeCastClientWrapper : INotifyPropertyChanged {

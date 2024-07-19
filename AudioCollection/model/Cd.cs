@@ -8,7 +8,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace AudioCollectionApi {
+namespace AudioCollectionApi.model {
 
  
     public class Cd :BaseMedia, IMedia {

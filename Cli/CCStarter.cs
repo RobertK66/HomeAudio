@@ -1,4 +1,5 @@
 ﻿using AudioCollectionApi;
+using AudioCollectionApi.model;
 using Sharpcaster;
 using Sharpcaster.Channels;
 using Sharpcaster.Interfaces;

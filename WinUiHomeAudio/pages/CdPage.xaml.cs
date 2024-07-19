@@ -26,6 +26,8 @@ using Windows.Foundation.Collections;
 using Windows.Media.Core;
 using Windows.Media.Playback;
 using WinUiHomeAudio.model;
+using AudioCollectionApi.api;
+using AudioCollectionApi.model;
 
 
 // To learn more about WinUI, the WinUI project structure,
@@ -57,8 +59,8 @@ namespace WinUiHomeAudio.pages
     public sealed partial class CdPage : VmPage {
 
      
-        private ObservableCollection<Cd>  _ListOfCDs = new();
-        public ObservableCollection<Cd> ListOfCDs { get { return _ListOfCDs; } set { if (_ListOfCDs != value) { _ListOfCDs = value; RaisePropertyChanged(); } } }
+        private ObservableCollection<IMedia>  _ListOfCDs = new();
+        public ObservableCollection<IMedia> ListOfCDs { get { return _ListOfCDs; } set { if (_ListOfCDs != value) { _ListOfCDs = value; RaisePropertyChanged(); } } }
         
         public CdPage() {
             this.InitializeComponent();
@@ -67,7 +69,7 @@ namespace WinUiHomeAudio.pages
      
         protected override void OnNavigatedTo(NavigationEventArgs e) {
             if (e.Parameter is string p) {
-                ListOfCDs = App.Host.Services.GetRequiredService<IMediaRepository>().GetCdRepository(p);
+                ListOfCDs = App.Host.Services.GetRequiredService<IMediaRepository2>().GetMediaRepository(p);
             }
             base.OnNavigatedTo(e);
         }
