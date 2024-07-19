@@ -62,7 +62,7 @@ namespace ConGui {
         readonly List<IAudioTab> MediaTabs = new();
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0090:\"new(...)\" verwenden", Justification = "mag ich hier lieber lesbarere mit Klassennamen davor")]
-        public StaticAudioCollection(IConfiguration conf, ILogger<StaticAudioCollection> logger, IMediaRepository mr) {
+        public StaticAudioCollection(IConfiguration conf, ILogger<StaticAudioCollection> logger, IMediaRepository2 mr) {
             Log = logger;
 
             var rootPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".\\";
@@ -78,26 +78,30 @@ namespace ConGui {
                 if (!String.IsNullOrEmpty(contentFilePath)) {
 
                     string name = Path.GetFileNameWithoutExtension(contentFilePath);
-                    MediaCategory? mc = mr.GetCdCategories().Where(c=>c.Name.Equals(name)).FirstOrDefault();
+                    MediaCategory? mc = mr.GetCategories().Where(c=>c.Name.Equals(name)).FirstOrDefault();
                     if (mc != null) {
-                        foreach(var cd in mr.GetCdRepository(mc.Id)) {
+                        foreach(var media in mr.GetMediaRepository(mc.Id)) {
                             AudioEntry entry = new AudioEntry();
-                            entry.Name = cd.Name;
-                            foreach(var tr in cd.Tracks) {
-                                entry.Tracks.Add(new AudioEntry() { Name = tr.Name, ContentUrl=tr.ContentUrl });
+                            entry.Name = media.Name;
+                            if (media.IsCollection) {
+                                foreach (var tr in media.Content) {
+                                    entry.Tracks.Add(new AudioEntry() { Name = tr.Name, ContentUrl = tr.ContentUrl });
+                                }
+                            } else {
+                                entry.ContentUrl = media.ContentUrl;
                             }
                             at.AddAudioEntry(entry);
                         }
                     }
-                    mc = mr.GetRadioCategories().Where(c => c.Name.Equals(name)).FirstOrDefault();
-                    if (mc != null) {
-                        foreach (var radio in mr.GetRadioRepository(mc.Id)) {
-                            AudioEntry entry = new AudioEntry();
-                            entry.Name = radio.Name;
-                            entry.ContentUrl = radio.ContentUrl;
-                            at.AddAudioEntry(entry);
-                        }
-                    }
+                    //mc = mr.GetRadioCategories().Where(c => c.Name.Equals(name)).FirstOrDefault();
+                    //if (mc != null) {
+                    //    foreach (var radio in mr.GetRadioRepository(mc.Id)) {
+                    //        AudioEntry entry = new AudioEntry();
+                    //        entry.Name = radio.Name;
+                    //        entry.ContentUrl = radio.ContentUrl;
+                    //        at.AddAudioEntry(entry);
+                    //    }
+                    //}
                     //using (StreamReader file = File.OpenText(contentFilePath)) {
                     //    JsonSerializer serializer = new JsonSerializer();
                     //    AudioEntry[]? entries = (AudioEntry[]?)serializer.Deserialize(file, typeof(AudioEntry[]));

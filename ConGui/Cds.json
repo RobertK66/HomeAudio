@@ -1,5 +1,6 @@
 [
   {
+    "type":  "cd",
     "CDID": "810e5104",
     "Name": "Some Folk from openmusicarchive",
     "Artist": "...",
@@ -23,6 +24,7 @@
     ]
   },
   {
+    "type": "cd",
     "CDID": "960ad510",
     "Name": "Some Tracks from freepd",
     "Artist": "xyz",
@@ -70,6 +72,7 @@
     ]
   },
   {
+    "type": "cd",
     "CDID": "a40d3f14",
     "Name": "Memories (from local nas)",
     "Artist": "Barbra Streisand",
@@ -129,6 +132,7 @@
     ]
   },
   {
+    "type": "cd",
     "CDID": "e10cd113",
     "Name": "One Voice (from local nas)",
     "Artist": "Barbra Streisand",

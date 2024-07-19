@@ -26,7 +26,7 @@ namespace AudioCollectionImpl
         private ObservableCollection<MediaCategory> Categories = new ();
         
         public JsonMediaRepository2(ILoggerFactory? lf = null) {
-            Log = lf?.CreateLogger<JsonMediaRepository>();
+            Log = lf?.CreateLogger<JsonMediaRepository2>();
         }
 
         private bool loading = false;
@@ -37,12 +37,12 @@ namespace AudioCollectionImpl
                 if (rootPath is string dirPath) {
                     int i = 0;
                     foreach (var f in Directory.GetFiles(dirPath, "*.json")) {
-                        Log?.LogInformation("Next Path {path}", f);
+                        Log?.LogDebug("Scanning {path} for media content.", f);
                         if (reLoadPath != null) {
                             break;
                         }
                         //await Task.Delay(2000);
-                        await AddRepos("R-" + (i++).ToString(), f);
+                        await AddRepos(System.IO.Path.GetFileNameWithoutExtension(f), f);
                     }
                 }
                 loading = false;
@@ -84,12 +84,14 @@ namespace AudioCollectionImpl
                             var media = item as IMedia;
                             if (media != null) {
                                 cat.Entries.Add(media);
+                                rep.Add(media);
                             }
                         }
                     }
-                    Log?.LogDebug("Added {count} entries from {path}", cont?.Count, path);
+                    Log?.LogInformation("Added {count} entries from {name}[{id}]", cont?.Count, cat.Name, reposid);
                 } catch (Exception ex) {
-                    Log?.LogError("Exception beim Laden eines Repositories: {repName}, {ex}", path, ex);
+                    // Silently skip all non media json ...
+                    Log?.LogTrace("Exception beim Laden eines Repositories: {repName}, {ex}", path, ex);
                 }
             }
 

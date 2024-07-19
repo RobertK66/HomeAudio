@@ -28,6 +28,9 @@
     <None Update="Cds.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Update="Mixed.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="WebRadios.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

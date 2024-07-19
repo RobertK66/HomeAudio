@@ -1,41 +1,51 @@
   [
     {
+      "type": "radio",
       "ContentUrl": "https://orf-live.ors-shoutcast.at/oe1-q1a",
       "Name": "Ö1-(128bps)"
     },
     {
+      "type": "radio",
       "Name": "Antenne Kärnten Sunrise",
       "ContentUrl": "http://live.antenne.at/sun"
     },
     {
+      "type": "radio",
       "Name": "Antenne Steiermark",
       "ContentUrl": "http://live.antenne.at/as"
     },
     {
+      "type": "radio",
       "Name": "Antenne Vorarlberg",
       "ContentUrl": "https://web.radio.antennevorarlberg.at/av-live?aggregator=Radioplayer"
     },
     {
+      "type": "radio",
       "ContentUrl": "https://orf-live.ors-shoutcast.at/oe1-q2a",
       "Name": "Ö1-(192bps)"
     },
     {
+      "type": "radio",
       "ContentUrl": "http://orf-live.ors-shoutcast.at/campus-q1a",
       "Name": "Ö1 Campus"
     },
     {
+      "type": "radio",
       "ContentUrl": "http://orf-live.ors-shoutcast.at/wie-q1a",
       "Name": "Ö2-(Wien)"
     },
     {
+      "type": "radio",
       "ContentUrl": "http://orf-live.ors-shoutcast.at/noe-q1a",
       "Name": "Ö2-(Nö)"
     },
     {
+      "type": "radio",
       "ContentUrl": "https://orf-live.ors-shoutcast.at/oe3-q1a",
       "Name": "Ö 3"
     },
     {
+      "type": "radio",
       "ContentUrl": "https://orf-live.ors-shoutcast.at/fm4-q1a",
       "Name": "FM4"
     }

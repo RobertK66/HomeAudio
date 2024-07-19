@@ -1,0 +1,94 @@
+[
+  {
+    "type": "cd",
+    "CDID": "810e5104",
+    "Name": "Some Folk from openmusicarchive",
+    "Artist": "...",
+    "Tracks": [
+      {
+        "ContentUrl": "http://www.openmusicarchive.org/audio/Frankie%20by%20Mississippi%20John%20Hurt.mp3",
+        "Name": "Frankie"
+      },
+      {
+        "ContentUrl": "http://www.openmusicarchive.org/audio/Mississippi%20Boweavil%20Blues%20by%20The%20Masked%20Marvel.mp3",
+        "Name": "Mississippi"
+      },
+      {
+        "ContentUrl": "http://www.openmusicarchive.org/audio/The%20Wild%20Wagoner%20by%20Jilson%20Setters.mp3",
+        "Name": "Wild Wagoner"
+      },
+      {
+        "ContentUrl": "http://www.openmusicarchive.org/audio/Drunkards%20Special%20by%20Coley%20Jones.mp3",
+        "Name": "Drunkards"
+      }
+    ]
+  },
+  {
+    "type": "radio",
+    "Name": "Antenne Vorarlberg",
+    "ContentUrl": "https://web.radio.antennevorarlberg.at/av-live?aggregator=Radioplayer"
+  },
+  {
+    "type": "cd",
+    "CDID": "960ad510",
+    "Name": "Some Tracks from freepd",
+    "Artist": "xyz",
+    "Tracks": [
+      {
+        "ContentUrl": "https://freepd.com/music/Barnville.mp3",
+        "Name": "Barnville"
+      },
+      {
+        "ContentUrl": "https://freepd.com/music/Deck%20the%20Halls.mp3",
+        "Name": "Deck the Halls"
+      },
+      {
+        "ContentUrl": "https://freepd.com/music/Happy%20Whistling%20Ukulele.mp3",
+        "Name": "Happy Whistling"
+      },
+      {
+        "ContentUrl": "https://freepd.com/music/Frogs%20Legs%20Rag.mp3",
+        "Name": "Frogs"
+      },
+      {
+        "ContentUrl": "https://freepd.com/music/Rush.mp3",
+        "Name": "Rush"
+      },
+      {
+        "ContentUrl": "https://freepd.com/music/Consecrated%20Ground.mp3",
+        "Name": "Consecrated Ground"
+      },
+      {
+        "ContentUrl": "https://freepd.com/music/Nightmare.mp3",
+        "Name": "Nightmare"
+      },
+      {
+        "ContentUrl": "https://freepd.com/music/Isolation%20Waltz.mp3",
+        "Name": "Isolation Waltz"
+      },
+      {
+        "ContentUrl": "https://freepd.com/music/City%20Run.mp3",
+        "Name": "City Run"
+      },
+      {
+        "ContentUrl": "https://freepd.com/music/Heroic%20Adventure.mp3",
+        "Name": "Heroic Adventure"
+      }
+    ]
+  },
+  {
+    "type": "radio",
+    "Name": "Antenne Steiermark",
+    "ContentUrl": "http://live.antenne.at/as"
+  },
+  {
+    "type": "radio",
+    "ContentUrl": "https://orf-live.ors-shoutcast.at/oe1-q2a",
+    "Name": "Ö1-(192bps)"
+  },
+  {
+    "type": "radio",
+    "ContentUrl": "http://orf-live.ors-shoutcast.at/campus-q1a",
+    "Name": "Ö1 Campus"
+  }
+]

@@ -32,7 +32,7 @@ namespace ConGui {
             IHostBuilder host = Host.CreateDefaultBuilder(args)
                                     .ConfigureServices((hostContext, services) => {
                                         services.AddSingleton<ITabedAudioCollection, StaticAudioCollection>();
-                                        services.AddSingleton<IMediaRepository, JsonMediaRepository>();
+                                        services.AddSingleton<IMediaRepository2, JsonMediaRepository2>();
 
                                         // In order to get a hosted service able to be injected in a constructor, we register both a singelton and a service!
                                         services.AddSingleton<IChromeCastWrapper, ChromeCastWrapper>();

@@ -25,7 +25,7 @@ namespace AudioCollectionApi {
 
         public bool IsCollection => true;
 
-        public IList<IMedia> Content => (IList<IMedia>)Tracks;
+        public IList<IMedia> Content => Tracks.Cast<IMedia>().ToList();
 
         //public IEnumerator<IMedia> GetContent() => Tracks.GetEnumerator();
 

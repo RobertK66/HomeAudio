@@ -79,7 +79,7 @@ namespace Cli {
                 //await Task.WhenAll(waitForRadioStations); //Task.WhenAll(waitForCaster); //, waitForRadioStations);
                 IEnumerable<MediaCategory> radioCategories  = DlnaRepos2.GetRadioCategories();
                 var cat = radioCategories.ElementAtOrDefault(5);
-                if ((cat != null) && cat.IsCollection) {
+                if ((cat != null)) {
                     var media = cat.Entries.FirstOrDefault();
                     if (!string.IsNullOrEmpty(media?.ContentUrl)) {
                         await ccs.PlayLive(media.ContentUrl, media.Name);
