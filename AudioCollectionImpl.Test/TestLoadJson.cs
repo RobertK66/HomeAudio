@@ -12,7 +12,7 @@ namespace AudioCollectionImpl.Test {
         [Fact]
         public async Task Test1() {
             var th = new TestHelper(output);
-            var repos = new JsonMediaRepository2(th.CreateMockedLoggerFactory());
+            var repos = new JsonMediaRepository(th.CreateMockedLoggerFactory());
 
             await repos.LoadAllAsync("./data");
             Assert.Equal(3, repos.GetCategories().Count);

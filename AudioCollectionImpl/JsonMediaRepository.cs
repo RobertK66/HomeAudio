@@ -17,15 +17,14 @@ using System.Threading.Tasks;
 
 namespace AudioCollectionImpl
 {
-    public class JsonMediaRepository2(ILoggerFactory? loggerFactory = null) : IMediaRepository2 {
+    public class JsonMediaRepository(ILoggerFactory? loggerFactory = null) : IMediaRepository {
 
-        private readonly ILogger? Log = loggerFactory?.CreateLogger<JsonMediaRepository2>();
+        private readonly ILogger? Log = loggerFactory?.CreateLogger<JsonMediaRepository>();
 
-        private readonly JsonSerializerOptions jsonOptions = JsonSerializerOptions.Default;
-        //    new() {
-        //    ReadCommentHandling = JsonCommentHandling.Skip,
-        //    AllowTrailingCommas = true
-        //};
+        private JsonSerializerOptions jsonOptions = new JsonSerializerOptions {
+            AllowTrailingCommas = true,
+            ReadCommentHandling = JsonCommentHandling.Skip
+        };
 
         private readonly Dictionary<String, ObservableCollection<IMedia>> Repositories = [];
         private readonly ObservableCollection<MediaCategory> Categories = [];
@@ -71,9 +70,7 @@ namespace AudioCollectionImpl
 
             if (File.Exists(path)) {
                 try {
-              
                     using Stream reader = new FileStream(path, FileMode.Open);
-                    
                     var cont = await JsonSerializer.DeserializeAsync<List<BaseMedia>>(reader, jsonOptions);
                     if (cont != null) {
                         foreach (var item in cont) {

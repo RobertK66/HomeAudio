@@ -59,8 +59,8 @@ namespace WinUiHomeAudio {
 
             _ccRepos = App.Host.Services.GetRequiredService<ChromeCastRepository>();
 
-            IEnumerable<IMediaRepository2> mrs = App.Host.Services.GetServices<IMediaRepository2>();
-            foreach (IMediaRepository2 mr in mrs) {
+            IEnumerable<IMediaRepository> mrs = App.Host.Services.GetServices<IMediaRepository>();
+            foreach (IMediaRepository mr in mrs) {
 
                 //            IMediaRepository mr = App.Host.Services.GetServices<IMediaRepository>();
 

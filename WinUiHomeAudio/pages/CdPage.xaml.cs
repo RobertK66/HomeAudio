@@ -69,7 +69,7 @@ namespace WinUiHomeAudio.pages
      
         protected override void OnNavigatedTo(NavigationEventArgs e) {
             if (e.Parameter is string p) {
-                ListOfCDs = App.Host.Services.GetRequiredService<IMediaRepository2>().GetMediaRepository(p);
+                ListOfCDs = App.Host.Services.GetRequiredService<IMediaRepository>().GetMediaRepository(p);
             }
             base.OnNavigatedTo(e);
         }

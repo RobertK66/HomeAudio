@@ -11,7 +11,7 @@ using System.Text;
 
 namespace TestServers {
     internal class Program {
-        static X509Certificate? serverCertificate = null;
+        //static X509Certificate? serverCertificate = null;
 
 
         static void Main(string[] args) {

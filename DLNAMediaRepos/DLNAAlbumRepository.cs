@@ -16,7 +16,7 @@ using System.Xml;
 
 namespace DLNAMediaRepos {
 
-    public class DLNAAlbumRepository : IMediaRepository2 {
+    public class DLNAAlbumRepository : IMediaRepository {
         Dictionary<String, ObservableCollection<Cd>> CdRepositories = new();
         Dictionary<String, ObservableCollection<NamedUrl>> RadioRepositories = new();
 

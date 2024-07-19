@@ -62,7 +62,7 @@ namespace WinUiHomeAudio {
                        //}).
                        ConfigureServices((context, services) => {
                            //services.AddSingleton(logVm);
-                           services.AddSingleton<IMediaRepository2, JsonMediaRepository2>();
+                           services.AddSingleton<IMediaRepository, JsonMediaRepository>();
                            //services.AddSingleton<IMediaRepository, DLNAAlbumRepository>();
                            services.AddSingleton<AppSettings>();
                            services.AddSingleton<ChromeCastRepository>();

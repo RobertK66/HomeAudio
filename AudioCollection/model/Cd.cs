@@ -22,6 +22,7 @@ namespace AudioCollectionApi.model {
 
         public string? ContentUrl => null;
 
+        [JsonRequired]
         public List<NamedUrl> Tracks { get; set; } = new List<NamedUrl>();
 
         public bool IsCollection => true;
@@ -30,17 +31,12 @@ namespace AudioCollectionApi.model {
 
         //public IEnumerator<IMedia> GetContent() => Tracks.GetEnumerator();
 
-
-        [SetsRequiredMembers]
         public Cd(string Id) {
             CDID = Id;
-            Name = ".";
         }
 
-        [SetsRequiredMembers]
         public Cd() {
             CDID = $"<unknown_"+(UnknownIdCont++)+">";
-            Name = ".";
         }
     }
 }

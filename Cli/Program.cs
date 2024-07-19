@@ -61,7 +61,7 @@ namespace Cli {
             //var waitForCaster = 
 
             // Start the DLNA Search ...
-            DLNAAlbumRepository DlnaRepos2 = new DLNAAlbumRepository(null);
+            DLNAAlbumRepository DlnaRepos2 = new(null);
 
             //var waitForAlbums = DlnaRepos2.LoadAlbumsAsync();
             await DlnaRepos2.LoadRadioStationsAsync();

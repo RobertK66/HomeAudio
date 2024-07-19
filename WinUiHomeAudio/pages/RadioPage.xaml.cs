@@ -44,18 +44,18 @@ namespace WinUiHomeAudio.pages
         protected override void OnNavigatedTo(NavigationEventArgs e) {
             var p = e.Parameter;
 
-            ListOfRadios = App.Host.Services.GetRequiredService<IMediaRepository2>().GetMediaRepository(e?.Parameter?.ToString() ?? "X");
+            ListOfRadios = App.Host.Services.GetRequiredService<IMediaRepository>().GetMediaRepository(e?.Parameter?.ToString() ?? "X");
             base.OnNavigatedTo(e);
         }
 
         private void ItemsView_ItemInvoked(ItemsView sender, ItemsViewItemInvokedEventArgs args) {
-            IMedia? radio = (args.InvokedItem as IMedia);
-            if (radio != null) {
-                Debug.WriteLine(radio.Name);
-                if (radio.IsCollection) {
-                    App.Host.Services.GetRequiredService<ChromeCastRepository>().PlayCed(radio as Cd);
-                } else {
-                    App.Host.Services.GetRequiredService<ChromeCastRepository>().PlayRadio(radio as NamedUrl);
+            IMedia? item = (args.InvokedItem as IMedia);
+            if (item != null) {
+                Debug.WriteLine(item.Name);
+                if ((item.IsCollection) && (item is Cd cd)) {
+                    App.Host.Services.GetRequiredService<ChromeCastRepository>().PlayCed(cd);
+                } else if (item is NamedUrl radio){
+                    App.Host.Services.GetRequiredService<ChromeCastRepository>().PlayRadio(radio);
                 }
             }
         }

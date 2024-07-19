@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace AudioCollectionApi.api
 {
-    public interface IMediaRepository2 {
+    public interface IMediaRepository {
         Task LoadAllAsync(object PersitenceContext);
         ObservableCollection<MediaCategory> GetCategories();
         ObservableCollection<IMedia> GetMediaRepository(string categoryId);

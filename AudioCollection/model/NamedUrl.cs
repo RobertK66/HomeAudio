@@ -11,9 +11,9 @@ using System.Threading.Tasks;
 namespace AudioCollectionApi.model {
  
     public class NamedUrl :BaseMedia, IMedia{
+        [JsonRequired]
         public required String ContentUrl { get; set; }
-        //public String Name { get; set; }
-
+      
         public bool IsCollection => false;
 
         public IList<IMedia> Content => (new List<IMedia>() { this });
