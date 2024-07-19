@@ -1,4 +1,5 @@
 ﻿using AudioCollectionApi.api;
+using AudioCollectionApi.model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -7,9 +8,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace AudioCollectionApi {
-    public class NamedUrl :IMedia{
+    public class NamedUrl :BaseMedia, IMedia{
         public String ContentUrl { get; set; }
-        public String Name { get; set; }
+        //public String Name { get; set; }
 
         public bool IsCollection => false;
 

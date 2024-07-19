@@ -1,4 +1,5 @@
 ﻿using AudioCollectionApi.api;
+using AudioCollectionApi.model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +10,10 @@ using System.Threading.Tasks;
 namespace AudioCollectionApi {
 
   
-    public class Cd :IMedia {
+    public class Cd :BaseMedia, IMedia {
         private static int UnknownIdCont = 0;
 
-        public string? Name { get; set; }
+        //public string? Name { get; set; }
         public string? Artist { get; set; }
         public string CDID { get; set; }
 
