@@ -40,14 +40,18 @@ namespace DLNAMediaRepos {
 
             foreach (var st in results) {
                 if ((st.Url != null) && (st.Name != null)) {
-                    MediaCategory cat = new("Radio-" + (IdCnt++)) { Name = string.IsNullOrEmpty(st.Tags[0]) ? "untagged" : st.Tags[0] };
-                    if (!RadioRepositories.ContainsKey(cat.Id)) {
+                    var tag = string.IsNullOrEmpty(st.Tags[0]) ? "untagged" : st.Tags[0];
+                    MediaCategory? cat = RadioCategories.Where(rc => rc.Name == tag).FirstOrDefault();
+                    if (cat == null) {
+                        cat = new("Radio-" + (IdCnt++)) { Name = tag };
                         RadioCategories.Add(cat);
                         RadioRepositories.Add(cat.Id, new ObservableCollection<NamedUrl>());
-                    }
+                    } 
                     ObservableCollection<NamedUrl> rep = RadioRepositories[cat.Id];
                     if (!rep.Where(r => r.Name == st.Name).Any()) {
-                        rep.Add(new NamedUrl(name: st.Name,contentUrl: st.Url.ToString()));
+                        var entry = new NamedUrl(name: st.Name, contentUrl: st.Url.ToString());
+                        cat.Entries.Add(entry);
+                        rep.Add(entry);
                     }
 
                    // Log.LogInformation("{count} Stations found.", rep.Count);

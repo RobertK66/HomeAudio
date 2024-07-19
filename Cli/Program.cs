@@ -1,8 +1,10 @@
 ﻿using AudioCollectionApi;
+using AudioCollectionApi.api;
 using DLNAMediaRepos;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using System.Linq;
 
 namespace Cli {
     public class Program : IHostedService {
@@ -58,11 +60,10 @@ namespace Cli {
             //var waitForCaster = 
 
             // Start the DLNA Search ...
-            IMediaRepository DlnaRepos2 = new DLNAAlbumRepository(null);
+            DLNAAlbumRepository DlnaRepos2 = new DLNAAlbumRepository(null);
 
             //var waitForAlbums = DlnaRepos2.LoadAlbumsAsync();
-            //await DlnaRepos2.LoadRadioStationsAsync();
-
+            await DlnaRepos2.LoadRadioStationsAsync();
 
             if (qcCommand == "playCd") {
                 // For playing CD we have to wait for both, the DLNA Repos and the connect beeing ready.
@@ -76,13 +77,15 @@ namespace Cli {
                 }
             } else if (qcCommand == "playRadio") {
                 //await Task.WhenAll(waitForRadioStations); //Task.WhenAll(waitForCaster); //, waitForRadioStations);
-                var cat = DlnaRepos2.GetRadioCategories().FirstOrDefault();
-                if (cat != null) {
-                    var media = DlnaRepos2.GetRadioRepository(cat.Id).ElementAtOrDefault(playIdx);
+                IEnumerable<MediaCategory> radioCategories  = DlnaRepos2.GetRadioCategories();
+                var cat = radioCategories.ElementAtOrDefault(5);
+                if ((cat != null) && cat.IsCollection) {
+                    var media = cat.Entries.FirstOrDefault();
                     if (!string.IsNullOrEmpty(media?.ContentUrl)) {
                         await ccs.PlayLive(media.ContentUrl, media.Name);
                     }
                 }
+
             } else if (qcCommand == "next") {
                 //await waitForCaster;
                 _ = await ccs.PlayNext();

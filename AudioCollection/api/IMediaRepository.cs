@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AudioCollectionApi.api;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -23,4 +24,11 @@ namespace AudioCollectionApi
         ObservableCollection<MediaCategory> GetRadioCategories();
         ObservableCollection<MediaCategory> GetCdCategories();
     }
+
+    public interface IMediaRepository2 {
+        Task LoadAllAsync(object PersitenceContext);
+        ObservableCollection<MediaCategory> GetCategories();
+        ObservableCollection<IMedia> GetMediaRepository(string categoryId);
+    }
+
 }
