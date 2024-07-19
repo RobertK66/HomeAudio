@@ -20,26 +20,22 @@ namespace ConGui {
         public class AudioEntry : IAudioEntry {
             public String Name { get; set; } = "";
             public String? ContentUrl { get; set; }
-            public List<AudioEntry> Tracks { get; set; } = new List<AudioEntry>();
+            public List<AudioEntry> Tracks { get; set; } = [];
 
             // To cast we have to use LINQ and create a new typed List!
-            public List<IAudioEntry>? AudioTracks => Tracks.ToList<IAudioEntry>();
+            //public List<IAudioEntry>? AudioTracks => Tracks.ToList<IAudioEntry>();
+
+            // new syntax with collection expression: hmmmm... ;-)
+            public List<IAudioEntry>? AudioTracks => [.. Tracks];
         }
 
-        public class AudioTab : IAudioTab {
-            private readonly List<AudioEntry> entries = new();
+        public class AudioTab(String name, int col, int row, int cellSize) : IAudioTab {
+            private readonly List<AudioEntry> entries = [];
 
-            public int Cols { get; set; }
-            public int Rows { get ; set ; }
-            public int CellSize { get; set; }
-            public string TabName { get ; set ; }
-
-            public AudioTab(String name, int col, int row, int cellSize) {
-                TabName = name;
-                Cols = col;
-                Rows = row;
-                CellSize = cellSize;
-            }
+            public int Cols { get; set; } = col;
+            public int Rows { get; set; } = row;
+            public int CellSize { get; set; } = cellSize;
+            public string TabName { get; set; } = name;
 
             public List<AudioEntry> GetAudioEntries() {
                 return entries;
@@ -50,7 +46,7 @@ namespace ConGui {
             }
 
             List<IAudioEntry> IAudioTab.GetAudioEntries() {
-                return entries.ToList<IAudioEntry>();
+                return [.. entries];
             }
         }
 
@@ -59,7 +55,7 @@ namespace ConGui {
         //List<(string name, List<(string url, string name)> tracks, string artist, string cdid)> Albums = new();
         //List<(string name, string url)> WebRadios = new();
 
-        readonly List<IAudioTab> MediaTabs = new();
+        readonly List<IAudioTab> MediaTabs = [];
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0090:\"new(...)\" verwenden", Justification = "mag ich hier lieber lesbarere mit Klassennamen davor")]
         public StaticAudioCollection(IConfiguration conf, ILogger<StaticAudioCollection> logger, IMediaRepository2 mr) {
@@ -78,11 +74,10 @@ namespace ConGui {
                 if (!String.IsNullOrEmpty(contentFilePath)) {
 
                     string name = Path.GetFileNameWithoutExtension(contentFilePath);
-                    MediaCategory? mc = mr.GetCategories().Where(c=>c.Name.Equals(name)).FirstOrDefault();
+                    MediaCategory? mc = mr.GetCategories().Where(c=>name.Equals(c.Name)).FirstOrDefault();
                     if (mc != null) {
                         foreach(var media in mr.GetMediaRepository(mc.Id)) {
-                            AudioEntry entry = new AudioEntry();
-                            entry.Name = media.Name;
+                            AudioEntry entry = new() { Name = media.Name };
                             if (media.IsCollection) {
                                 foreach (var tr in media.Content) {
                                     entry.Tracks.Add(new AudioEntry() { Name = tr.Name, ContentUrl = tr.ContentUrl });

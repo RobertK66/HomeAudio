@@ -17,25 +17,23 @@ using System.Threading.Tasks;
 
 namespace AudioCollectionImpl
 {
-    public class JsonMediaRepository2 :IMediaRepository2 {
+    public class JsonMediaRepository2(ILoggerFactory? loggerFactory = null) : IMediaRepository2 {
 
-        //private enum MediaType { None, Cd, Radio };
-        private readonly ILogger? Log;
+        private readonly ILogger? Log = loggerFactory?.CreateLogger<JsonMediaRepository2>();
 
-        Dictionary<String, ObservableCollection<IMedia>> Repositories = new();
-        private ObservableCollection<MediaCategory> Categories = new ();
-        
-        public JsonMediaRepository2(ILoggerFactory? lf = null) {
-            Log = lf?.CreateLogger<JsonMediaRepository2>();
-        }
+        private readonly JsonSerializerOptions jsonOptions = new() {
+            ReadCommentHandling = JsonCommentHandling.Skip,
+            AllowTrailingCommas = true,
+        };
 
+        private readonly Dictionary<String, ObservableCollection<IMedia>> Repositories = [];
+        private readonly ObservableCollection<MediaCategory> Categories = [];
         private bool loading = false;
         private String? reLoadPath = null;
         public async Task LoadAllAsync(object rootPath) {
             if (!loading) {
                 loading = true;
                 if (rootPath is string dirPath) {
-                    int i = 0;
                     foreach (var f in Directory.GetFiles(dirPath, "*.json")) {
                         Log?.LogDebug("Scanning {path} for media content.", f);
                         if (reLoadPath != null) {
@@ -58,8 +56,8 @@ namespace AudioCollectionImpl
 
         private async Task AddRepos(string reposid, string path) {
             var rep = new ObservableCollection<IMedia>();
-            if (Repositories.ContainsKey(reposid)) {
-                rep = Repositories[reposid];
+            if (Repositories.TryGetValue(reposid, out ObservableCollection<IMedia>? value)) {
+                rep = value;
                 rep.Clear();
             } else {
                 Repositories.Add(reposid, rep);
@@ -69,21 +67,15 @@ namespace AudioCollectionImpl
                 cat = new MediaCategory(reposid) { Name = System.IO.Path.GetFileNameWithoutExtension(path) };
                 Categories.Add(cat);
             }
-            
+
             if (File.Exists(path)) {
                 try {
-                    var options = new JsonSerializerOptions {
-                        ReadCommentHandling = JsonCommentHandling.Skip,
-                        AllowTrailingCommas = true,
-                    };
-
+              
                     using Stream reader = new FileStream(path, FileMode.Open);
-                    var cont = await JsonSerializer.DeserializeAsync<List<BaseMedia>>(reader, options);
+                    var cont = await JsonSerializer.DeserializeAsync<List<BaseMedia>>(reader, jsonOptions);
                     if (cont != null) {
                         foreach (var item in cont) {
-                            var media = item as IMedia;
-                            if (media != null) {
-                                //cat.Entries.Add(media);
+                            if (item is IMedia media) {
                                 rep.Add(media);
                             }
                         }
@@ -98,10 +90,10 @@ namespace AudioCollectionImpl
         }
 
         public ObservableCollection<IMedia> GetMediaRepository(string reposid) {
-            if (Repositories.ContainsKey(reposid)) {
-                return Repositories[reposid];
+            if (Repositories.TryGetValue(reposid, out ObservableCollection<IMedia>? value)) {
+                return value;
             } else {
-                return new ObservableCollection<IMedia>();
+                return [];
             }
         }
         
