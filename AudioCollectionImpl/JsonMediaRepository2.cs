@@ -1,6 +1,5 @@
 ﻿using AudioCollectionApi;
 using AudioCollectionApi.api;
-using AudioCollectionApi.model;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -21,10 +20,11 @@ namespace AudioCollectionImpl
 
         private readonly ILogger? Log = loggerFactory?.CreateLogger<JsonMediaRepository2>();
 
-        private readonly JsonSerializerOptions jsonOptions = new() {
-            ReadCommentHandling = JsonCommentHandling.Skip,
-            AllowTrailingCommas = true,
-        };
+        private readonly JsonSerializerOptions jsonOptions = JsonSerializerOptions.Default;
+        //    new() {
+        //    ReadCommentHandling = JsonCommentHandling.Skip,
+        //    AllowTrailingCommas = true
+        //};
 
         private readonly Dictionary<String, ObservableCollection<IMedia>> Repositories = [];
         private readonly ObservableCollection<MediaCategory> Categories = [];
@@ -72,6 +72,7 @@ namespace AudioCollectionImpl
                 try {
               
                     using Stream reader = new FileStream(path, FileMode.Open);
+                    
                     var cont = await JsonSerializer.DeserializeAsync<List<BaseMedia>>(reader, jsonOptions);
                     if (cont != null) {
                         foreach (var item in cont) {

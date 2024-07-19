@@ -7,6 +7,7 @@
     <Nullable>enable</Nullable>
 	<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
 	  <Deterministic>false</Deterministic>
+	  <UserSecretsId>879bf2bf-1586-487b-b2b4-c2019bdc795b</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

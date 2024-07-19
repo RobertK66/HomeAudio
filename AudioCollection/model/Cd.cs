@@ -1,16 +1,16 @@
 ﻿using AudioCollectionApi.api;
-using AudioCollectionApi.model;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection.Metadata;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace AudioCollectionApi {
 
-  
+ 
     public class Cd :BaseMedia, IMedia {
         private static int UnknownIdCont = 0;
 

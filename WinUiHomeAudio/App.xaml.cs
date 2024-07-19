@@ -56,9 +56,12 @@ namespace WinUiHomeAudio {
 
             MyHost = Microsoft.Extensions.Hosting.Host.
                        CreateDefaultBuilder().
+                       //ConfigureHttpJsonOptions(options => {
+                       //    options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
+                       //}).
                        ConfigureServices((context, services) => {
                            //services.AddSingleton(logVm);
-                           services.AddSingleton<IMediaRepository, JsonMediaRepository>();
+                           services.AddSingleton<IMediaRepository2, JsonMediaRepository2>();
                            //services.AddSingleton<IMediaRepository, DLNAAlbumRepository>();
                            services.AddSingleton<AppSettings>();
                            services.AddSingleton<ChromeCastRepository>();

@@ -1,9 +1,9 @@
 [
   {
+    "type":  "cd",
     "CDID": "810e5104",
     "Name": "Some Folk from openmusicarchive",
     "Artist": "...",
-    "Picpath": "https://cdn.pixabay.com/photo/2023/06/01/06/52/mug-8032892_1280.png",
     "Tracks": [
       {
         "ContentUrl": "http://www.openmusicarchive.org/audio/Frankie%20by%20Mississippi%20John%20Hurt.mp3",
@@ -24,10 +24,10 @@
     ]
   },
   {
+    "type": "cd",
     "CDID": "960ad510",
     "Name": "Some Tracks from freepd",
     "Artist": "xyz",
-    "Picpath": "https://cdn.pixabay.com/animation/2023/07/28/08/38/08-38-28-378_512.gif",
     "Tracks": [
       {
         "ContentUrl": "https://freepd.com/music/Barnville.mp3",
@@ -72,10 +72,10 @@
     ]
   },
   {
+    "type": "cd",
     "CDID": "a40d3f14",
-    "Name": "Memories (from local hdd)",
+    "Name": "Memories (from local nas)",
     "Artist": "Barbra Streisand",
-    "Picpath": "http://192.168.177.65:50002/transcoder/jpegtnscaler.cgi/albumart/6566.jpg",
     "Tracks": [
       {
         "ContentUrl": "http://192.168.177.65:50002/m/NDLNA/6582.mp3",
@@ -132,8 +132,9 @@
     ]
   },
   {
+    "type": "cd",
     "CDID": "e10cd113",
-    "Name": "One Voice (from local hdd)",
+    "Name": "One Voice (from local nas)",
     "Artist": "Barbra Streisand",
     "Tracks": [
       {

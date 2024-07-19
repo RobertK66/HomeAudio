@@ -57,30 +57,30 @@ namespace WinUiHomeAudio {
 
             _ccRepos = App.Host.Services.GetRequiredService<ChromeCastRepository>();
 
-            IEnumerable<IMediaRepository> mrs = App.Host.Services.GetServices<IMediaRepository>();
-            foreach (IMediaRepository mr in mrs) {
+            IEnumerable<IMediaRepository2> mrs = App.Host.Services.GetServices<IMediaRepository2>();
+            foreach (IMediaRepository2 mr in mrs) {
 
                 //            IMediaRepository mr = App.Host.Services.GetServices<IMediaRepository>();
 
-                mr.GetCdCategories().CollectionChanged += (s, e) => {
+                mr.GetCategories().CollectionChanged += (s, e) => {
                     if (e.NewItems != null) {
                         foreach (var ni in e.NewItems) {
                             if (ni is MediaCategory mc) {
-                                Categories.Add(new Category() { Glyph = Symbol.Target, Name = mc.Name + "-Cds", Tag = mc.Id });
+                                Categories.Add(new Category() { Glyph = Symbol.Target, Name = mc.Name, Tag = mc.Id });
                             }
                         }
                     }
                 };
 
-                mr.GetRadioCategories().CollectionChanged += (s, e) => {
-                    if (e.NewItems != null) {
-                        foreach (var ni in e.NewItems) {
-                            if (ni is MediaCategory mc) {
-                                Categories.Add(new Category() { Glyph = Symbol.Account, Name = mc.Name ?? "unknown", Tag = mc.Id });
-                            }
-                        }
-                    }
-                };
+                //mr.GetRadioCategories().CollectionChanged += (s, e) => {
+                //    if (e.NewItems != null) {
+                //        foreach (var ni in e.NewItems) {
+                //            if (ni is MediaCategory mc) {
+                //                Categories.Add(new Category() { Glyph = Symbol.Account, Name = mc.Name ?? "unknown", Tag = mc.Id });
+                //            }
+                //        }
+                //    }
+                //};
 
                 _ = mr.LoadAllAsync(ApplicationData.Current.LocalFolder.Path);
             }
@@ -96,8 +96,8 @@ namespace WinUiHomeAudio {
                 string selectedItem = (String)args.InvokedItem;
                 if (selectedItem.Equals("ChromeCast")) {
                     //ContentFrame.Navigate(typeof(ChromecastPage));
-                } else if (selectedItem.Contains("Cd")) {
-                    ContentFrame.Navigate(typeof(CdPage), args.InvokedItemContainer.Tag.ToString());
+                //} else if (selectedItem.Contains("Cd")) {
+                //    ContentFrame.Navigate(typeof(CdPage), args.InvokedItemContainer.Tag.ToString());
                 } else {
                     ContentFrame.Navigate(typeof(RadioPage), args.InvokedItemContainer.Tag.ToString());
                 }

@@ -20,6 +20,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using Windows.Foundation;
 using Windows.Foundation.Collections;
+using AudioCollectionApi.api;
 
 
 // To learn more about WinUI, the WinUI project structure,
@@ -32,8 +33,8 @@ namespace WinUiHomeAudio.pages
     /// </summary>
     public sealed partial class RadioPage : VmPage {
 
-        private ObservableCollection<NamedUrl>  _ListOfRadios = new ObservableCollection<NamedUrl>();
-        public ObservableCollection<NamedUrl> ListOfRadios { get { return _ListOfRadios; } set { if (_ListOfRadios != value) { _ListOfRadios = value; RaisePropertyChanged(); } } }
+        private ObservableCollection<IMedia>  _ListOfRadios = new ObservableCollection<IMedia>();
+        public ObservableCollection<IMedia> ListOfRadios { get { return _ListOfRadios; } set { if (_ListOfRadios != value) { _ListOfRadios = value; RaisePropertyChanged(); } } }
         
         public RadioPage() {
             this.InitializeComponent();
@@ -41,15 +42,20 @@ namespace WinUiHomeAudio.pages
         
         protected override void OnNavigatedTo(NavigationEventArgs e) {
             var p = e.Parameter;
-            ListOfRadios = App.Host.Services.GetRequiredService<IMediaRepository>().GetRadioRepository(e?.Parameter?.ToString() ?? "X");
+
+            ListOfRadios = App.Host.Services.GetRequiredService<IMediaRepository2>().GetMediaRepository(e?.Parameter?.ToString() ?? "X");
             base.OnNavigatedTo(e);
         }
 
         private void ItemsView_ItemInvoked(ItemsView sender, ItemsViewItemInvokedEventArgs args) {
-            NamedUrl? radio = (args.InvokedItem as NamedUrl);
+            IMedia? radio = (args.InvokedItem as IMedia);
             if (radio != null) {
                 Debug.WriteLine(radio.Name);
-                App.Host.Services.GetRequiredService<ChromeCastRepository>().PlayRadio(radio);
+                if (radio.IsCollection) {
+                    App.Host.Services.GetRequiredService<ChromeCastRepository>().PlayCed(radio as Cd);
+                } else {
+                    App.Host.Services.GetRequiredService<ChromeCastRepository>().PlayRadio(radio as NamedUrl);
+                }
             }
         }
     }

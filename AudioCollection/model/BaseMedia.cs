@@ -6,12 +6,12 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace AudioCollectionApi.model {
+namespace AudioCollectionApi {
 
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
     [JsonDerivedType(typeof(BaseMedia))]
-    [JsonDerivedType(typeof(Cd), typeDiscriminator: "cd")]
-    [JsonDerivedType(typeof(NamedUrl), typeDiscriminator: "radio")]
+    [JsonDerivedType(typeof(AudioCollectionApi.Cd), typeDiscriminator: "cd")]
+    [JsonDerivedType(typeof(AudioCollectionApi.NamedUrl), typeDiscriminator: "radio")]
     public class BaseMedia {
         public required string Name { get; set; }
 

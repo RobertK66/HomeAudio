@@ -12,11 +12,11 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Page.Resources>
-        <DataTemplate x:Key="ImageTemplate" x:DataType="localm:NamedUrl">
+        <DataTemplate x:Key="ImageTemplate" x:DataType="localm:BaseMedia">
             <ItemContainer HorizontalAlignment="Left" Width="800" Height="40" >
                 <StackPanel Orientation="Horizontal">
                     <TextBox IsEnabled="False" Text="{x:Bind Name}"/>
-                    <TextBox IsEnabled="False" Text="{x:Bind ContentUrl}"/>
+                    <!--<TextBox IsEnabled="False" Text="{x:Bind ContentUrl}"/>-->
                 </StackPanel>
             </ItemContainer>
         </DataTemplate>
