@@ -243,20 +243,20 @@ namespace ConGui {
         public async Task PlayNext() {
             if (mediaChannel != null) {
                 Log?.LogDebug("Play Next");
-                currentMediaStatus ??= mediaChannel.Status.FirstOrDefault();  
-                if (currentMediaStatus != null) {
-                    await mediaChannel.QueueNextAsync(currentMediaStatus.MediaSessionId);
-                }
+                //currentMediaStatus ??= mediaChannel.Status.FirstOrDefault();  
+                //if (currentMediaStatus != null) {
+                    await mediaChannel.QueueNextAsync();
+                //}
             }
         }
 
         public async Task PlayPrev() {
             if (mediaChannel != null) {
                 Log?.LogDebug("Play Prev");
-                currentMediaStatus ??= mediaChannel.Status.FirstOrDefault();
-                if (currentMediaStatus != null) {
-                    await mediaChannel.QueuePrevAsync(currentMediaStatus.MediaSessionId);
-                }
+                //currentMediaStatus ??= mediaChannel.Status.FirstOrDefault();
+                //if (currentMediaStatus != null) {
+                    await mediaChannel.QueuePrevAsync();
+                //}
             }
         }
 
