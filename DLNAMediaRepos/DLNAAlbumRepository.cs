@@ -2,9 +2,11 @@
 using AudioCollectionApi.api;
 using AudioCollectionApi.model;
 using Microsoft.Extensions.Logging;
+using Microsoft.VisualBasic;
 using RadioBrowser;
 using RadioBrowser.Models;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
@@ -17,55 +19,55 @@ using System.Xml;
 namespace DLNAMediaRepos {
 
     public class DLNAAlbumRepository : IMediaRepository {
-        Dictionary<String, ObservableCollection<Cd>> CdRepositories = new();
-        Dictionary<String, ObservableCollection<NamedUrl>> RadioRepositories = new();
+        Dictionary<String,ConcurrentDictionary<string, IMedia>> CdRepositories = new();
+        //Dictionary<String, ObservableCollection<NamedUrl>> RadioRepositories = new();
 
         private ObservableCollection<MediaCategory> CdCategories = new();
-        private ObservableCollection<MediaCategory> RadioCategories = new();
+        //private ObservableCollection<MediaCategory> RadioCategories = new();
 
         DLNAClient client; // = new();
-        RadioBrowserClient radioBrowser; //= new();
+        //RadioBrowserClient radioBrowser; //= new();
 
         private readonly ILogger? Log;
         private int IdCnt = 0;
 
-        public DLNAAlbumRepository(ILogger<DLNAAlbumRepository>? l) {
-            Log = l;
+        public DLNAAlbumRepository(ILoggerFactory? loggerFactory = null) {
+            Log = loggerFactory?.CreateLogger<DLNAAlbumRepository>();
         }
 
-        public async Task<int> LoadRadioStationsAsync() {
-            //Log.LogInformation("Starting advanced radio Search ...");
-            radioBrowser = new RadioBrowserClient();
-            var results = await radioBrowser.Search.AdvancedAsync(new AdvancedSearchOptions {
-                Country = "Austria"
-            });
+        //public async Task<int> LoadRadioStationsAsync() {
+        //    //Log.LogInformation("Starting advanced radio Search ...");
+        //    radioBrowser = new RadioBrowserClient();
+        //    var results = await radioBrowser.Search.AdvancedAsync(new AdvancedSearchOptions {
+        //        Country = "Austria"
+        //    });
 
-            foreach (var st in results) {
-                if ((st.Url != null) && (st.Name != null)) {
-                    var tag = string.IsNullOrEmpty(st.Tags[0]) ? "untagged" : st.Tags[0];
-                    MediaCategory? cat = RadioCategories.Where(rc => rc.Name == tag).FirstOrDefault();
-                    if (cat == null) {
-                        cat = new("Radio-" + (IdCnt++)) { Name = tag };
-                        RadioCategories.Add(cat);
-                        RadioRepositories.Add(cat.Id, new ObservableCollection<NamedUrl>());
-                    } 
-                    ObservableCollection<NamedUrl> rep = RadioRepositories[cat.Id];
-                    if (!rep.Where(r => r.Name == st.Name).Any()) {
-                        var entry = new NamedUrl(st.Name, st.Url.ToString());
-                        //cat.Entries.Add(entry);
-                        rep.Add(entry);
-                    }
+        //    foreach (var st in results) {
+        //        if ((st.Url != null) && (st.Name != null)) {
+        //            var tag = string.IsNullOrEmpty(st.Tags[0]) ? "untagged" : st.Tags[0];
+        //            MediaCategory? cat = RadioCategories.Where(rc => rc.Name == tag).FirstOrDefault();
+        //            if (cat == null) {
+        //                cat = new("Radio-" + (IdCnt++)) { Name = tag };
+        //                RadioCategories.Add(cat);
+        //                RadioRepositories.Add(cat.Id, new ObservableCollection<NamedUrl>());
+        //            } 
+        //            ObservableCollection<NamedUrl> rep = RadioRepositories[cat.Id];
+        //            if (!rep.Where(r => r.Name == st.Name).Any()) {
+        //                var entry = new NamedUrl(st.Name, st.Url.ToString());
+        //                //cat.Entries.Add(entry);
+        //                rep.Add(entry);
+        //            }
 
-                   // Log.LogInformation("{count} Stations found.", rep.Count);
-                }
-            }
+        //           // Log.LogInformation("{count} Stations found.", rep.Count);
+        //        }
+        //    }
 
-            return results.Count;
-        }
+        //    return results.Count;
+        //}
 
 
         public async Task<int> LoadAlbumsAsync() {
-            //Log.LogInformation("Starting DLNA Album search ...");
+            Log.LogInformation("Starting DLNA Album search ...");
             client = new DLNAClient();
             client.DLNADevices.CollectionChanged += DLNADevicesFound; 
             int deviceCnt = await client.SearchingDevicesAsync();
@@ -81,9 +83,9 @@ namespace DLNAMediaRepos {
                     MediaCategory cat = new("Cd-" + (IdCnt++)) { Name = device.FriendlyName };
                     if (!CdCategories.Where(c => c.Name == cat.Name).Any()) {
                         CdCategories.Add(cat);
-                        CdRepositories.Add(cat.Id, new ObservableCollection<Cd>());
+                        CdRepositories.Add(cat.Id, new ConcurrentDictionary<string, IMedia>());
                     }
-                    //Log.LogInformation("Searching {mName} {fName} for album/track items... ",device.ModelName,device.FriendlyName);
+                    Log?.LogInformation("Searching {mName} {fName} for album/track items... ",device.ModelName,device.FriendlyName);
                     //var rootContent = clonedDevice.GetDeviceContent("0");
                     var rootContent = clonedDevice.GetDeviceContent("21");
                     rootContent.ForEach(async item => {
@@ -116,10 +118,10 @@ namespace DLNAMediaRepos {
 
         private async Task AddAlbum(DLNADevice device, DLNAObject cd) {
             var c = CdCategories.Where(c => c.Name.Equals(device.FriendlyName)).FirstOrDefault();
-            ObservableCollection<Cd> rep = CdRepositories[c.Id];
+            ConcurrentDictionary<string, IMedia> rep = CdRepositories[c.Id];
 
-            if (!rep.Where(rcd => cd.Name == rcd.Name).Any()) {
-                Log?.LogInformation("+");
+            if (!rep.Where(rcd => cd.Name == rcd.Value?.Name).Any()) {
+                //Log?.LogInformation("+");
                 //Log.LogInformation("{album} reading", cd.Name);
                 await Task.Delay(100);
                 var cdXmlDocument = new XmlDocument();
@@ -151,12 +153,15 @@ namespace DLNAMediaRepos {
 
                 album.CDID = (XX % 256).ToString("x2") + YYYY.ToString("x4") + tracks.Count.ToString("x2");
 
-                if (!rep.Where(cd => cd.CDID == album.CDID).Any()) {
-                    //Log.LogInformation("{album} added.", cd.Name);
-                    rep.Add(album);
+                if (rep.TryAdd(album.CDID, album)) {
+                    Log.LogDebug("{album} added.", cd.Name);
                 }
+                //if (!rep.Where(cd => (cd as Cd)?.CDID == album.CDID).Any()) {
+                //    //Log.LogInformation("{album} added.", cd.Name);
+                //    rep.Add(album);
+                //}
             } else {
-                Log?.LogInformation(".");
+                //Log?.LogInformation(".");
             }
         }
 
@@ -172,29 +177,29 @@ namespace DLNAMediaRepos {
         //    //} 
         //}
 
-        public ObservableCollection<Cd> GetCdRepository(string collectionid) {
-            if (CdRepositories.ContainsKey(collectionid)) {
-                return CdRepositories[collectionid];
-            } else {
-                return new ObservableCollection<Cd>();
-            }
-        }
+        //public ObservableCollection<Cd> GetCdRepository(string collectionid) {
+        //    if (CdRepositories.ContainsKey(collectionid)) {
+        //        return CdRepositories[collectionid];
+        //    } else {
+        //        return new ObservableCollection<Cd>();
+        //    }
+        //}
 
-        public ObservableCollection<NamedUrl> GetRadioRepository(string collectionid) {
-            if (RadioRepositories.ContainsKey(collectionid)) {
-                return RadioRepositories[collectionid];
-            } else {
-                return new ObservableCollection<NamedUrl>();
-            }
-        }
+        //public ObservableCollection<NamedUrl> GetRadioRepository(string collectionid) {
+        //    if (RadioRepositories.ContainsKey(collectionid)) {
+        //        return RadioRepositories[collectionid];
+        //    } else {
+        //        return new ObservableCollection<NamedUrl>();
+        //    }
+        //}
 
-        public ObservableCollection<MediaCategory> GetRadioCategories() {
-            return RadioCategories;
-        }
+        //public ObservableCollection<MediaCategory> GetRadioCategories() {
+        //    return RadioCategories;
+        //}
 
-        public ObservableCollection<MediaCategory> GetCdCategories() {
-            return CdCategories;
-        }
+        //public ObservableCollection<MediaCategory> GetCdCategories() {
+        //    return CdCategories;
+        //}
 
         public async Task LoadAllAsync(object PersitenceContext) {
             Log?.LogInformation("DLNA wait for start ...");
@@ -208,11 +213,15 @@ namespace DLNAMediaRepos {
         }
 
         public ObservableCollection<MediaCategory> GetCategories() {
-            throw new NotImplementedException();
+            return CdCategories;
         }
 
         public ObservableCollection<IMedia> GetMediaRepository(string categoryId) {
-            throw new NotImplementedException();
+            if (CdRepositories.ContainsKey(categoryId)) {
+                return new ObservableCollection<IMedia>(CdRepositories[categoryId].Values);
+            } else {
+                return new ObservableCollection<IMedia>();
+            }
         }
     }
 }
