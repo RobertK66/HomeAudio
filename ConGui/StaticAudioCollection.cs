@@ -16,7 +16,6 @@ using AudioCollectionApi.model;
 
 namespace ConGui {
 
-
     public class StaticAudioCollection : ITabedAudioCollection {
 
         public class AudioEntry : IAudioEntry {
@@ -54,9 +53,6 @@ namespace ConGui {
 
         private readonly ILogger Log;
 
-        //List<(string name, List<(string url, string name)> tracks, string artist, string cdid)> Albums = new();
-        //List<(string name, string url)> WebRadios = new();
-
         readonly List<IAudioTab> MediaTabs = [];
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE0090:\"new(...)\" verwenden", Justification = "mag ich hier lieber lesbarere mit Klassennamen davor")]
@@ -64,6 +60,7 @@ namespace ConGui {
             Log = logger;
 
             var rootPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) ?? ".\\";
+            rootPath += "/repos";
             mr.LoadAllAsync(rootPath).Wait();
 
             var TabedAudioConf = conf.GetSection("MediaTabs");
@@ -90,54 +87,12 @@ namespace ConGui {
                             at.AddAudioEntry(entry);
                         }
                     }
-                    //mc = mr.GetRadioCategories().Where(c => c.Name.Equals(name)).FirstOrDefault();
-                    //if (mc != null) {
-                    //    foreach (var radio in mr.GetRadioRepository(mc.Id)) {
-                    //        AudioEntry entry = new AudioEntry();
-                    //        entry.Name = radio.Name;
-                    //        entry.ContentUrl = radio.ContentUrl;
-                    //        at.AddAudioEntry(entry);
-                    //    }
-                    //}
-                    //using (StreamReader file = File.OpenText(contentFilePath)) {
-                    //    JsonSerializer serializer = new JsonSerializer();
-                    //    AudioEntry[]? entries = (AudioEntry[]?)serializer.Deserialize(file, typeof(AudioEntry[]));
-                    //    if (entries != null && entries.Length > 0) {
-                    //        foreach (var item in entries) {
-                    //            at.AddAudioEntry(item);
-                    //        }
-                    //    }
-                    //}
                     MediaTabs.Add(at);
                 }
             }
             Log.LogDebug("{tabCount} Media Tabs created.", MediaTabs.Count);
 
         }
-
-        //public List<(string name, List<(string url, string name)> tracks, string artist, string cdid)> GetAllAlbums() {
-        //    return Albums;
-        //}
-
-        //public List<(string name, string url)> GetAllStations() {
-        //    return WebRadios;
-        //}
-
-        //public List<(string url, string name)> GetCdTracks(int albumIdx) {
-        //    return Albums[albumIdx%Albums.Count].tracks;
-        //}
-
-        //public List<(string url, string name)> GetCdTracks(string cdid) {
-        //    return Albums.Where(a=>a.cdid == cdid).FirstOrDefault().tracks;
-        //}
-
-        //public (string name, string url) GetRadioStation(int stationIdx) {
-        //    return WebRadios[stationIdx];
-        //}
-
-        //public (string name, string url) GetRadioStation(string stationName) {
-        //    return WebRadios.Where(st=>st.name == stationName).FirstOrDefault();
-        //}
 
         public List<IAudioTab> GetAllTabs() {
             return MediaTabs;

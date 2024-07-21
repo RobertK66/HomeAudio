@@ -46,18 +46,28 @@ namespace DLNAMediaRepos {
                 options = new AdvancedSearchOptions { Country = "Austria" };
             }
 
+            RadioCategories.Add(new MediaCategory("Pop") { Name = "Pop" });
+            RadioCategories.Add(new MediaCategory("Rock") { Name = "Rock" });
+            RadioCategories.Add(new MediaCategory("Classic") { Name = "Classic" });
+            RadioCategories.Add(new MediaCategory("Rest") { Name = "*" });
+
+            RadioRepositories.Add("Pop", new ObservableCollection<IMedia>());
+            RadioRepositories.Add("Rock", new ObservableCollection<IMedia>());
+            RadioRepositories.Add("Classic", new ObservableCollection<IMedia>());
+            RadioRepositories.Add("Rest", new ObservableCollection<IMedia>());
+
             var results = await radioBrowser.Search.AdvancedAsync(options);
 
             int cnt = 0;
             foreach (var st in results) {
                 if ((st.Url != null) && (st.Name != null)) {
-                    var tag = string.IsNullOrEmpty(st.Tags[0]) ? "untagged" : st.Tags[0];
-                    MediaCategory? cat = RadioCategories.Where(rc => rc.Name == tag).FirstOrDefault();
+                    var tag = string.Concat(st.Tags).ToLower();
+                    MediaCategory? cat = RadioCategories.Where(rc => tag.Contains(rc.Name?.ToLower()??"trööt")).FirstOrDefault();
                     if (cat == null) {
-                        cat = new("R-" + (IdCnt++)) { Name = tag };
-                        RadioCategories.Add(cat);
-                        RadioRepositories.Add(cat.Id, new ObservableCollection<IMedia>());
-                        Log.LogDebug($"Category '{cat.Name}' added.");
+                        cat = RadioCategories.Where(rc => rc.Id == "Rest").FirstOrDefault();
+                        //RadioCategories.Add(cat);
+                        //RadioRepositories.Add(cat.Id, new ObservableCollection<IMedia>());
+                        Log.LogTrace($"rest wegen ****'{tag}'*****!");
                     }
                     ObservableCollection<IMedia> rep = RadioRepositories[cat.Id];
                     if (!rep.Where(r => r.Name == st.Name).Any()) {
@@ -65,7 +75,7 @@ namespace DLNAMediaRepos {
                         //cat.Entries.Add(entry);
                         rep.Add(entry);
                         cnt++;
-                        Log.LogDebug($"Added '{entry.Name}'");
+                        Log.LogDebug($"Added '{entry.Name}' to [{cat.Id}]");
                     }
                 }
             }

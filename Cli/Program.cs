@@ -88,7 +88,7 @@ namespace Cli {
                 }
             } else if (qcCommand == "playRadio") {
                 await Task.WhenAll(waitForRadios, waitForCaster);
-                IEnumerable<MediaCategory> radioCategories  = radioRepository.GetCategories();
+                IEnumerable<MediaCategory> radioCategories = radioRepository.GetCategories();
                 var cat = radioCategories.ElementAtOrDefault(5);
                 if ((cat != null)) {
                     var media = radioRepository.GetMediaRepository(cat.Id).FirstOrDefault();
@@ -133,20 +133,30 @@ namespace Cli {
                     logger.LogInformation($"Cd file '{outPath}' written with {CdArray.Length} entries.");
                 }
             } else if (qcCommand == "writeRadio") {
-                //await Task.WhenAll(waitForRadioStations);
-                //var cat = DlnaRepos2.GetRadioCategories().FirstOrDefault();
-                //if (cat != null) {
-                //    var st = DlnaRepos2.GetRadioRepository(cat.Id).ToList();
-                //    var station = new { Name = default(string), ContentUrl = default(string) };
-                //    var StationArray = Array.CreateInstance(station.GetType(), st.Count);
-                //    int idx = 0;
-                //    foreach (var s in st) {
-                //        StationArray.SetValue(new { s.Name, s.ContentUrl }, idx++);
-                //    }
-                //    var WebRadio = new { WebRadio = StationArray };
-                //    string radj = "";// JsonConvert.SerializeObject(WebRadio, Formatting.Indented);
-                //    File.WriteAllText(outPath, radj);
-                //}
+                await Task.WhenAll(waitForRadios);
+                int catnr = 0;
+                //var cat = radioRepository.GetCategories().FirstOrDefault();
+                foreach (var cat in radioRepository.GetCategories()) { 
+                    if (cat != null) {
+                        var st = radioRepository.GetMediaRepository(cat.Id).ToList();
+                        var station = new { type="radio", Name = default(string), ContentUrl = default(string) };
+                        var StationArray = Array.CreateInstance(station.GetType(), st.Count);
+                        int idx = 0;
+                        foreach (var s in st) {
+                            StationArray.SetValue(new { type = "radio", s.Name, s.ContentUrl }, idx++);
+                        }
+                        var WebRadio = new { WebRadio = StationArray };
+                        string radj = JsonSerializer.Serialize(WebRadio);
+                        string path = outPath + "_" + cat.Id + ".json";
+                        try {
+                            File.WriteAllText(path, radj);
+                        } catch {
+                            logger.LogError($"Error writing '{path}'");
+                        }
+                        logger.LogDebug($"{StationArray.Length} stations written to '{path}'");
+                        catnr++;
+                    }
+                }
             }
             logger.LogDebug("Program.StartAsync() finished.");
         }
