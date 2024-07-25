@@ -17,6 +17,7 @@
     <None Remove="pages\CdPage.xaml" />
     <None Remove="pages\ChromecastPage.xaml" />
     <None Remove="pages\RadioPage.xaml" />
+    <None Remove="pages\SettingsPage.xaml" />
   </ItemGroup>
 
   <ItemGroup>
@@ -30,6 +31,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.1.240606-rc" />
     <PackageReference Include="CommunityToolkit.WinUI.Converters" Version="8.1.240606-rc" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.240627000" />
@@ -56,6 +58,9 @@
     <None Update="Cds.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Page Update="pages\SettingsPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <None Update="WebRadios.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

@@ -54,6 +54,9 @@ namespace WinUiHomeAudio {
                                                                    } 
                                                              } }
 
+        public NavigationView MainNavPane { get => this.MainNavView; }
+
+
         public MainPage() {
             this.InitializeComponent();
 
@@ -92,7 +95,7 @@ namespace WinUiHomeAudio {
         private void NavigationView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args) {
             if (args.IsSettingsInvoked) {
                 //this.ccPlayer.Visibility = Visibility.Collapsed;
-                //ContentFrame.Navigate(typeof(SettingsPage));
+                ContentFrame.Navigate(typeof(SettingsPage));
             } else {
                 //this.ccPlayer.Visibility = Visibility.Visible;
                 string selectedItem = (String)args.InvokedItem;

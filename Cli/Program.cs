@@ -35,10 +35,10 @@ namespace Cli {
         private readonly ILogger logger;    
 
 
-        public Program(IConfiguration conf, DLNAAlbumRepository DlnaRepos, ILogger<Program> log, WebRadioRepository radioRepos) {
+        public Program(ILogger<Program> log, IConfiguration conf, DLNAAlbumRepository DlnaRepos, WebRadioRepository radioRepos) {
+            logger = log;
             albumRepository = DlnaRepos;
             radioRepository = radioRepos;
-            logger = log;
 
             logger.LogDebug("Program() Constructor called.");
             
@@ -70,8 +70,8 @@ namespace Cli {
             var waitForCaster = ccs.Connect();
 
             // Start the DLNA Search ...
-            //IMediaRepository DlnaRepos = new DLNAAlbumRepository();
-            var waitForAlbums = Task.CompletedTask; //albumRepository.LoadAllAsync("dummy");
+            IMediaRepository DlnaRepos = new DLNAAlbumRepository();
+            var waitForAlbums = albumRepository.LoadAllAsync("dummy");
 
             // Start the Radio Search ...
             var waitForRadios = radioRepository.LoadAllAsync("dummy");
@@ -98,10 +98,10 @@ namespace Cli {
                 }
 
             } else if (qcCommand == "next") {
-                //await waitForCaster;
+                await waitForCaster;
                 _ = await ccs.PlayNext();
             } else if (qcCommand == "prev") {
-                //await waitForCaster;
+                await waitForCaster;
                 _ = await ccs.PlayPrev();
             } else if (qcCommand == "writeCd") {
                 await Task.WhenAll(waitForAlbums);

@@ -46,7 +46,7 @@ namespace WinUiHomeAudio {
         public readonly IHost MyHost;
         private readonly ILogger<App> Log;
 
-        private MainWindow? m_window;
+        public MainWindow? m_window;
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
