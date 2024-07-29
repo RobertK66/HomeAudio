@@ -1,4 +1,5 @@
 
+using CommunityToolkit.WinUI.Controls;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI;
@@ -51,24 +52,6 @@ namespace WinUiHomeAudio.pages {
         //private static int navigatecount = 0;
         private TimeSpan? loadTime = null;
 
-        public string EaVersion {
-            get {
-                var version = System.Reflection.Assembly.GetEntryAssembly()?.GetName().Version;
-                return string.Format("{0}.{1}.{2}.{3}", version?.Major, version?.Minor, version?.Build, version?.Revision);
-            }
-        }
-
-        public string EaName {
-            get {
-                return System.Reflection.Assembly.GetEntryAssembly()?.FullName ?? "<null>";
-            }
-        }
-
-        public string EaDecription {
-            get {
-                return System.Reflection.Assembly.GetEntryAssembly()?.Location ?? "unknown";
-            }
-        }
 
         public string PackageVersion {
             get {
@@ -84,14 +67,13 @@ namespace WinUiHomeAudio.pages {
 
         public String RepositoryPath {
             get {
-                return "Settings.ReposPath;";
-            }
+                return Settings.ReposPath;            }
 
             set {
-                //if (!Object.Equals(Settings.ReposPath, value)) {
-                //    Settings.ReposPath = value;
-                //    RaisePropertyChanged();
-                //}
+                if (!Object.Equals(Settings.ReposPath, value)) {
+                    Settings.ReposPath = value;
+                    RaisePropertyChanged();
+                }
             }
         }
 
@@ -136,13 +118,13 @@ namespace WinUiHomeAudio.pages {
         }
 
 
-        public string WinAppSdkDetails {
-            get => "App.WinAppSdkDetails;";
-        }
+        //public string WinAppSdkDetails {
+        //    get => "App.WinAppSdkDetails;";
+        //}
 
-        public string WinAppSdkRuntimeDetails {
-            get => "App.WinAppSdkRuntimeDetails;";
-        }
+        //public string WinAppSdkRuntimeDetails {
+        //    get => "App.WinAppSdkRuntimeDetails;";
+        //}
 
         public SettingsPage() {
             DateTime startTime = DateTime.Now;
@@ -153,15 +135,16 @@ namespace WinUiHomeAudio.pages {
 
             var aa = Assembly.GetEntryAssembly()?.GetReferencedAssemblies();
             if (aa != null) {
-                foreach (var a in aa) {
+                foreach (var a in aa.OrderBy(y=>y.Name)) {
                     try {
                         if (a != null) {
                             var asm = Assembly.Load(a);
-                            //this.VersionExpander.Items.Add(new SettingsCard() {
-                            //    Header = a.FullName,
-                            //    Content = string.Format("{0}.{1}.{2}.{3} ", a.Version?.Major, a.Version?.Minor, a.Version?.Build, a.Version?.Revision),
-                            //    Description = asm.Location
-                            //});
+                            System.Diagnostics.FileVersionInfo fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(asm.Location);
+                            this.VersionExpander.Items.Add(new SettingsCard() {
+                                Header = fvi.InternalName??fvi.FileName,
+                                Content = fvi.FileVersion, //string.Format("{0}.{1}.{2}.{3} ", a.Version?.Major, a.Version?.Minor, a.Version?.Build, a.Version?.Revision),
+                                Description = a.FullName
+                            }); 
                         }
                     } catch { }
                 }
@@ -179,7 +162,7 @@ namespace WinUiHomeAudio.pages {
             try {
                 RepositoryFiles.Clear();
                 foreach (var s in Directory.GetFiles(RepositoryPath, "*.json")) {
-                    RepositoryFiles.Add(s);
+                    RepositoryFiles.Add(Path.GetFullPath(s));
                     i++;
                 }
             } catch (Exception ex) {
@@ -188,15 +171,18 @@ namespace WinUiHomeAudio.pages {
             return i;
         }
 
+
+
+
         private void themeMode_SelectionChanged_1(object sender, SelectionChangedEventArgs e) {
             var selectedTheme = ((ComboBoxItem)themeMode.SelectedItem)?.Tag?.ToString();
             if (selectedTheme != null) {
-                //var t = App.GetEnum<ElementTheme>(selectedTheme);
+                var t = Settings.GetEnum<ElementTheme>(selectedTheme);
 
-                //if (App.Current.m_window?.Content is FrameworkElement rootElement) {
-                //    rootElement.RequestedTheme = t;
-                //    ApplicationData.Current.LocalSettings.Values[AppSettingKeys.UiTheme] = t.ToString();
-                //}
+                if ((App.Current as WinUiHomeAudio.App)?.m_window?.Content is FrameworkElement rootElement) {
+                    rootElement.RequestedTheme = t;
+                    Settings.UiTheme  = t.ToString();
+                }
             }
 
         }
@@ -206,10 +192,10 @@ namespace WinUiHomeAudio.pages {
             if (navPane != null) {
                 if (navigationLocation.SelectedIndex == 0) {
                     navPane.PaneDisplayMode = NavigationViewPaneDisplayMode.Auto;
-                    //ApplicationData.Current.LocalSettings.Values[AppSettingKeys.IsLeftMode] = true;
+                    Settings.IsLeftMode = true;
                 } else {
                     navPane.PaneDisplayMode = NavigationViewPaneDisplayMode.Top;
-                    //ApplicationData.Current.LocalSettings.Values[AppSettingKeys.IsLeftMode] = false;
+                    Settings.IsLeftMode = false;
                 }
             }
         }
@@ -218,8 +204,7 @@ namespace WinUiHomeAudio.pages {
             loadcount++;
             Log.LogDebug(string.Format("Settings Page constructed: {0}, loaded: {1} ", constcount, loadcount));
 
-            bool? isLeft = null; // ApplicationData.Current.LocalSettings.Values[AppSettingKeys.IsLeftMode];
-            if (isLeft == null || ((bool)isLeft == true)) {
+            if (Settings.IsLeftMode) {
                 navigationLocation.SelectedIndex = 0;
             } else {
                 navigationLocation.SelectedIndex = 1;
@@ -252,7 +237,7 @@ namespace WinUiHomeAudio.pages {
 
         private void CreateFileList() {
             if (ListReposFiles() > 0) {
-                //App.Current.ReconfigureMainWindow(RepositoryPath);
+                (App.Current as WinUiHomeAudio.App)?.m_window?.MainPage?.ReconfigureMediaFolder(RepositoryPath);
             }
         }
 

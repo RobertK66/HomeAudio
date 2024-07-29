@@ -34,6 +34,8 @@ namespace AudioCollectionImpl
             if (!loading) {
                 loading = true;
                 if (rootPath is string dirPath) {
+                    Repositories.Clear();
+                    Categories.Clear();
                     foreach (var f in Directory.GetFiles(dirPath, "*.json")) {
                         Log?.LogDebug("Scanning {path} for media content.", f);
                         if (reLoadPath != null) {
@@ -76,12 +78,14 @@ namespace AudioCollectionImpl
                         foreach (var item in cont) {
                             if (item is IMedia media) {
                                 rep.Add(media);
+                            } else {
+                                Log?.LogInformation($"Entry '{item.Name}' with type '{item.GetType().Name}' can not be added as IMedia element. Add \"type\":\"radio\" or \"type\":\"cd\" to your json objects.");
                             }
                         }
                     }
-                    Log?.LogInformation("Added {count} entries from {name}[{id}]", cont?.Count, cat.Name, reposid);
+                    Log?.LogInformation("Added {count} entries from {name}[{id}]", rep.Count, cat.Name, reposid);
                 } catch (Exception ex) {
-                    // Silently skip all non media json ...
+                    // Skip all non media json ...
                     Log?.LogTrace("Exception beim Laden eines Repositories: {repName}, {ex}", path, ex);
                 }
             }

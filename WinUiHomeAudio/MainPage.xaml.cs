@@ -62,11 +62,10 @@ namespace WinUiHomeAudio {
 
             _ccRepos = App.Host.Services.GetRequiredService<ChromeCastRepository>();
 
+            var settings = App.Host.Services.GetRequiredService<AppSettings>();
             IEnumerable<IMediaRepository> mrs = App.Host.Services.GetServices<IMediaRepository>();
             foreach (IMediaRepository mr in mrs) {
-
-                //            IMediaRepository mr = App.Host.Services.GetServices<IMediaRepository>();
-
+           
                 mr.GetCategories().CollectionChanged += (s, e) => {
                     if (e.NewItems != null) {
                         foreach (var ni in e.NewItems) {
@@ -77,20 +76,18 @@ namespace WinUiHomeAudio {
                     }
                 };
 
-                //mr.GetRadioCategories().CollectionChanged += (s, e) => {
-                //    if (e.NewItems != null) {
-                //        foreach (var ni in e.NewItems) {
-                //            if (ni is MediaCategory mc) {
-                //                Categories.Add(new Category() { Glyph = Symbol.Account, Name = mc.Name ?? "unknown", Tag = mc.Id });
-                //            }
-                //        }
-                //    }
-                //};
-
-                _ = mr.LoadAllAsync(ApplicationData.Current.LocalFolder.Path);
+                _ = mr.LoadAllAsync(settings.ReposPath);
             }
         }
 
+
+        public void ReconfigureMediaFolder(string reposRootPath) {
+            Categories.Clear();
+            IEnumerable<IMediaRepository> mrs = App.Host.Services.GetServices<IMediaRepository>();
+            foreach (IMediaRepository mr in mrs) {
+                _ = mr.LoadAllAsync(reposRootPath);
+            }
+        }
 
         private void NavigationView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args) {
             if (args.IsSettingsInvoked) {

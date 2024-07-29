@@ -84,13 +84,13 @@
 
                 <TextBlock Style="{StaticResource SettingsSectionHeaderTextBlockStyle}" Text="About" />
 
-                <labs:SettingsExpander x:Name="VersionExpander" Description="© 2023 Robert'sw" Header="lkjklöjlö jklöj klökj lk" HeaderIcon="PreviewLink">
+                <labs:SettingsExpander x:Name="VersionExpander" Description="© 2023 Robert'sw" Header="My Home Audio" HeaderIcon="PreviewLink">
                     <TextBlock
                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                        IsTextSelectionEnabled="True"
                        Text="{x:Bind PackageVersion}" />
                     <labs:SettingsExpander.Items>
-                        <labs:SettingsCard
+                        <!--<labs:SettingsCard
                             x:Name="versioncard"
                             Header="{x:Bind EaName}"
                             Description="{x:Bind EaDecription}"  
@@ -102,7 +102,7 @@
                                 Foreground="{ThemeResource TextFillColorSecondaryBrush}"
                                 IsTextSelectionEnabled="True"
                                 Text="{x:Bind EaVersion}" />
-                        </labs:SettingsCard>
+                        </labs:SettingsCard>-->
                     </labs:SettingsExpander.Items>
                 </labs:SettingsExpander>
             </StackPanel>

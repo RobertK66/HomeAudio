@@ -11,6 +11,9 @@
     <UseWinUI>true</UseWinUI>
     <EnableMsixTooling>true</EnableMsixTooling>
     <Nullable>enable</Nullable>
+    <PackageCertificateThumbprint>E5C8D50612BBEEAAE1A270272585C328BABCED24</PackageCertificateThumbprint>
+    <PackageCertificateKeyFile>WinUiHomeAudio_TemporaryKey.pfx</PackageCertificateKeyFile>
+    <AppxPackageSigningEnabled>True</AppxPackageSigningEnabled>
   </PropertyGroup>
   <ItemGroup>
     <None Remove="MainPage.xaml" />
