@@ -17,13 +17,10 @@
     <Page Update="MainPage.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="pages\CdPage.xaml">
-      <SubType>Designer</SubType>
-    </Page>
     <Page Update="pages\ChromecastPage.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="pages\RadioPage.xaml">
+    <Page Update="pages\MediaPage.xaml">
       <SubType>Designer</SubType>
     </Page>
     <None Update="MainWindow.xaml">

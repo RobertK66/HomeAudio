@@ -98,10 +98,8 @@ namespace WinUiHomeAudio {
                 string selectedItem = (String)args.InvokedItem;
                 if (selectedItem.Equals("ChromeCast")) {
                     //ContentFrame.Navigate(typeof(ChromecastPage));
-                //} else if (selectedItem.Contains("Cd")) {
-                //    ContentFrame.Navigate(typeof(CdPage), args.InvokedItemContainer.Tag.ToString());
                 } else {
-                    ContentFrame.Navigate(typeof(RadioPage), args.InvokedItemContainer.Tag.ToString());
+                    ContentFrame.Navigate(typeof(MediaPage), args.InvokedItemContainer.Tag.ToString());
                 }
             }
         }

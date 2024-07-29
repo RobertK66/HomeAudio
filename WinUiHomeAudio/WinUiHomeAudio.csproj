@@ -17,9 +17,8 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="MainPage.xaml" />
-    <None Remove="pages\CdPage.xaml" />
     <None Remove="pages\ChromecastPage.xaml" />
-    <None Remove="pages\RadioPage.xaml" />
+    <None Remove="pages\MediaPage.xaml" />
     <None Remove="pages\SettingsPage.xaml" />
   </ItemGroup>
 
@@ -72,15 +71,11 @@
     <Page Update="MainPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="pages\CdPage.xaml">
-      <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
-      <SubType>Designer</SubType>
-    </Page>
     <Page Update="pages\ChromecastPage.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="pages\RadioPage.xaml">
+    <Page Update="pages\MediaPage.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>

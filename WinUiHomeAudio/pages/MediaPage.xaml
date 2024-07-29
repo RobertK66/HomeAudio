@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <local:VmPage
-    x:Class="WinUiHomeAudio.pages.RadioPage"
+    x:Class="WinUiHomeAudio.pages.MediaPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:WinUiHomeAudio.pages"
@@ -12,7 +12,15 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <Page.Resources>
-        <DataTemplate x:Key="ImageTemplate" x:DataType="localm:BaseMedia">
+        <DataTemplate x:Key="CdTemplate" x:DataType="localm:Cd">
+            <ItemContainer HorizontalAlignment="Left" Width="800" Height="40" >
+                <StackPanel Orientation="Horizontal">
+                    <TextBox IsEnabled="False" Text="{x:Bind Name}"/>
+                    <TextBox IsEnabled="False" Text="{x:Bind CDID}"/>
+                </StackPanel>
+            </ItemContainer>
+        </DataTemplate>
+        <DataTemplate x:Key="RadioTemplate" x:DataType="localm:NamedUrl">
             <ItemContainer HorizontalAlignment="Left" Width="800" Height="40" >
                 <StackPanel Orientation="Horizontal">
                     <TextBox IsEnabled="False" Text="{x:Bind Name}"/>
@@ -20,11 +28,14 @@
                 </StackPanel>
             </ItemContainer>
         </DataTemplate>
-
+        
+        <local:MyItemTemplateSelector x:Key="MyItemTemplateSelector"
+            CdTemplate="{StaticResource CdTemplate}"
+            RadioTemplate="{StaticResource RadioTemplate}"/>
     </Page.Resources>
     <Grid>
-        <ItemsView ItemsSource="{x:Bind ListOfRadios, Mode=OneWay}"
-                   ItemTemplate="{StaticResource ImageTemplate}"
+        <ItemsView ItemsSource="{x:Bind ListOfMedia, Mode=OneWay}"
+                   ItemTemplate="{StaticResource MyItemTemplateSelector}"
                    IsItemInvokedEnabled="True"
                    ItemInvoked="ItemsView_ItemInvoked"
                    />

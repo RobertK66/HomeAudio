@@ -32,19 +32,18 @@ namespace WinUiHomeAudio.pages
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class RadioPage : VmPage {
+    public sealed partial class MediaPage : VmPage {
 
-        private ObservableCollection<IMedia>  _ListOfRadios = new ObservableCollection<IMedia>();
-        public ObservableCollection<IMedia> ListOfRadios { get { return _ListOfRadios; } set { if (_ListOfRadios != value) { _ListOfRadios = value; RaisePropertyChanged(); } } }
+        private ObservableCollection<IMedia>  _ListOfMedia = new ObservableCollection<IMedia>();
+        public ObservableCollection<IMedia> ListOfMedia { get { return _ListOfMedia; } set { if (_ListOfMedia != value) { _ListOfMedia = value; RaisePropertyChanged(); } } }
         
-        public RadioPage() {
+        public MediaPage() {
             this.InitializeComponent();
         }
         
         protected override void OnNavigatedTo(NavigationEventArgs e) {
-            var p = e.Parameter;
-
-            ListOfRadios = App.Host.Services.GetRequiredService<IMediaRepository>().GetMediaRepository(e?.Parameter?.ToString() ?? "X");
+            //var p = e.Parameter;
+            ListOfMedia = App.Host.Services.GetRequiredService<IMediaRepository>().GetMediaRepository(e?.Parameter?.ToString() ?? "X");
             base.OnNavigatedTo(e);
         }
 
