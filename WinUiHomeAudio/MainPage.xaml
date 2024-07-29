@@ -55,7 +55,7 @@
                                 <Border BorderBrush="{x:Bind Path=IsConnected, Mode=OneWay, Converter={StaticResource BoolToColorConverter}}"
                                         Visibility="Visible" 
                                         BorderThickness="2">
-                                    <StackPanel Orientation="Horizontal" Padding="4,0,4,0">
+                                    <StackPanel Orientation="Horizontal" Padding="4,0,5,0">
                                         <ToggleSwitch x:Name="ConnectToggle"
                                                       Toggled="CcPlayer_ConnectToggeled"
                                                       Width="120"

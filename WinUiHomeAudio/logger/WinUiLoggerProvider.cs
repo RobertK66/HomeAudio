@@ -1,13 +1,10 @@
-﻿using System;
+﻿using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Concurrent;
-using System.Runtime.Versioning;
 
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
-
-namespace MyHomeAudio.logger {
-    [UnsupportedOSPlatform("browser")]
-    [ProviderAlias("ConGuiConsole")]
+namespace WinUiHomeAudio.logger {
+    //[UnsupportedOSPlatform("browser")]
+    //[ProviderAlias("ConGuiConsole")]
     public sealed class WinUiLoggerProvider : ILoggerProvider {
         private readonly IDisposable? _onChangeToken;
         private WinUiLoggerConfiguration _currentConfig;
@@ -17,7 +14,7 @@ namespace MyHomeAudio.logger {
         public WinUiLoggerProvider(
             Microsoft.Extensions.Options.IOptionsMonitor<WinUiLoggerConfiguration> config) {
             _currentConfig = config.CurrentValue;
-            _onChangeToken = config.OnChange(updatedConfig => _currentConfig = updatedConfig);
+            _onChangeToken = config.OnChange((con, x) => _currentConfig = con);
         }
 
         public ILogger CreateLogger(string categoryName) =>

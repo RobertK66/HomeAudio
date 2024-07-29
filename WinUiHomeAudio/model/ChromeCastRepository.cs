@@ -1,19 +1,11 @@
-﻿using ABI.System;
-using AudioCollectionApi;
-using AudioCollectionApi.model;
+﻿using AudioCollectionApi.model;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Dispatching;
 using Sharpcaster.Models;
-using Sharpcaster.Models.Protobuf;
-using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace WinUiHomeAudio.model
-{
+namespace WinUiHomeAudio.model {
     public class ChromeCastRepository {
 
         public ChromeCastClientWrapper? _activeClient = null;

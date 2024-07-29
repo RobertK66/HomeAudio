@@ -5,23 +5,14 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:WinUiHomeAudio.pages"
     xmlns:localm="using:WinUiHomeAudio.model"
+    xmlns:locall="using:WinUiHomeAudio.logger"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
     mc:Ignorable="d"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}"
     NavigationCacheMode="Required">
     <Page.Resources>
-        <DataTemplate x:Name="CccTemplate" x:DataType="localm:ChromeCastClientWrapper">
-            <ItemContainer HorizontalAlignment="Left" >
-                <StackPanel Orientation="Horizontal">
-                    <TextBox IsEnabled="False" Text="{x:Bind Name}"/>
-                    <TextBox IsEnabled="False" Text="{x:Bind Status, Mode=OneWay}"/>
-                    <TextBox IsEnabled="False" Text="{x:Bind Volume, Mode=OneWay}"/>
-                    <TextBox IsEnabled="False" Text="{x:Bind AppId, Mode=OneWay}"/>
-                    <TextBox IsEnabled="False" Text="{x:Bind MediaStatus, Mode=OneWay}"/>
-                </StackPanel>
-            </ItemContainer>
-        </DataTemplate>
+        
     </Page.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -30,14 +21,36 @@
         </Grid.RowDefinitions>
 
 
-        <ComboBox Grid.Row="0" x:Name="ChromeCastClients" ItemsSource="{x:Bind CCC, Mode=OneWay}"
+        <!--<ComboBox Grid.Row="0" x:Name="ChromeCastClients" ItemsSource="{x:Bind CCC, Mode=OneWay}"
                   ItemTemplate="{StaticResource CccTemplate}" 
                   SelectedItem="{x:Bind SelectedCcc, Mode=TwoWay}"
                   SelectionChanged="ChromeCastClients_SelectionChanged"
-                  PlaceholderText="&lt;No Chromecast receiver found in Network>" />
+                  PlaceholderText="&lt;No Chromecast receiver found in Network>" />-->
+
+        <Button Grid.Row="0" Click="Button_Click">ClearLog</Button>
 
         <ScrollViewer x:Name="logScroll"  Grid.Row="1" VerticalAlignment="Stretch" VerticalScrollBarVisibility="Visible" VerticalScrollMode="Enabled" >
-            <!--<TextBlock Text="{x:Bind LoggerVm.ContentText, Mode=TwoWay}" TextWrapping="Wrap" SizeChanged="TextBlock_SizeChanged"></TextBlock>-->
+            <TextBlock Text="{x:Bind LoggerVm.ContentText, Mode=OneWay}" TextWrapping="Wrap" SizeChanged="TextBlock_SizeChanged" IsTextSelectionEnabled="True"></TextBlock>
+            <!--<ListView ItemsSource="{x:Bind LoggerVm.Entries, Mode=OneWay}" 
+                      BorderThickness="0" Padding="0" Margin="0">
+                <ListView.ItemContainerStyle>
+                    <Style TargetType="ListViewItem">
+                        <Setter Property="Padding" Value="0"/>
+                        <Setter Property="Margin" Value="0"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                    </Style>
+                </ListView.ItemContainerStyle>
+                <ListView.ItemsPanel>
+                    <ItemsPanelTemplate >
+                        <StackPanel Orientation="Vertical" Padding="0" Margin="0"/>
+                    </ItemsPanelTemplate>
+                </ListView.ItemsPanel>
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <TextBox Text="{Binding}" Margin="0" Padding="0" BorderThickness="0" Height="8" ></TextBox>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>-->
         </ScrollViewer>
     </Grid>
 </local:VmPage>

@@ -1,26 +1,12 @@
-using AudioCollectionApi;
+using AudioCollectionApi.api;
+using AudioCollectionApi.model;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.ComponentModel.Design.Serialization;
-using System.IO;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.Storage;
-using AudioCollectionApi.api;
-using AudioCollectionApi.model;
 using WinUiHomeAudio.model;
 using WinUiHomeAudio.pages;
 
@@ -46,13 +32,16 @@ namespace WinUiHomeAudio {
 
 
         private ChromeCastClientWrapper? _SelectedChromecast;
-        public ChromeCastClientWrapper? SelectedChromecast { get { return _SelectedChromecast; } 
-                                                             set { if (_SelectedChromecast != value) {
-                                                                       _SelectedChromecast = value;
-                                                                       RaisePropertyChanged();
-                                                                       CcRepos.SetActiveClient(value);
-                                                                   } 
-                                                             } }
+        public ChromeCastClientWrapper? SelectedChromecast {
+            get { return _SelectedChromecast; }
+            set {
+                if (_SelectedChromecast != value) {
+                    _SelectedChromecast = value;
+                    RaisePropertyChanged();
+                    CcRepos.SetActiveClient(value);
+                }
+            }
+        }
 
         public NavigationView MainNavPane { get => this.MainNavView; }
 
@@ -61,11 +50,13 @@ namespace WinUiHomeAudio {
             this.InitializeComponent();
 
             _ccRepos = App.Host.Services.GetRequiredService<ChromeCastRepository>();
+            FooterCategories.Add(new Category() { Name = "Live Logger", Tag = "ChromeCast" });
+
 
             var settings = App.Host.Services.GetRequiredService<AppSettings>();
             IEnumerable<IMediaRepository> mrs = App.Host.Services.GetServices<IMediaRepository>();
             foreach (IMediaRepository mr in mrs) {
-           
+
                 mr.GetCategories().CollectionChanged += (s, e) => {
                     if (e.NewItems != null) {
                         foreach (var ni in e.NewItems) {
@@ -94,10 +85,11 @@ namespace WinUiHomeAudio {
                 //this.ccPlayer.Visibility = Visibility.Collapsed;
                 ContentFrame.Navigate(typeof(SettingsPage));
             } else {
+                var tag = args.InvokedItemContainer.Tag.ToString();
                 //this.ccPlayer.Visibility = Visibility.Visible;
-                string selectedItem = (String)args.InvokedItem;
-                if (selectedItem.Equals("ChromeCast")) {
-                    //ContentFrame.Navigate(typeof(ChromecastPage));
+                //string tag = (String)args.InvokedItem;
+                if (tag.Equals("ChromeCast")) {
+                    ContentFrame.Navigate(typeof(ChromecastPage));
                 } else {
                     ContentFrame.Navigate(typeof(MediaPage), args.InvokedItemContainer.Tag.ToString());
                 }

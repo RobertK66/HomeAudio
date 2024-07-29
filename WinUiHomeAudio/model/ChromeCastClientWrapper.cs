@@ -1,23 +1,18 @@
-﻿
-using AudioCollectionApi;
+﻿using AudioCollectionApi.model;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Dispatching;
+using Sharpcaster;
+using Sharpcaster.Channels;
+using Sharpcaster.Models;
+using Sharpcaster.Models.Media;
+using Sharpcaster.Models.Queue;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Windows.Devices.Radios;
-using Windows.Media.Protection.PlayReady;
-using Sharpcaster;
-using Sharpcaster.Models.Media;
-using Sharpcaster.Models.Queue;
-using Sharpcaster.Models;
-using Sharpcaster.Channels;
-using AudioCollectionApi.model;
 
 namespace WinUiHomeAudio.model {
     public class ChromeCastClientWrapper : INotifyPropertyChanged {
@@ -66,7 +61,7 @@ namespace WinUiHomeAudio.model {
         public int Volume { get { return _volume; } set { _volume = value; RaisePropertyChanged(); } }
         public String? MediaStatus { get { return _mediaStatus; } set { _mediaStatus = value; RaisePropertyChanged(); } }
         public String? AppId { get { return _appId; } set { _appId = value; RaisePropertyChanged(); } }
-        public bool IsConnected { get { return _isConnected; } set {  _isConnected = value; RaisePropertyChanged(); } }
+        public bool IsConnected { get { return _isConnected; } set { _isConnected = value; RaisePropertyChanged(); } }
 
         public bool IsOn { get { return _isOn; } set { _isOn = value; RaisePropertyChanged(); } }
 
@@ -101,7 +96,7 @@ namespace WinUiHomeAudio.model {
 
                     ConnectedClient.Disconnected += ConnectedClient_Disconnected;
                     IsConnected = true;
-                    IsOn=true;
+                    IsOn = true;
                 }
             } catch (Exception ex) {
                 Log.LogError("Exception while trying to connect chromecast: {ex}", ex);
@@ -237,13 +232,13 @@ namespace WinUiHomeAudio.model {
         public void Disconnect() {
             if (ConnectedClient != null) {
                 IsConnected = false;
-                IsOn=false;
+                IsOn = false;
                 _ = ConnectedClient.DisconnectAsync();
             }
         }
 
- 
- 
+
+
 
         public async Task StopMediaPlay() {
             await semaphoreSlim.WaitAsync();    // Only one Play at once is routet to LoadAsync!
@@ -256,7 +251,7 @@ namespace WinUiHomeAudio.model {
                         //Log.LogDebug("Load Media.");
                         await mediaChannel.StopAsync();
                     }
-                    
+
                 }
             } finally {
                 semaphoreSlim?.Release();

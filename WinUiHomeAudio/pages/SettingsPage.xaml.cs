@@ -2,36 +2,18 @@
 using CommunityToolkit.WinUI.Controls;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.UI;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Documents;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using Microsoft.VisualBasic;
-using Sharpcaster.Models.Protobuf;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices.WindowsRuntime;
-using System.Threading.Tasks;
 using Windows.ApplicationModel;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
 using Windows.Storage;
 using Windows.Storage.AccessCache;
 using Windows.Storage.Pickers;
 using WinUiHomeAudio.model;
-using static System.Net.Mime.MediaTypeNames;
 
 
 // To learn more about WinUI, the WinUI project structure,
@@ -67,7 +49,8 @@ namespace WinUiHomeAudio.pages {
 
         public String RepositoryPath {
             get {
-                return Settings.ReposPath;            }
+                return Settings.ReposPath;
+            }
 
             set {
                 if (!Object.Equals(Settings.ReposPath, value)) {
@@ -135,16 +118,16 @@ namespace WinUiHomeAudio.pages {
 
             var aa = Assembly.GetEntryAssembly()?.GetReferencedAssemblies();
             if (aa != null) {
-                foreach (var a in aa.OrderBy(y=>y.Name)) {
+                foreach (var a in aa.OrderBy(y => y.Name)) {
                     try {
                         if (a != null) {
                             var asm = Assembly.Load(a);
                             System.Diagnostics.FileVersionInfo fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(asm.Location);
                             this.VersionExpander.Items.Add(new SettingsCard() {
-                                Header = fvi.InternalName??fvi.FileName,
+                                Header = fvi.InternalName ?? fvi.FileName,
                                 Content = fvi.FileVersion, //string.Format("{0}.{1}.{2}.{3} ", a.Version?.Major, a.Version?.Minor, a.Version?.Build, a.Version?.Revision),
                                 Description = a.FullName
-                            }); 
+                            });
                         }
                     } catch { }
                 }
@@ -181,7 +164,7 @@ namespace WinUiHomeAudio.pages {
 
                 if ((App.Current as WinUiHomeAudio.App)?.m_window?.Content is FrameworkElement rootElement) {
                     rootElement.RequestedTheme = t;
-                    Settings.UiTheme  = t.ToString();
+                    Settings.UiTheme = t.ToString();
                 }
             }
 
@@ -259,7 +242,7 @@ namespace WinUiHomeAudio.pages {
             // Set options for your folder picker
             openPicker.SuggestedStartLocation = PickerLocationId.Desktop;
             openPicker.FileTypeFilter.Add("*");
-            
+
 
             // Open the picker for the user to pick a folder
             StorageFolder folder = await openPicker.PickSingleFolderAsync();

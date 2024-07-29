@@ -1,40 +1,24 @@
-﻿using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.UI.Xaml;
-using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
-using Microsoft.UI.Xaml.Shapes;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.ApplicationModel;
-using Windows.ApplicationModel.Activation;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using AudioCollectionApi;
+﻿using AudioCollectionApi.api;
 using AudioCollectionImpl;
-using WinUiHomeAudio.model;
-using AudioCollectionApi.api;
-using Sharpcaster.Interfaces;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.UI.Dispatching;
+using Microsoft.UI.Xaml;
+using Sharpcaster;
+using System;
+using System.IO;
 using System.Threading;
 using Windows.Storage;
-using DLNAMediaRepos;
-using Sharpcaster;
+using WinUiHomeAudio.logger;
+using WinUiHomeAudio.model;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
 
 namespace WinUiHomeAudio {
 
-    
+
 
     /// <summary>
     /// Provides application-specific behavior to supplement the default Application class.
@@ -55,21 +39,27 @@ namespace WinUiHomeAudio {
         public App() {
             this.InitializeComponent();
 
+            // Make Instance of Logger View Model here to pass it a reference to the GUI Dispatcher queue.
+            var logVm = new LoggerVm {
+                Dq = DispatcherQueue.GetForCurrentThread()
+            };
+
             MyHost = Microsoft.Extensions.Hosting.Host.
                        CreateDefaultBuilder().
                        //ConfigureHttpJsonOptions(options => {
                        //    options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
                        //}).
                        ConfigureServices((context, services) => {
-                           //services.AddSingleton(logVm);
+                           services.AddSingleton(logVm);
                            services.AddSingleton<IMediaRepository, JsonMediaRepository>();
                            //services.AddSingleton<IMediaRepository, DLNAAlbumRepository>();
                            services.AddSingleton<AppSettings>();
                            services.AddSingleton<ChromeCastRepository>();
                            services.AddLogging(logging => {
-                               logging.AddFilter(level => level >= LogLevel.Trace);
-                               //    //.AddWinUiLogger((con) => {       // This adds our LogPanel as possible target (configure in appsettings.json)
-                               //    //    con.LoggerVm = logVm;
+                               logging.AddFilter(level => level >= LogLevel.Trace)
+                               .AddWinUiLogger((con) => {       // This adds our LogPanel as possible target (configure in appsettings.json)
+                                   con.LoggerVm = logVm;
+                               });
                            });
                        }).
                        Build();
@@ -115,7 +105,7 @@ namespace WinUiHomeAudio {
         private void Locator_ChromecastReceivedFound(object? sender, Sharpcaster.Models.ChromecastReceiver e) {
             var ccr = MyHost.Services.GetRequiredService<ChromeCastRepository>();
             var appSettings = MyHost.Services.GetRequiredService<AppSettings>();
-            
+
             var ccc = ccr.Add(e);
 
             if (!String.IsNullOrEmpty(appSettings.AutoConnectName) && e.Name.StartsWith(appSettings.AutoConnectName)) {
@@ -125,7 +115,7 @@ namespace WinUiHomeAudio {
                 if (m_window != null) {
                     m_window.MainPage.SelectedChromecast = ccc;
                 }
-                    
+
             }
 
         }

@@ -11,13 +11,13 @@ namespace WinUiHomeAudio.model {
         private const string c_AutoConnect = "Auto_Connect";
         private const string c_AppId = "App_Id";
 
-        private string _AppId = (ApplicationData.Current.LocalSettings.Values[c_AppId]  as string) ?? "46C1A819";
+        private string _AppId = (ApplicationData.Current.LocalSettings.Values[c_AppId] as string) ?? "46C1A819";
         public string AppId {
             get { return _AppId; }
             set { if (!Object.Equals(_AppId, value)) { _AppId = value; ApplicationData.Current.LocalSettings.Values[c_AppId] = value; } }
         }
 
-        private string? _AutoConnectName = (ApplicationData.Current.LocalSettings.Values[c_AutoConnect] as string)??"My JBL";
+        private string? _AutoConnectName = (ApplicationData.Current.LocalSettings.Values[c_AutoConnect] as string) ?? "My JBL";
         public string? AutoConnectName {
             get { return _AutoConnectName; }
             set { if (!Object.Equals(_AutoConnectName, value)) { _AutoConnectName = value; ApplicationData.Current.LocalSettings.Values[c_AutoConnect] = value; } }

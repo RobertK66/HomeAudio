@@ -4,11 +4,11 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 
 
-namespace MyHomeAudio.logger {
-    public class LoggerVm :INotifyPropertyChanged {
+namespace WinUiHomeAudio.logger {
+    public class LoggerVm : INotifyPropertyChanged {
 
         public DispatcherQueue? Dq { get; set; }
-        
+
         public event PropertyChangedEventHandler? PropertyChanged;
         protected void RaisePropertyChanged(string name) {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
@@ -26,6 +26,12 @@ namespace MyHomeAudio.logger {
                 RaisePropertyChanged("ContentText");
             });
 
+        }
+
+        public void Clear() {
+            ContentText = "";
+            Entries?.Clear();
+            RaisePropertyChanged("ContentText");
         }
     }
 }
