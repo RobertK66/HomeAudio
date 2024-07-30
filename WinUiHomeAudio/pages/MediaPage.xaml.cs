@@ -3,8 +3,11 @@ using AudioCollectionApi.model;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
+using Microsoft.VisualBasic;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Linq;
 using WinUiHomeAudio.model;
 
 
@@ -16,6 +19,7 @@ namespace WinUiHomeAudio.pages {
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
     public sealed partial class MediaPage : VmPage {
+        private List<string> IsSorted = new List<string>();
 
         private ObservableCollection<IMedia> _ListOfMedia = new ObservableCollection<IMedia>();
         public ObservableCollection<IMedia> ListOfMedia { get { return _ListOfMedia; } set { if (_ListOfMedia != value) { _ListOfMedia = value; RaisePropertyChanged(); } } }
@@ -25,8 +29,17 @@ namespace WinUiHomeAudio.pages {
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e) {
-            //var p = e.Parameter;
-            ListOfMedia = App.Host.Services.GetRequiredService<IMediaRepository>().GetMediaRepository(e?.Parameter?.ToString() ?? "X");
+            string? cat = e?.Parameter?.ToString();
+            if (cat != null) {
+                ListOfMedia = App.Host.Services.GetRequiredService<IMediaRepository>().GetMediaRepository(cat);
+                if (!IsSorted.Contains(cat)) {
+                    var sorted = ListOfMedia.OrderBy(x => x.Name).ToList();
+                    for (int i = 0; i < sorted.Count(); i++) {
+                        ListOfMedia.Move(ListOfMedia.IndexOf(sorted[i]), i);
+                    }
+                    IsSorted.Add(cat);
+                }
+            }
             base.OnNavigatedTo(e);
         }
 
