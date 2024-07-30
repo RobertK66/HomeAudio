@@ -50,13 +50,13 @@ namespace WinUiHomeAudio {
             this.InitializeComponent();
 
             _ccRepos = App.Host.Services.GetRequiredService<ChromeCastRepository>();
-            FooterCategories.Add(new Category() { Name = "Live Logger", Tag = "ChromeCast" });
+            FooterCategories.Add(new Category() { Name = "Live Logger", Tag = "Logger" });
 
 
             var settings = App.Host.Services.GetRequiredService<AppSettings>();
             IEnumerable<IMediaRepository> mrs = App.Host.Services.GetServices<IMediaRepository>();
-            foreach (IMediaRepository mr in mrs) {
 
+            foreach (IMediaRepository mr in mrs) {
                 mr.GetCategories().CollectionChanged += (s, e) => {
                     if (e.NewItems != null) {
                         foreach (var ni in e.NewItems) {
@@ -66,7 +66,6 @@ namespace WinUiHomeAudio {
                         }
                     }
                 };
-
                 _ = mr.LoadAllAsync(settings.ReposPath);
             }
         }
@@ -85,13 +84,11 @@ namespace WinUiHomeAudio {
                 //this.ccPlayer.Visibility = Visibility.Collapsed;
                 ContentFrame.Navigate(typeof(SettingsPage));
             } else {
-                var tag = args.InvokedItemContainer.Tag.ToString();
-                //this.ccPlayer.Visibility = Visibility.Visible;
-                //string tag = (String)args.InvokedItem;
-                if (tag.Equals("ChromeCast")) {
-                    ContentFrame.Navigate(typeof(ChromecastPage));
+                var tag = args.InvokedItemContainer.Tag.ToString() ?? "??";
+                if (tag.Equals("Logger")) {
+                    ContentFrame.Navigate(typeof(LoggerPage));
                 } else {
-                    ContentFrame.Navigate(typeof(MediaPage), args.InvokedItemContainer.Tag.ToString());
+                    ContentFrame.Navigate(typeof(MediaPage), tag);
                 }
             }
         }
@@ -102,7 +99,6 @@ namespace WinUiHomeAudio {
                     ccw.VolumeUp();
                 }
             }
-
         }
 
         public void CcPlayer_VolumeDown(object sender, RoutedEventArgs e) {
@@ -123,7 +119,6 @@ namespace WinUiHomeAudio {
                         } else {
                             _ = ccw.TryConnectAsync(CcRepos._appId);
                         }
-
                     }
                 }
             }

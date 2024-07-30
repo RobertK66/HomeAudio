@@ -17,7 +17,7 @@
     <Page Update="MainPage.xaml">
       <SubType>Designer</SubType>
     </Page>
-    <Page Update="pages\ChromecastPage.xaml">
+    <Page Update="pages\LoggerPage.xaml">
       <SubType>Designer</SubType>
     </Page>
     <Page Update="pages\MediaPage.xaml">

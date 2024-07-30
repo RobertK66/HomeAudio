@@ -56,10 +56,11 @@ namespace WinUiHomeAudio {
                            services.AddSingleton<AppSettings>();
                            services.AddSingleton<ChromeCastRepository>();
                            services.AddLogging(logging => {
-                               logging.AddFilter(level => level >= LogLevel.Trace)
-                               .AddWinUiLogger((con) => {       // This adds our LogPanel as possible target (configure in appsettings.json)
-                                   con.LoggerVm = logVm;
-                               });
+                                               logging.AddFilter(level => level >= LogLevel.Trace)
+                                                      .AddWinUiLogger((con) => {    
+                                                          // This adds our LogPanel as possible target (configure in appsettings.json)
+                                                          con.LoggerVm = logVm;
+                                                      });
                            });
                        }).
                        Build();

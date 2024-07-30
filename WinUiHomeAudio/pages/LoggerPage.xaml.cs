@@ -12,7 +12,7 @@ namespace WinUiHomeAudio.pages {
     /// <summary>
     /// An empty page that can be used on its own or navigated to within a Frame.
     /// </summary>
-    public sealed partial class ChromecastPage : VmPage {
+    public sealed partial class LoggerPage : VmPage {
 
         private LoggerVm? _loggerVm;
         public LoggerVm LoggerVm { get { return _loggerVm; } set { if (_loggerVm != value) { _loggerVm = value; RaisePropertyChanged(); } } }
@@ -36,7 +36,7 @@ namespace WinUiHomeAudio.pages {
         //}
 
 
-        public ChromecastPage() {
+        public LoggerPage() {
             this.InitializeComponent();
 
             //            CCC = App.Host.Services.GetRequiredService<ChromeCastRepository>().GetClients();

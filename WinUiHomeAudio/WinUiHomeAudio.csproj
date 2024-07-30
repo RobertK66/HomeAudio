@@ -17,7 +17,7 @@
   </PropertyGroup>
   <ItemGroup>
     <None Remove="MainPage.xaml" />
-    <None Remove="pages\ChromecastPage.xaml" />
+    <None Remove="pages\LoggerPage.xaml" />
     <None Remove="pages\MediaPage.xaml" />
     <None Remove="pages\SettingsPage.xaml" />
   </ItemGroup>
@@ -71,7 +71,7 @@
     <Page Update="MainPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Update="pages\ChromecastPage.xaml">
+    <Page Update="pages\LoggerPage.xaml">
       <XamlRuntime>$(DefaultXamlRuntime)</XamlRuntime>
       <SubType>Designer</SubType>
     </Page>

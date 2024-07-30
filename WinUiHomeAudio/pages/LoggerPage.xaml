@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <local:VmPage
-    x:Class="WinUiHomeAudio.pages.ChromecastPage"
+    x:Class="WinUiHomeAudio.pages.LoggerPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:WinUiHomeAudio.pages"
@@ -19,13 +19,6 @@
             <RowDefinition  Height="Auto"/>
             <RowDefinition  Height="*"/>
         </Grid.RowDefinitions>
-
-
-        <!--<ComboBox Grid.Row="0" x:Name="ChromeCastClients" ItemsSource="{x:Bind CCC, Mode=OneWay}"
-                  ItemTemplate="{StaticResource CccTemplate}" 
-                  SelectedItem="{x:Bind SelectedCcc, Mode=TwoWay}"
-                  SelectionChanged="ChromeCastClients_SelectionChanged"
-                  PlaceholderText="&lt;No Chromecast receiver found in Network>" />-->
 
         <Button Grid.Row="0" Click="Button_Click">ClearLog</Button>
 
