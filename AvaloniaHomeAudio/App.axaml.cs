@@ -7,6 +7,7 @@ using Avalonia.Markup.Xaml;
 
 using AvaloniaHomeAudio.ViewModels;
 using AvaloniaHomeAudio.Views;
+using AvaloniaHomeAudio.player;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
@@ -31,6 +32,7 @@ public partial class App : Application
         //collection.AddTransient<BusinessService>();
         collection.AddTransient<MainViewModel>();
         collection.AddSingleton<IMediaRepository, JsonMediaRepository>();
+        collection.AddSingleton<IChromeCastPlayer, ChromeCastPlayer>();
         collection.AddLogging(logging => {
             logging.SetMinimumLevel(LogLevel.Trace);
             logging.AddDebug();

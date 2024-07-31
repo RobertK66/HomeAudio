@@ -18,12 +18,20 @@
 			<ColumnDefinition/>
 		</Grid.ColumnDefinitions>
         <!--<TextBlock Grid.Column="0" Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>-->
-		<Button Grid.Column="1" Content="ClickMe" HorizontalAlignment="Stretch" HorizontalContentAlignment="Center" Click="Button_Click"/>
 		<ListBox Grid.Column="0" ItemsSource="{Binding Categories}">
 			<ListBox.ItemTemplate>
 				<DataTemplate>
 					<StackPanel Orientation="Horizontal">
-						<TextBlock Text="{Binding Name}" />
+						<Button Content="{Binding Name}" Tag="{Binding Name}" Click="Button_Click_2"/>
+					</StackPanel>
+				</DataTemplate>
+			</ListBox.ItemTemplate>
+		</ListBox>
+		<ListBox Grid.Column="1" ItemsSource="{Binding MediaList}">
+			<ListBox.ItemTemplate>
+				<DataTemplate>
+					<StackPanel Orientation="Horizontal">
+						<Button Content="{Binding Name}" Tag="{Binding}" Click="Button_Click_3"/>
 					</StackPanel>
 				</DataTemplate>
 			</ListBox.ItemTemplate>
