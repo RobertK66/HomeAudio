@@ -15,6 +15,7 @@ namespace AudioCollectionApi.api
         Task LoadAllAsync(object PersitenceContext);
         ObservableCollection<MediaCategory> GetCategories();
         ObservableCollection<IMedia> GetMediaRepository(string categoryId);
+        Task LoadReposAsync(string context, Stream streamReader);
     }
 
 }

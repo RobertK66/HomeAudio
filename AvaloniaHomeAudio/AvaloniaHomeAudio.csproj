@@ -11,6 +11,11 @@
     <AvaloniaResource Include="Assets\**" />
   </ItemGroup>
 
+  
+  
+  
+
+
   <ItemGroup>
     <PackageReference Include="Avalonia" Version="11.1.1" />
     <PackageReference Include="Avalonia.Themes.Fluent" Version="11.1.1" />
@@ -30,11 +35,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="data\Cds.json">
+    <None Update="Assets\Mixed.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="data\Mixed.json">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
+	  <None Update="Assets\Cds.json">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
   </ItemGroup>
 </Project>

@@ -15,8 +15,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 
 
-namespace AudioCollectionImpl
-{
+namespace AudioCollectionImpl {
     public class JsonMediaRepository(ILoggerFactory? loggerFactory = null) : IMediaRepository {
 
         private readonly ILogger? Log = loggerFactory?.CreateLogger<JsonMediaRepository>();
@@ -31,19 +30,27 @@ namespace AudioCollectionImpl
         private bool loading = false;
         private String? reLoadPath = null;
         public async Task LoadAllAsync(object rootPath) {
+
             if (!loading) {
                 loading = true;
+
                 if (rootPath is string dirPath) {
+                    Log?.LogInformation("*****  Repos starts scanning dir " + dirPath);
                     Repositories.Clear();
                     Categories.Clear();
-                    foreach (var f in Directory.GetFiles(dirPath, "*.json")) {
-                        Log?.LogDebug("Scanning {path} for media content.", f);
-                        if (reLoadPath != null) {
-                            break;
+                    try {
+                        foreach (var f in Directory.GetFiles(dirPath, "*.json")) {
+                            Log?.LogInformation("Scanning {path} for media content.", f);
+                            if (reLoadPath != null) {
+                                break;
+                            }
+                            //await Task.Delay(2000);
+                            await AddRepos(System.IO.Path.GetFileNameWithoutExtension(f), f);
                         }
-                        //await Task.Delay(2000);
-                        await AddRepos(System.IO.Path.GetFileNameWithoutExtension(f), f);
+                    } catch (Exception ex) {
+                        Log?.LogError("***** Error loading files. " + ex.Message);
                     }
+                    Log?.LogInformation("*****  Repos stops scanning dir " + dirPath);
                 }
                 loading = false;
                 if (reLoadPath != null) {
@@ -56,19 +63,36 @@ namespace AudioCollectionImpl
             }
         }
 
-        private async Task AddRepos(string reposid, string path) {
+        private ObservableCollection<IMedia> CreateOrUseRepository(string category) {
             var rep = new ObservableCollection<IMedia>();
-            if (Repositories.TryGetValue(reposid, out ObservableCollection<IMedia>? value)) {
+            if (Repositories.TryGetValue(category, out ObservableCollection<IMedia>? value)) {
                 rep = value;
                 rep.Clear();
             } else {
-                Repositories.Add(reposid, rep);
+                Repositories.Add(category, rep);
             }
-            MediaCategory? cat = Categories.Where(c => c.Id == reposid).FirstOrDefault();
+            MediaCategory? cat = Categories.Where(c => c.Id == category).FirstOrDefault();
             if (cat == null) {
-                cat = new MediaCategory(reposid) { Name = System.IO.Path.GetFileNameWithoutExtension(path) };
+                cat = new MediaCategory(category) { Name = category };
                 Categories.Add(cat);
             }
+            return rep;
+        }
+
+        private async Task AddRepos(string reposid, string path) {
+            var rep = CreateOrUseRepository(reposid);
+            //var rep = new ObservableCollection<IMedia>();
+            //if (Repositories.TryGetValue(reposid, out ObservableCollection<IMedia>? value)) {
+            //    rep = value;
+            //    rep.Clear();
+            //} else {
+            //    Repositories.Add(reposid, rep);
+            //}
+            //MediaCategory? cat = Categories.Where(c => c.Id == reposid).FirstOrDefault();
+            //if (cat == null) {
+            //    cat = new MediaCategory(reposid) { Name = System.IO.Path.GetFileNameWithoutExtension(path) };
+            //    Categories.Add(cat);
+            //}
 
             if (File.Exists(path)) {
                 try {
@@ -83,7 +107,7 @@ namespace AudioCollectionImpl
                             }
                         }
                     }
-                    Log?.LogInformation("Added {count} entries from {name}[{id}]", rep.Count, cat.Name, reposid);
+                    Log?.LogInformation("Added {count} entries from {name}[{id}]", rep.Count, reposid, reposid);
                 } catch (Exception ex) {
                     // Skip all non media json ...
                     Log?.LogTrace("Exception beim Laden eines Repositories: {repName}, {ex}", path, ex);
@@ -99,10 +123,32 @@ namespace AudioCollectionImpl
                 return [];
             }
         }
-        
+
         public ObservableCollection<MediaCategory> GetCategories() {
             return Categories;
         }
 
+        public async Task LoadReposAsync(string category, Stream reader) {
+            var rep = CreateOrUseRepository(category);
+            try {
+                var cont = await JsonSerializer.DeserializeAsync<List<BaseMedia>>(reader, jsonOptions);
+                if (cont != null) {
+                    foreach (var item in cont) {
+                        if (item is IMedia media) {
+                            rep.Add(media);
+                        } else {
+                            Log?.LogInformation($"Entry '{item.Name}' with type '{item.GetType().Name}' can not be added as IMedia element. Add \"type\":\"radio\" or \"type\":\"cd\" to your json objects.");
+                        }
+                    }
+                }
+                Log?.LogInformation("Added {count} entries from {name}[{id}]", rep.Count, category, category);
+            } catch (Exception ex) {
+                // Skip all non media json ...
+                Log?.LogTrace("Exception beim Laden eines Repositories:  " + ex.Message);
+            } finally {
+                reader?.Dispose();
+            }
+        }
     }
 }
+

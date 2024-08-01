@@ -6,6 +6,7 @@ using RadioBrowser.Models;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.IO;
 using System.Linq;
 using System.Runtime.Intrinsics.X86;
 using System.Text;
@@ -81,6 +82,10 @@ namespace DLNAMediaRepos {
             }
 
             Log.LogInformation($"{cnt} Stations found in {RadioCategories.Count} categories.");
+        }
+
+        public Task LoadReposAsync(string context, Stream stream) {
+            throw new NotImplementedException();
         }
     }
 }

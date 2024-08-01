@@ -22,7 +22,7 @@ public partial class MainView : UserControl
     }
 
     private void UserControl_Loaded_1(object? sender, Avalonia.Interactivity.RoutedEventArgs e) {
-        _ = vm.LoadReposAsync();
+        vm.LoadReposAsync();
     }
 
     private void Button_Click_2(object? sender, Avalonia.Interactivity.RoutedEventArgs e) {
