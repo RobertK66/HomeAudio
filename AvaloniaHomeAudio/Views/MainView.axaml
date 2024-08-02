@@ -13,28 +13,35 @@
     <vm:TestInstance/>
   </Design.DataContext>>-->
 	<Grid>
-		<Grid.ColumnDefinitions>
-			<ColumnDefinition/>
-			<ColumnDefinition/>
-		</Grid.ColumnDefinitions>
-        <!--<TextBlock Grid.Column="0" Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>-->
-		<ListBox Grid.Column="0" ItemsSource="{Binding Categories}">
-			<ListBox.ItemTemplate>
-				<DataTemplate>
-					<StackPanel Orientation="Horizontal">
-						<Button Content="{Binding Name}" Tag="{Binding Name}" Click="Button_Click_2"/>
-					</StackPanel>
-				</DataTemplate>
-			</ListBox.ItemTemplate>
-		</ListBox>
-		<ListBox Grid.Column="1" ItemsSource="{Binding MediaList}">
-			<ListBox.ItemTemplate>
-				<DataTemplate>
-					<StackPanel Orientation="Horizontal">
-						<Button Content="{Binding Name}" Tag="{Binding}" Click="Button_Click_3"/>
-					</StackPanel>
-				</DataTemplate>
-			</ListBox.ItemTemplate>
-		</ListBox>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="Auto"/>
+		</Grid.RowDefinitions>
+		<Grid Grid.Row="0">
+			<Grid.ColumnDefinitions>
+				<ColumnDefinition/>
+				<ColumnDefinition/>
+			</Grid.ColumnDefinitions>
+			<!--<TextBlock Grid.Column="0" Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>-->
+			<ListBox Grid.Column="0" ItemsSource="{Binding Categories}">
+				<ListBox.ItemTemplate>
+					<DataTemplate>
+						<StackPanel Orientation="Horizontal">
+							<Button Content="{Binding Name}" Tag="{Binding Name}" Click="Button_Click_2"/>
+						</StackPanel>
+					</DataTemplate>
+				</ListBox.ItemTemplate>
+			</ListBox>
+			<ListBox Grid.Column="1" ItemsSource="{Binding MediaList}">
+				<ListBox.ItemTemplate>
+					<DataTemplate>
+						<StackPanel Orientation="Horizontal">
+							<Button Content="{Binding Name}" Tag="{Binding}" Click="Button_Click_3"/>
+						</StackPanel>
+					</DataTemplate>
+				</ListBox.ItemTemplate>
+			</ListBox>
+		</Grid>
+		<TextBlock Grid.Row="1" Text="{Binding Player.PlayerStatus}" Margin="5"/>
 	</Grid>
 </UserControl>

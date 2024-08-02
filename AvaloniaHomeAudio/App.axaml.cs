@@ -10,6 +10,8 @@ using AvaloniaHomeAudio.Views;
 using AvaloniaHomeAudio.player;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Sharpcaster.Interfaces;
+using Sharpcaster;
 
 namespace AvaloniaHomeAudio;
 
@@ -33,6 +35,7 @@ public partial class App : Application
         collection.AddTransient<MainViewModel>();
         collection.AddSingleton<IMediaRepository, JsonMediaRepository>();
         collection.AddSingleton<IChromeCastPlayer, ChromeCastPlayer>();
+        collection.AddSingleton<IChromecastLocator, MdnsChromecastLocator>();
         collection.AddLogging(logging => {
             logging.SetMinimumLevel(LogLevel.Trace);
             logging.AddDebug();

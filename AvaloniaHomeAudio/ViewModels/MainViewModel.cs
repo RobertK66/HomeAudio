@@ -14,7 +14,21 @@ namespace AvaloniaHomeAudio.ViewModels;
 
 
 public static class TestData {
-    public static MainViewModel TestInstance = new MainViewModel(null, null, null);
+    private class DummyPlayer : IChromeCastPlayer {
+
+        private string _playerstatus;
+        public string PlayerStatus { get { return _playerstatus; } }
+
+        public void Play(IMedia media) {
+        }
+
+        public DummyPlayer(string text) {
+            _playerstatus = text;
+        }
+    }
+
+
+    public static MainViewModel TestInstance = new MainViewModel(null, null, new DummyPlayer("Design Time Player"));
 }
 
 
@@ -22,7 +36,9 @@ public partial class MainViewModel : ViewModelBase
 {
     private readonly ILogger? _logger;
     private readonly IMediaRepository? _repos;
-    private readonly IChromeCastPlayer _player;
+
+    [ObservableProperty]
+    public IChromeCastPlayer _player;
 
     [ObservableProperty]
     public string _Greeting = "Welcome to MyHomeAudio!";
@@ -33,12 +49,10 @@ public partial class MainViewModel : ViewModelBase
     [ObservableProperty]
     public ObservableCollection<IMedia> _mediaList = new ObservableCollection<IMedia>();
 
-    public MainViewModel(ILogger<MainViewModel>? logger, IMediaRepository? repos, IChromeCastPlayer? player) {
+    public MainViewModel(ILogger<MainViewModel>? logger, IMediaRepository? repos, IChromeCastPlayer player) {
         _logger = logger;
         _repos = repos;
         _player = player;
-
-        _logger?.LogInformation("************************************* Constructor called *****************************************");
     }
 
     public async Task LoadReposAsync() {
@@ -75,6 +89,6 @@ public partial class MainViewModel : ViewModelBase
     }
 
     internal void PlayMedia(IMedia media) {
-        _player?.Play(media);
+        Player.Play(media);
     }
 }
