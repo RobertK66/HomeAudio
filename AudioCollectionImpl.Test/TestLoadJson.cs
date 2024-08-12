@@ -1,6 +1,8 @@
 using System.Linq.Expressions;
 using Xunit.Abstractions;
 using TestBasis;
+using Castle.Core.Logging;
+using Microsoft.Extensions.Logging;
 
 namespace AudioCollectionImpl.Test {
     public class TestLoadJson {
@@ -12,7 +14,7 @@ namespace AudioCollectionImpl.Test {
         [Fact]
         public async Task Test1() {
             var th = new TestHelper(output);
-            var repos = new JsonMediaRepository(th.CreateMockedLoggerFactory());
+            var repos = new JsonMediaRepository((ILogger<JsonMediaRepository>)th.CreateMockedLoggerFactory().CreateLogger("JsonMediaRepository"));
 
             await repos.LoadAllAsync("./data");
             Assert.Equal(3, repos.GetCategories().Count);

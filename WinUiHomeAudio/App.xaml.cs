@@ -55,6 +55,7 @@ namespace WinUiHomeAudio {
                            //services.AddSingleton<IMediaRepository, DLNAAlbumRepository>();
                            services.AddSingleton<AppSettings>();
                            services.AddSingleton<ChromeCastRepository>();
+                           // TODO: read log levels from config ...
                            services.AddLogging(logging => {
                                                logging.AddFilter(level => level >= LogLevel.Trace)
                                                       .AddWinUiLogger((con) => {    
@@ -64,6 +65,9 @@ namespace WinUiHomeAudio {
                            });
                        }).
                        Build();
+
+            // no need to start this host- We only have DI and no 'services'
+            // MyHost.Start();
 
             Log = MyHost.Services.GetRequiredService<ILogger<App>>();
             Log.LogTrace("*** Application instanciated. ***");
@@ -76,17 +80,12 @@ namespace WinUiHomeAudio {
         /// <param name="args">Details about the launch request and process.</param>
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args) {
 
-            // if not done already, copy the provided examples to current executable path. 
-            //string? fullpath = System.Reflection.Assembly.GetEntryAssembly()?.Location;
+            // copy the provided examples to current executable path. 
             if (System.Reflection.Assembly.GetEntryAssembly()?.Location is string fullpath) {
                 string path = fullpath[..fullpath.LastIndexOf('\\')];
-
-                if (!File.Exists(ApplicationData.Current.LocalFolder.Path + "\\Cds.json")) {
-                    System.IO.File.Copy(path + "\\Cds.json", ApplicationData.Current.LocalFolder.Path + "\\Cds.json", true);
-                }
-                if (!File.Exists(ApplicationData.Current.LocalFolder.Path + "\\WebRadios.json")) {
-                    System.IO.File.Copy(path + "\\WebRadios.json", ApplicationData.Current.LocalFolder.Path + "\\WebRadios.json");
-                }
+                System.IO.File.Copy(path + "\\Cds.json", ApplicationData.Current.LocalFolder.Path + "\\Cds.json", true);
+                System.IO.File.Copy(path + "\\WebRadios.json", ApplicationData.Current.LocalFolder.Path + "\\WebRadios.json", true);
+                
             }
 
 
@@ -100,7 +99,15 @@ namespace WinUiHomeAudio {
             }
 
             m_window = new MainWindow();
+            this.m_window.Closed += M_window_Closed;
+
             m_window.Activate();
+        }
+
+        private void M_window_Closed(object sender, WindowEventArgs args) {
+            //await MyHost.StopAsync();
+            // Lets ged rid of our Singeltons...
+            MyHost.Dispose();
         }
 
         private void Locator_ChromecastReceivedFound(object? sender, Sharpcaster.Models.ChromecastReceiver e) {
@@ -120,6 +127,8 @@ namespace WinUiHomeAudio {
             }
 
         }
+
+        
 
     }
 }

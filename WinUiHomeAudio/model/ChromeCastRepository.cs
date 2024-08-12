@@ -2,11 +2,13 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Dispatching;
 using Sharpcaster.Models;
+using System;
 using System.Collections.ObjectModel;
 using System.Threading.Tasks;
+using Windows.Storage.Streams;
 
 namespace WinUiHomeAudio.model {
-    public class ChromeCastRepository {
+    public class ChromeCastRepository :IDisposable {
 
         public ChromeCastClientWrapper? _activeClient = null;
         public ObservableCollection<ChromeCastClientWrapper> KnownChromecasts = new();
@@ -61,6 +63,20 @@ namespace WinUiHomeAudio.model {
 
         internal void VolumeUp() {
             _activeClient?.VolumeUp();
+        }
+
+        public void Dispose() {
+            Dispose(true);
+        }
+
+        protected virtual void Dispose(bool disposing) {
+            if (disposing) { // release other disposable objects
+                Log.LogInformation("Dispose called");
+                // Lets do some time consuming stuff here...
+                //var t = Task.Delay(2000);
+                //t.Wait();
+                Log.LogInformation("Dispose finished");
+            }
         }
     }
 }

@@ -38,7 +38,7 @@
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="8.0.0" />
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.5.240627000" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.1" />
-    <PackageReference Include="Sharpcaster" Version="1.2.0" />
+    <PackageReference Include="Sharpcaster" Version="1.2.1-alpha" />
     <PackageReference Include="System.Text.Json" Version="8.0.4" />
     <Manifest Include="$(ApplicationManifest)" />
   </ItemGroup>
@@ -58,6 +58,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Update="Cds.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\disk.jpg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <Page Update="pages\SettingsPage.xaml">

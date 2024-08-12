@@ -1,6 +1,6 @@
 [
   {
-    "type":  "cd",
+    "type": "cd",
     "CDID": "810e5104",
     "Name": "Some Folk from openmusicarchive",
     "Artist": "...",
@@ -21,7 +21,8 @@
         "ContentUrl": "http://www.openmusicarchive.org/audio/Drunkards%20Special%20by%20Coley%20Jones.mp3",
         "Name": "Drunkards"
       }
-    ]
+    ],
+    "Picpath": "ms-appx:///Assets/disk.jpg"
   },
   {
     "type": "cd",
@@ -69,7 +70,8 @@
         "ContentUrl": "https://freepd.com/music/Heroic%20Adventure.mp3",
         "Name": "Heroic Adventure"
       }
-    ]
+    ],
+    "Picpath": "ms-appx:///Assets/disk.jpg"
   },
   {
     "type": "cd",
@@ -89,7 +91,8 @@
         "ContentUrl": "https://audionautix.com/Music/JoyToTheWorld.mp3",
         "Name": "JoyToTheWorld"
       }
-    ]
+    ],
+    "Picpath": "ms-appx:///Assets/disk.jpg"
   }
    
 ]
