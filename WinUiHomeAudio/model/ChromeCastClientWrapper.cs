@@ -74,8 +74,6 @@ namespace WinUiHomeAudio.model {
                 _connectionAppId = appId;
 
                 ConnectedClient = new ChromecastClient(loggerFactory: _loggerFactory);
-
-                //cr.DeviceUri = new System.Uri("http://localhost:123/base");
                 var st = await ConnectedClient.ConnectChromecast(cr);
 
                 string? oldAppid = null;
@@ -198,8 +196,9 @@ namespace WinUiHomeAudio.model {
                         //Log.LogDebug("Load Cd with " + media.Count + " tracks.");
                         await mediaChannel.QueueLoadAsync(media.ToArray());
                     }
-
                 }
+            } catch (Exception e) {
+                Log.LogError("Exception when loading media");
             } finally {
                 semaphoreSlim?.Release();
             }

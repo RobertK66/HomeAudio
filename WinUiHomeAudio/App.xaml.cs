@@ -66,7 +66,7 @@ namespace WinUiHomeAudio {
                        }).
                        Build();
 
-            // no need to start this host- We only have DI and no 'services'
+            // no need to start this host - We only use DI and have no 'services' to start.
             // MyHost.Start();
 
             Log = MyHost.Services.GetRequiredService<ILogger<App>>();
@@ -80,33 +80,31 @@ namespace WinUiHomeAudio {
         /// <param name="args">Details about the launch request and process.</param>
         protected override void OnLaunched(Microsoft.UI.Xaml.LaunchActivatedEventArgs args) {
 
-            // copy the provided examples to current executable path. 
-            if (System.Reflection.Assembly.GetEntryAssembly()?.Location is string fullpath) {
-                string path = fullpath[..fullpath.LastIndexOf('\\')];
-                System.IO.File.Copy(path + "\\Cds.json", ApplicationData.Current.LocalFolder.Path + "\\Cds.json", true);
-                System.IO.File.Copy(path + "\\WebRadios.json", ApplicationData.Current.LocalFolder.Path + "\\WebRadios.json", true);
-                
-            }
-
-
             try {
+                // copy the provided examples to current executable path. 
+                if (System.Reflection.Assembly.GetEntryAssembly()?.Location is string fullpath) {
+                    string path = fullpath[..fullpath.LastIndexOf('\\')];
+                    System.IO.File.Copy(path + "\\Cds.json", ApplicationData.Current.LocalFolder.Path + "\\Cds.json", true);
+                    System.IO.File.Copy(path + "\\WebRadios.json", ApplicationData.Current.LocalFolder.Path + "\\WebRadios.json", true);
+                }
+
                 // start the search for CC Receivers in local network
                 MdnsChromecastLocator locator = new();
                 locator.ChromecastReceivedFound += Locator_ChromecastReceivedFound;
-                _ = locator.FindReceiversAsync(CancellationToken.None);          // Fire the search process and wait for receiver found events in the handler. No await here!
+                CancellationTokenSource tokenSource = new CancellationTokenSource(10000);
+                _ = locator.FindReceiversAsync(tokenSource.Token);          // Fire the search process and allow 10 seconds for receiver found events to call the handler.
             } catch (Exception ex) {
                 Log.LogError("Exception on Loading: {ex} ", ex);
             }
 
             m_window = new MainWindow();
             this.m_window.Closed += M_window_Closed;
-
             m_window.Activate();
         }
 
         private void M_window_Closed(object sender, WindowEventArgs args) {
             //await MyHost.StopAsync();
-            // Lets ged rid of our Singeltons...
+            // Lets ged rid of our Singeltons in orderly manner...
             MyHost.Dispose();
         }
 

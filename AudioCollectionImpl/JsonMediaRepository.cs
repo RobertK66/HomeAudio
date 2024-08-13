@@ -45,8 +45,8 @@ namespace AudioCollectionImpl {
                                 if (reLoadPath != null) {
                                     break;
                                 }
-                                using Stream s = new StreamReader(f).BaseStream;
-                                await LoadReposAsync(System.IO.Path.GetFileNameWithoutExtension(f), s);
+                                using StreamReader sr = new StreamReader(f);
+                                await LoadReposAsync(System.IO.Path.GetFileNameWithoutExtension(f), sr.BaseStream);
                             }
                         }
                     } catch (Exception ex) {
