@@ -123,11 +123,14 @@ namespace WinUiHomeAudio.pages {
                         if (a != null) {
                             var asm = Assembly.Load(a);
                             System.Diagnostics.FileVersionInfo fvi = System.Diagnostics.FileVersionInfo.GetVersionInfo(asm.Location);
+                            Log.LogDebug(a.FullName + " - " + (fvi.InternalName ?? fvi.FileName) + " " + fvi.FileVersion);
                             this.VersionExpander.Items.Add(new SettingsCard() {
                                 Header = fvi.InternalName ?? fvi.FileName,
                                 Content = fvi.FileVersion, //string.Format("{0}.{1}.{2}.{3} ", a.Version?.Major, a.Version?.Minor, a.Version?.Build, a.Version?.Revision),
                                 Description = a.FullName
                             });
+                            
+                            
                         }
                     } catch { }
                 }

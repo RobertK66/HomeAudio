@@ -71,7 +71,8 @@
                 <labs:SettingsExpander x:Name="fileExpander" Header="Media Repository Path" HeaderIcon="PreviewLink" ItemsSource="{x:Bind RepositoryFiles, Mode=TwoWay}" Expanded="SettingsExpander_Expanded">
                     <labs:SettingsExpander.ItemTemplate>
                         <DataTemplate x:DataType="system:String">
-                            <labs:SettingsCard  Description="" Header="{Binding}" />
+                            <labs:SettingsCard  Header="{Binding}">
+                            </labs:SettingsCard>
                         </DataTemplate>
                     </labs:SettingsExpander.ItemTemplate>
                     <StackPanel Orientation="Horizontal">
