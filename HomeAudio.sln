@@ -28,9 +28,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvaloniaHomeAudio.Android",
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AvaloniaHomeAudio.Desktop", "AvaloniaHomeAudio.Desktop\AvaloniaHomeAudio.Desktop.csproj", "{505295CA-B9B1-42CD-A0C2-2AD87D37B85F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AudioCollectionImpl.Test", "AudioCollectionImpl.Test\AudioCollectionImpl.Test.csproj", "{3C4F9203-105F-491B-B433-6574062C2D29}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AudioCollectionImpl.Test", "AudioCollectionImpl.Test\AudioCollectionImpl.Test.csproj", "{3C4F9203-105F-491B-B433-6574062C2D29}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestBasis", "TestBasis\TestBasis.csproj", "{C2F22161-BDB4-4BFA-93AD-7503A5D6BCCE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestBasis", "TestBasis\TestBasis.csproj", "{C2F22161-BDB4-4BFA-93AD-7503A5D6BCCE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LmsClient", "LmsClient\LmsClient.csproj", "{9A4E4688-D259-4D82-B511-A46AEF6200EC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -252,6 +254,22 @@ Global
 		{C2F22161-BDB4-4BFA-93AD-7503A5D6BCCE}.Release|x64.Build.0 = Release|Any CPU
 		{C2F22161-BDB4-4BFA-93AD-7503A5D6BCCE}.Release|x86.ActiveCfg = Release|Any CPU
 		{C2F22161-BDB4-4BFA-93AD-7503A5D6BCCE}.Release|x86.Build.0 = Release|Any CPU
+		{9A4E4688-D259-4D82-B511-A46AEF6200EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9A4E4688-D259-4D82-B511-A46AEF6200EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9A4E4688-D259-4D82-B511-A46AEF6200EC}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{9A4E4688-D259-4D82-B511-A46AEF6200EC}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{9A4E4688-D259-4D82-B511-A46AEF6200EC}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{9A4E4688-D259-4D82-B511-A46AEF6200EC}.Debug|x64.Build.0 = Debug|Any CPU
+		{9A4E4688-D259-4D82-B511-A46AEF6200EC}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{9A4E4688-D259-4D82-B511-A46AEF6200EC}.Debug|x86.Build.0 = Debug|Any CPU
+		{9A4E4688-D259-4D82-B511-A46AEF6200EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9A4E4688-D259-4D82-B511-A46AEF6200EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9A4E4688-D259-4D82-B511-A46AEF6200EC}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{9A4E4688-D259-4D82-B511-A46AEF6200EC}.Release|ARM64.Build.0 = Release|Any CPU
+		{9A4E4688-D259-4D82-B511-A46AEF6200EC}.Release|x64.ActiveCfg = Release|Any CPU
+		{9A4E4688-D259-4D82-B511-A46AEF6200EC}.Release|x64.Build.0 = Release|Any CPU
+		{9A4E4688-D259-4D82-B511-A46AEF6200EC}.Release|x86.ActiveCfg = Release|Any CPU
+		{9A4E4688-D259-4D82-B511-A46AEF6200EC}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

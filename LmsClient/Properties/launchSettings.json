@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "LmsClient": {
+      "commandName": "Project",
+      "commandLineArgs": "list -t LmsRadio"
+    }
+  }
+}
