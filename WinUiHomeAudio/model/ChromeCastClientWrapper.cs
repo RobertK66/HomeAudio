@@ -198,7 +198,7 @@ namespace WinUiHomeAudio.model {
                     }
                 }
             } catch (Exception e) {
-                Log.LogError("Exception when loading media");
+                Log.LogError("Exception when loading media: " + e.Message);
             } finally {
                 semaphoreSlim?.Release();
             }

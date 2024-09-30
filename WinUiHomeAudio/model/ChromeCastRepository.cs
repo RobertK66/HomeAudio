@@ -24,7 +24,7 @@ namespace WinUiHomeAudio.model {
         // Used from UIBinding
         private ObservableCollection<ChromeCastClientWrapper> _knownPlayer = new();
 
-        public event EventHandler<IPlayerProxy> PlayerFound;
+        public event EventHandler<IPlayerProxy>? PlayerFound;
 
         public ObservableCollection<ChromeCastClientWrapper> KnownPlayer { get => _knownPlayer; }
 
