@@ -94,6 +94,8 @@ namespace LmsRepositiory {
             return cnt;
         }
 
+#region *************** Impl of IIMediaRepository
+
         public async Task LoadAllAsync(object PersitenceContext) {
             var rads = await GetRadiosAsync();
             foreach (var rad in rads) {
@@ -122,4 +124,6 @@ namespace LmsRepositiory {
             throw new NotImplementedException();
         }
     }
+#endregion
+
 }

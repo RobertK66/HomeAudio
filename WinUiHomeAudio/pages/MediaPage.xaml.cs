@@ -48,9 +48,9 @@ namespace WinUiHomeAudio.pages {
             if (item != null) {
                 Debug.WriteLine(item.Name);
                 if ((item.IsCollection) && (item is Cd cd)) {
-                    App.Host.Services.GetRequiredService<ChromeCastRepository>().PlayCed(cd);
+                    App.Host.Services.GetRequiredService<IPlayerRepository>().PlayCd(cd);
                 } else if (item is NamedUrl radio) {
-                    App.Host.Services.GetRequiredService<ChromeCastRepository>().PlayRadio(radio);
+                    App.Host.Services.GetRequiredService<IPlayerRepository>().PlayRadio(radio);
                 }
             }
         }

@@ -46,7 +46,7 @@
                     <RowDefinition  Height="*"/>
                 </Grid.RowDefinitions>
 
-                <ComboBox ItemsSource="{x:Bind Path=CcRepos.KnownChromecasts}"
+                <ComboBox ItemsSource="{x:Bind Path=CcRepos.KnownPlayer}"
                           SelectedItem="{x:Bind Path=SelectedChromecast , Mode=TwoWay}"
                           >
                     <ComboBox.ItemTemplate>

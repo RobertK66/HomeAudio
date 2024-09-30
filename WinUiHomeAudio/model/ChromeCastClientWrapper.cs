@@ -15,7 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace WinUiHomeAudio.model {
-    public class ChromeCastClientWrapper : INotifyPropertyChanged {
+    public class ChromeCastClientWrapper : INotifyPropertyChanged, IPlayerProxy {
         private readonly SemaphoreSlim semaphoreSlim = new(1, 1);
 
         public event PropertyChangedEventHandler? PropertyChanged;

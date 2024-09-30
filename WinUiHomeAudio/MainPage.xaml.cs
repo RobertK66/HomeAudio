@@ -19,6 +19,8 @@ namespace WinUiHomeAudio {
     /// </summary>
     public sealed partial class MainPage : Page, INotifyPropertyChanged {
 
+        private string ConfiguredAppId;
+
         public event PropertyChangedEventHandler? PropertyChanged;
         public void RaisePropertyChanged([CallerMemberName] string propertyName = "") {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
@@ -27,8 +29,8 @@ namespace WinUiHomeAudio {
         public ObservableCollection<Category> Categories = [];
         public ObservableCollection<Category> FooterCategories = [];
 
-        private ChromeCastRepository _ccRepos;
-        public ChromeCastRepository CcRepos { get { return _ccRepos; } set { if (_ccRepos != value) { _ccRepos = value; RaisePropertyChanged(); } } }
+        private IPlayerRepository _ccRepos;
+        public IPlayerRepository CcRepos { get { return _ccRepos; } set { if (_ccRepos != value) { _ccRepos = value; RaisePropertyChanged(); } } }
 
 
         private ChromeCastClientWrapper? _SelectedChromecast;
@@ -49,12 +51,14 @@ namespace WinUiHomeAudio {
         public MainPage() {
             this.InitializeComponent();
 
-            _ccRepos = App.Host.Services.GetRequiredService<ChromeCastRepository>();
+            _ccRepos = App.Host.Services.GetRequiredService<IPlayerRepository>();
             FooterCategories.Add(new Category() { Name = "Live Logger", Tag = "Logger" });
 
 
             var settings = App.Host.Services.GetRequiredService<AppSettings>();
             IEnumerable<IMediaRepository> mrs = App.Host.Services.GetServices<IMediaRepository>();
+
+            ConfiguredAppId = settings.AppId;
 
             foreach (IMediaRepository mr in mrs) {
                 var cats = mr.GetCategories();
@@ -70,7 +74,10 @@ namespace WinUiHomeAudio {
                         }
                     }
                 };
+
                 _ = mr.LoadAllAsync(settings.ReposPath);
+
+
             }
         }
 
@@ -121,7 +128,7 @@ namespace WinUiHomeAudio {
                         if (ccw.IsConnected) {
                             ccw.Disconnect();
                         } else {
-                            _ = ccw.TryConnectAsync(CcRepos._appId);
+                            _ = ccw.TryConnectAsync(ConfiguredAppId);
                         }
                     }
                 }

@@ -1,21 +1,32 @@
 ﻿using AudioCollectionApi.model;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Dispatching;
+using Microsoft.UI.Xaml;
+using Sharpcaster;
 using Sharpcaster.Models;
 using System;
 using System.Collections.ObjectModel;
+using System.Threading;
 using System.Threading.Tasks;
 using Windows.Storage.Streams;
 
 namespace WinUiHomeAudio.model {
-    public class ChromeCastRepository :IDisposable {
+    public class ChromeCastRepository : IPlayerRepository, IDisposable {
 
+        // Used from UIBinding
         public ChromeCastClientWrapper? _activeClient = null;
-        public ObservableCollection<ChromeCastClientWrapper> KnownChromecasts = new();
+      
         private string? _autoConnectName;
         public string _appId;
         private ILoggerFactory _loggerFactory;
         private ILogger<ChromeCastRepository> Log;
+
+        // Used from UIBinding
+        private ObservableCollection<ChromeCastClientWrapper> _knownPlayer = new();
+
+        public event EventHandler<IPlayerProxy> PlayerFound;
+
+        public ObservableCollection<ChromeCastClientWrapper> KnownPlayer { get => _knownPlayer; }
 
         public ChromeCastRepository(AppSettings appSettings, Microsoft.Extensions.Logging.ILoggerFactory loggerFactory) {
             _autoConnectName = appSettings.AutoConnectName;
@@ -29,7 +40,7 @@ namespace WinUiHomeAudio.model {
             Log.LogInformation("Receiver '{CcrName}' found at {CcrUri} {tostr}", e.Name, e.DeviceUri, e.Port);
             var dq = DispatcherQueue.GetForCurrentThread();
             var ccc = new ChromeCastClientWrapper(e, dq, _loggerFactory);
-            KnownChromecasts.Add(ccc);
+            KnownPlayer.Add(ccc);
             return ccc;
 
             //if (!String.IsNullOrEmpty(_autoConnectName) && e.Name.StartsWith(_autoConnectName)) {
@@ -38,27 +49,24 @@ namespace WinUiHomeAudio.model {
             //}
         }
 
-        public async Task TryConnectAsync(ChromeCastClientWrapper ccc) {
-            var status = await ccc.TryConnectAsync(_appId);
+        public async Task TryConnectAsync(IPlayerProxy pp) {
+            
+            var status = await pp.TryConnectAsync(_appId);
             if (status) {
-                SetActiveClient(ccc);
+                SetActiveClient(pp);
             }
         }
 
-        public ObservableCollection<ChromeCastClientWrapper> GetClients() {
-            return KnownChromecasts;
-        }
-
-        internal void PlayCed(Cd cd) {
+        public void PlayCd(Cd cd) {
             _activeClient?.PlayCdAsync(cd);
         }
 
-        internal void PlayRadio(NamedUrl url) {
+        public void PlayRadio(NamedUrl url) {
             _activeClient?.PlayRadioAsync(url);
         }
 
-        internal void SetActiveClient(ChromeCastClientWrapper? selectedCcc) {
-            _activeClient = selectedCcc;
+        public void SetActiveClient(IPlayerProxy? selectedCcc) {
+            _activeClient = selectedCcc as ChromeCastClientWrapper;
         }
 
         internal void VolumeUp() {
@@ -77,6 +85,26 @@ namespace WinUiHomeAudio.model {
                 //t.Wait();
                 Log.LogInformation("Dispose finished");
             }
+        }
+
+        public ObservableCollection<ChromeCastClientWrapper> GetKnownPlayer() {
+            return KnownPlayer;
+        }
+
+        public async Task LoadAllAsync() {
+
+            // start the search for CC Receivers in local network
+            MdnsChromecastLocator locator = new();
+            locator.ChromecastReceivedFound += Locator_ChromecastReceivedFound;
+            // Fire the search process and allow 10 seconds for receiver found events to call the handler.
+            CancellationTokenSource tokenSource = new CancellationTokenSource(10000);
+            await locator.FindReceiversAsync(tokenSource.Token);          
+
+        }
+
+        private void Locator_ChromecastReceivedFound(object? sender, ChromecastReceiver e) {
+            var wrapper = Add(e);
+            PlayerFound?.Invoke(sender, wrapper);
         }
     }
 }
