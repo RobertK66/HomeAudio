@@ -1,4 +1,5 @@
-﻿using AudioCollectionApi.model;
+﻿using AudioCollectionApi.api;
+using AudioCollectionApi.model;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Dispatching;
 using Microsoft.UI.Xaml;
@@ -22,11 +23,11 @@ namespace WinUiHomeAudio.model {
         private ILogger<ChromeCastRepository> Log;
 
         // Used from UIBinding
-        private ObservableCollection<ChromeCastClientWrapper> _knownPlayer = new();
+        private ObservableCollection<IPlayerProxy> _knownPlayer = new();
 
         public event EventHandler<IPlayerProxy>? PlayerFound;
 
-        public ObservableCollection<ChromeCastClientWrapper> KnownPlayer { get => _knownPlayer; }
+        public ObservableCollection<IPlayerProxy> KnownPlayer { get => _knownPlayer; }
 
         public ChromeCastRepository(AppSettings appSettings, Microsoft.Extensions.Logging.ILoggerFactory loggerFactory) {
             _autoConnectName = appSettings.AutoConnectName;
@@ -57,12 +58,12 @@ namespace WinUiHomeAudio.model {
             }
         }
 
-        public void PlayCd(Cd cd) {
-            _activeClient?.PlayCdAsync(cd);
+        public void PlayCd(IMedia cd) {
+            _activeClient?.PlayCdAsync(cd as Cd);
         }
 
-        public void PlayRadio(NamedUrl url) {
-            _activeClient?.PlayRadioAsync(url);
+        public void PlayRadio(IMedia url) {
+            _activeClient?.PlayRadioAsync(url as NamedUrl);
         }
 
         public void SetActiveClient(IPlayerProxy? selectedCcc) {
@@ -87,7 +88,7 @@ namespace WinUiHomeAudio.model {
             }
         }
 
-        public ObservableCollection<ChromeCastClientWrapper> GetKnownPlayer() {
+        public ObservableCollection<IPlayerProxy> GetKnownPlayer() {
             return KnownPlayer;
         }
 

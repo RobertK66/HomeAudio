@@ -9,7 +9,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace LmsRepositiory {
-    public class LmsClientRepos :IMediaRepository {
+    public class LmsClientRepos :IMediaRepository, IPlayerRepository {
         HttpClient client = new HttpClient();
 
         private ObservableCollection<MediaCategory> mediaCategories = new ObservableCollection<MediaCategory>() {
@@ -21,8 +21,13 @@ namespace LmsRepositiory {
         private ObservableCollection<IMedia> albumList = new ObservableCollection<IMedia>();
 
         private Dictionary<String, ObservableCollection<IMedia>> mediaRepositories = new Dictionary<String, ObservableCollection<IMedia>>();
-        
+
+        public event EventHandler<IPlayerProxy>? PlayerFound;
+
         public string BaseUrl { get; set; } = "http://192.168.177.65:9000/";
+
+        private ObservableCollection<IPlayerProxy> _knownPlayer = new ObservableCollection<IPlayerProxy>();
+        public ObservableCollection<IPlayerProxy> KnownPlayer { get { return _knownPlayer; } }
 
         public LmsClientRepos() {
             mediaRepositories.Add("Radios", radioList);
@@ -44,6 +49,9 @@ namespace LmsRepositiory {
         private async Task<IEnumerable<LmsObject>> GetLmsObjectsAsync(LmsJsonRequest request, string loopname, string idprop, string nameprop) {
             List<LmsObject> retVal = new List<LmsObject>();
             var url = string.Concat(BaseUrl, "jsonrpc.js");
+            bool isCollection = nameprop.Equals("album");
+            
+
 
             string json = JsonSerializer.Serialize(request);
             var response = await client.PostAsync(url, new StringContent(json));
@@ -55,7 +63,7 @@ namespace LmsRepositiory {
             var p = r.GetProperty(loopname);
             foreach(var x in  p.EnumerateArray()) {
                 try {
-                    retVal.Add(new LmsObject(x.GetProperty(idprop).ToString(), x.GetProperty(nameprop).ToString()));
+                    retVal.Add(new LmsObject(x.GetProperty(idprop).ToString(), x.GetProperty(nameprop).ToString(), isCollection));
                 } catch (Exception) {
                     // TODO: logging //error out 
                 }
@@ -94,7 +102,7 @@ namespace LmsRepositiory {
             return cnt;
         }
 
-#region *************** Impl of IIMediaRepository
+#region *************** Impl of IMediaRepository
 
         public async Task LoadAllAsync(object PersitenceContext) {
             var rads = await GetRadiosAsync();
@@ -120,10 +128,39 @@ namespace LmsRepositiory {
             }
         }
 
+        // This should go private - is only needed because assets are not listable by directory in Avolon impl....
         public Task LoadReposAsync(string context, Stream streamReader) {
             throw new NotImplementedException();
         }
-    }
+
 #endregion
+        public void PlayCd(IMedia cd) {
+            PlayAlbum(CurrentActive.Id, (cd as LmsObject).Id);
+        }
+
+        public void PlayRadio(IMedia radio) {
+            PlayRadio(CurrentActive.Id, (radio as LmsObject).Id);
+        }
+
+        private IPlayerProxy? CurrentActive;
+
+        public void SetActiveClient(IPlayerProxy? value) {
+            CurrentActive = value;
+        }
+
+        public async Task LoadAllAsync() {
+            var players = await GetPlayersAsync();
+            foreach (var player in players) {
+                KnownPlayer.Add(player);
+                PlayerFound?.Invoke(this, player);
+            }
+        }
+
+        public Task TryConnectAsync(IPlayerProxy ccw) {
+            CurrentActive = ccw;
+            return Task.CompletedTask;
+        }
+    }
+
 
 }

@@ -5,6 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:WinUiHomeAudio"
     xmlns:mod="using:WinUiHomeAudio.model"
+    xmlns:api="using:AudioCollectionApi.api"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:converters="using:CommunityToolkit.WinUI.Converters"
@@ -50,7 +51,7 @@
                           SelectedItem="{x:Bind Path=SelectedChromecast , Mode=TwoWay}"
                           >
                     <ComboBox.ItemTemplate>
-                        <DataTemplate x:DataType="mod:ChromeCastClientWrapper">
+                        <DataTemplate x:DataType="api:IPlayerProxy">
                             <ItemContainer HorizontalAlignment="Left" Margin="4">
                                 <Border BorderBrush="{x:Bind Path=IsConnected, Mode=OneWay, Converter={StaticResource BoolToColorConverter}}"
                                         Visibility="Visible" 

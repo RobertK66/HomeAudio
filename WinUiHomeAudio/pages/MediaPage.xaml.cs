@@ -1,5 +1,6 @@
 using AudioCollectionApi.api;
 using AudioCollectionApi.model;
+using LmsRepositiory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml.Controls;
 using Microsoft.UI.Xaml.Navigation;
@@ -51,6 +52,12 @@ namespace WinUiHomeAudio.pages {
                     App.Host.Services.GetRequiredService<IPlayerRepository>().PlayCd(cd);
                 } else if (item is NamedUrl radio) {
                     App.Host.Services.GetRequiredService<IPlayerRepository>().PlayRadio(radio);
+                } else if (item is LmsObject lmsObj) {
+                    if (lmsObj.IsCollection) {
+                        App.Host.Services.GetRequiredService<IPlayerRepository>().PlayCd(lmsObj);
+                    } else {
+                        App.Host.Services.GetRequiredService<IPlayerRepository>().PlayRadio(lmsObj);
+                    }
                 }
             }
         }

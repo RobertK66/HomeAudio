@@ -33,8 +33,8 @@ namespace WinUiHomeAudio {
         public IPlayerRepository CcRepos { get { return _ccRepos; } set { if (_ccRepos != value) { _ccRepos = value; RaisePropertyChanged(); } } }
 
 
-        private ChromeCastClientWrapper? _SelectedChromecast;
-        public ChromeCastClientWrapper? SelectedChromecast {
+        private IPlayerProxy? _SelectedChromecast;
+        public IPlayerProxy? SelectedChromecast {
             get { return _SelectedChromecast; }
             set {
                 if (_SelectedChromecast != value) {

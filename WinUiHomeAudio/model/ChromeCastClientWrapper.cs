@@ -1,4 +1,5 @@
-﻿using AudioCollectionApi.model;
+﻿using AudioCollectionApi.api;
+using AudioCollectionApi.model;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Dispatching;
 using Sharpcaster;
@@ -64,6 +65,8 @@ namespace WinUiHomeAudio.model {
         public bool IsConnected { get { return _isConnected; } set { _isConnected = value; RaisePropertyChanged(); } }
 
         public bool IsOn { get { return _isOn; } set { _isOn = value; RaisePropertyChanged(); } }
+
+        public string Id => "none";
 
         public async Task<bool> TryConnectAsync(string appId) {
             //bool connected = false;
