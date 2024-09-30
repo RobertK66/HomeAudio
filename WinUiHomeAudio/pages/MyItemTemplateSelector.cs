@@ -8,11 +8,15 @@ namespace WinUiHomeAudio.pages {
         public DataTemplate CdTemplate { get; set; }
         public DataTemplate RadioTemplate { get; set; }
 
+        public DataTemplate MediaTemplate { get; set; }
+
         protected override DataTemplate SelectTemplateCore(object item) {
             if (item is Cd) {
                 return CdTemplate;
-            } else {
+            } else if (item is NamedUrl) {
                 return RadioTemplate;
+            } else {
+                return MediaTemplate;
             }
         }
     }

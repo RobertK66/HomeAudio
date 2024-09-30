@@ -1,8 +1,11 @@
 {
   "profiles": {
     "LmsClient": {
+      "commandName": "Project"
+    },
+    "Play Album (LoudEsperagus)": {
       "commandName": "Project",
-      "commandLineArgs": "list -t LmsRadio"
+      "commandLineArgs": "play -t LmsAlbum 134 -p 08:b6:1f:b7:ae:c8"
     }
   }
 }

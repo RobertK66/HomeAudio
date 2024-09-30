@@ -57,7 +57,11 @@ namespace WinUiHomeAudio {
             IEnumerable<IMediaRepository> mrs = App.Host.Services.GetServices<IMediaRepository>();
 
             foreach (IMediaRepository mr in mrs) {
-                mr.GetCategories().CollectionChanged += (s, e) => {
+                var cats = mr.GetCategories();
+                foreach (var c in cats) {
+                    Categories.Add(new Category() { Glyph = Symbol.Target, Name = c.Name, Tag = c.Id });
+                }
+                cats.CollectionChanged += (s, e) => {
                     if (e.NewItems != null) {
                         foreach (var ni in e.NewItems) {
                             if (ni is MediaCategory mc) {

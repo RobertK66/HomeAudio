@@ -1,5 +1,6 @@
 ﻿using AudioCollectionApi.api;
 using AudioCollectionImpl;
+using LmsRepositiory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -51,6 +52,7 @@ namespace WinUiHomeAudio {
                        //}).
                        ConfigureServices((context, services) => {
                            services.AddSingleton(logVm);
+                           //services.AddSingleton<IMediaRepository, LmsClientRepos>();
                            services.AddSingleton<IMediaRepository, JsonMediaRepository>();
                            //services.AddSingleton<IMediaRepository, DLNAAlbumRepository>();
                            services.AddSingleton<AppSettings>();

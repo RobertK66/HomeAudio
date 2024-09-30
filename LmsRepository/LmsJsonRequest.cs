@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace LmsClient.model {
+namespace LmsRepositiory {
     public class LmsJsonRequest {
         private static int gid = 1;
         private readonly List<object> _parameters;
