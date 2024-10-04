@@ -207,7 +207,7 @@ namespace WinUiHomeAudio.model {
             }
         }
 
-        internal void VolumeUp() {
+        public void VolumeUp() {
             var rcChannel = ConnectedClient?.GetChannel<ReceiverChannel>();
             if (rcChannel != null) {
                 Volume = (Volume) + 3;
@@ -219,7 +219,7 @@ namespace WinUiHomeAudio.model {
             }
         }
 
-        internal void VolumeDown() {
+        public void VolumeDown() {
             var rcChannel = ConnectedClient?.GetChannel<ReceiverChannel>();
             if (rcChannel != null) {
                 Volume = (Volume) - 3;

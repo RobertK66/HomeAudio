@@ -53,7 +53,7 @@
                     <ComboBox.ItemTemplate>
                         <DataTemplate x:DataType="api:IPlayerProxy">
                             <ItemContainer HorizontalAlignment="Left" Margin="4">
-                                <Border BorderBrush="{x:Bind Path=IsConnected, Mode=OneWay, Converter={StaticResource BoolToColorConverter}}"
+                                <Border BorderBrush="{Binding Path=IsConnected, Mode=OneWay, Converter={StaticResource BoolToColorConverter}}"
                                         Visibility="Visible" 
                                         BorderThickness="2">
                                     <StackPanel Orientation="Horizontal" Padding="4,0,5,0">
@@ -63,7 +63,7 @@
                                                       MinWidth="0"
                                                       OnContent="Connected"
                                                       OffContent="Offline"
-                                                      IsOn="{x:Bind Path=IsOn, Mode=OneWay}" />
+                                                      IsOn="{Binding Path=IsOn, Mode=OneWay}" />
                                         <Button x:Name="VolDown" Content="vol-" VerticalAlignment="Top"  Click="CcPlayer_VolumeDown" >
                                             <Button.KeyboardAccelerators>
                                                 <KeyboardAccelerator Modifiers="None" Key="Subtract" />
@@ -74,11 +74,11 @@
                                                 <KeyboardAccelerator Modifiers="None" Key="Add" />
                                             </Button.KeyboardAccelerators>
                                         </Button>
-                                        <TextBox IsEnabled="False" Text="{x:Bind Name, Mode=OneWay}"/>
-                                        <TextBox IsEnabled="False" Text="{x:Bind Status, Mode=OneWay }"/>
-                                        <TextBox IsEnabled="False" Text="{x:Bind Volume, Mode=OneWay }"/>
-                                        <TextBox IsEnabled="False" Text="{x:Bind AppId, Mode=OneWay  }"/>
-                                        <TextBox IsEnabled="False" Text="{x:Bind MediaStatus, Mode=OneWay }"/>
+                                        <TextBox IsEnabled="False" Text="{Binding Name, Mode=OneWay}"/>
+                                        <TextBox IsEnabled="False" Text="{Binding Status, Mode=OneWay }"/>
+                                        <TextBox IsEnabled="False" Text="{Binding Volume, Mode=TwoWay }"/>
+                                        <TextBox IsEnabled="False" Text="{Binding AppId, Mode=OneWay  }"/>
+                                        <TextBox IsEnabled="False" Text="{Binding MediaStatus, Mode=OneWay }"/>
                                         <Button x:Name="Stop" Content="Stop" VerticalAlignment="Top"  Click="Stop_Click" >
                                         </Button>
                                     </StackPanel>

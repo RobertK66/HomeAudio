@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Net.NetworkInformation;
 using System.Text;
@@ -19,6 +20,11 @@ namespace AudioCollectionApi.api {
         bool IsOn { get; set; }
 
 
+        void Disconnect();
         Task<bool> TryConnectAsync(string appId);
+        void VolumeDown();
+        void VolumeUp();
+
+        
     }
 }

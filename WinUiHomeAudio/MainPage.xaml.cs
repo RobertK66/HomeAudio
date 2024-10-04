@@ -106,7 +106,7 @@ namespace WinUiHomeAudio {
 
         public void CcPlayer_VolumeUp(object sender, RoutedEventArgs e) {
             if (sender is FrameworkElement p) {
-                if (p.DataContext is ChromeCastClientWrapper ccw) {
+                if (p.DataContext is IPlayerProxy ccw) {
                     ccw.VolumeUp();
                 }
             }
@@ -114,7 +114,7 @@ namespace WinUiHomeAudio {
 
         public void CcPlayer_VolumeDown(object sender, RoutedEventArgs e) {
             if (sender is FrameworkElement p) {
-                if (p.DataContext is ChromeCastClientWrapper ccw) {
+                if (p.DataContext is IPlayerProxy ccw) {
                     ccw.VolumeDown();
                 }
             }
@@ -122,7 +122,7 @@ namespace WinUiHomeAudio {
 
         public void CcPlayer_ConnectToggeled(object sender, RoutedEventArgs e) {
             if (sender is FrameworkElement p) {
-                if (p.DataContext is ChromeCastClientWrapper ccw) {
+                if (p.DataContext is IPlayerProxy ccw) {
                     if (ccw.IsConnected != (e.OriginalSource as ToggleSwitch)?.IsOn) {
                         // This was because of user  toggle click
                         if (ccw.IsConnected) {
