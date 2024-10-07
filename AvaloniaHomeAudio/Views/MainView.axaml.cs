@@ -16,10 +16,10 @@ public partial class MainView : UserControl
         InitializeComponent();
     }
 
-    private void Button_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e) {
-        vm.Greeting += "+";
+    //private void Button_Click(object? sender, Avalonia.Interactivity.RoutedEventArgs e) {
+    //    vm.Greeting += "+";
 
-    }
+    //}
 
     private void UserControl_Loaded_1(object? sender, Avalonia.Interactivity.RoutedEventArgs e) {
         _ = vm.LoadReposAsync();
@@ -38,4 +38,11 @@ public partial class MainView : UserControl
         }
     }
 
+    private void Button_Click_Up(object? sender, Avalonia.Interactivity.RoutedEventArgs e) {
+        vm.VolumeUp();
+    }
+
+    private void Button_Click_Down(object? sender, Avalonia.Interactivity.RoutedEventArgs e) {
+        vm.VolumeDown();
+    }
 }

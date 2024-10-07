@@ -6,5 +6,7 @@ namespace AvaloniaHomeAudio.player
     public interface IChromeCastPlayer {
         string PlayerStatus { get; }
         void Play(IMedia media);
+        void VolumeDown();
+        void VolumeUp();
     }
 }

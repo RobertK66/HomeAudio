@@ -19,5 +19,7 @@ namespace AudioCollectionApi.api {
         void SetActiveClient(IPlayerProxy? value);
         Task LoadAllAsync();
         Task TryConnectAsync(IPlayerProxy ccw);
+        void VolumeUp();
+        void VolumeDown();
     }
 }

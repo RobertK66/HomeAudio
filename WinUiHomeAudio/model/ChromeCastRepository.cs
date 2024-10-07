@@ -70,7 +70,7 @@ namespace WinUiHomeAudio.model {
             _activeClient = selectedCcc as ChromeCastClientWrapper;
         }
 
-        internal void VolumeUp() {
+        public void VolumeUp() {
             _activeClient?.VolumeUp();
         }
 
@@ -106,6 +106,11 @@ namespace WinUiHomeAudio.model {
         private void Locator_ChromecastReceivedFound(object? sender, ChromecastReceiver e) {
             var wrapper = Add(e);
             PlayerFound?.Invoke(sender, wrapper);
+        }
+
+        
+        public void VolumeDown() {
+            _activeClient?.VolumeDown();
         }
     }
 }

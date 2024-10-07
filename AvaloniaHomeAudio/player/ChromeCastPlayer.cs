@@ -38,7 +38,7 @@ namespace AvaloniaHomeAudio.player {
             PlayerStatus = "Searching Receiver...";
             locator.ChromecastReceivedFound += Locator_ChromecastReceivedFound;
             cancelLocator = new CancellationTokenSource(TimeSpan.FromMilliseconds(5000));
-            _ = locator.FindReceiversAsync(cancelLocator.Token);
+            //_ = locator.FindReceiversAsync(cancelLocator.Token);
         }
 
         private bool IsFittingReceiver(ChromecastReceiver cr) {
@@ -104,7 +104,27 @@ namespace AvaloniaHomeAudio.player {
         }
 
         private void RcChannel_StatusChanged(object? sender, EventArgs e) {
-            //throw new NotImplementedException();
+            if (sender is ReceiverChannel sc) {
+                //  .LogDebug("Status changed: " + sc.Status.Volume.Level.ToString());
+
+                if (sc.Status?.Volume?.Level != null) {
+                    try {
+                        PlayerStatus = "Vol: " + (sc.Status.Volume.Level * 200).ToString();
+                    } catch (Exception) {
+
+                    }
+                }
+
+                    //_dispatcherQueue.TryEnqueue(() => {
+                    //    if (sc.Status?.Volume?.Level != null) {
+                    //        Volume = (int)(sc.Status.Volume.Level * 200);
+                    //    }
+                    //    Status = sc.Status?.Applications?.FirstOrDefault()?.StatusText ?? "<no status>";
+                    //    AppId = sc.Status?.Applications?.FirstOrDefault()?.AppId + "/" + sc.Status?.Applications?.FirstOrDefault()?.DisplayName;
+               
+
+
+            }
         }
 
         private void MediaChannel_StatusChanged(object? sender, EventArgs e) {
@@ -153,6 +173,14 @@ namespace AvaloniaHomeAudio.player {
                     _ = mediaChannel?.LoadAsync(item);
                 }
             } 
+        }
+
+        public void VolumeDown() {
+            rcChannel?.SetVolume(0.1);
+        }
+
+        public void VolumeUp() {
+            rcChannel?.SetVolume(0.3);
         }
     }
 }

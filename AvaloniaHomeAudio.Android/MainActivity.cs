@@ -5,7 +5,6 @@ using Avalonia;
 using Avalonia.Android;
 
 namespace AvaloniaHomeAudio.Android;
-
 [Activity(
     Label = "AvaloniaHomeAudio.Android",
     Theme = "@style/MyTheme.NoActionBar",

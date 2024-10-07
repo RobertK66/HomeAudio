@@ -25,7 +25,7 @@ namespace LmsClient.cmd {
 
             [Description("The Lyrion Music Server to be used.")]
             [CommandOption("-s|--server")]
-            [DefaultValue("http://192.168.177.65:9000/")]
+            [DefaultValue("http://192.168.177.65:9000/jsonrpc.js")]
             public String LmsBaseUrl { get; init; } = "";
 
             [Description("The ID of the LmsPlayer to be used.")]
@@ -46,7 +46,7 @@ namespace LmsClient.cmd {
             if (settings.ObjType == LmsType.LmsRadio) {
                 _lmsClient.PlayRadio(settings.PlayerId, settings.Id);
             } else {
-                int count = _lmsClient.PlayAlbum(settings.PlayerId, settings.Id);
+                int count = _lmsClient.PlayAlbum(settings.PlayerId, settings.Id).Result;
                 AnsiConsole.MarkupLineInterpolated($"{count} Track(s) loaded.");
             }
 

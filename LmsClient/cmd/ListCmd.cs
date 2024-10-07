@@ -28,7 +28,7 @@ namespace LmsClient.cmd
             //[CommandArgument(0, "[searchPath]")]
             //public string? SearchPath { get; init; }
             [CommandOption("-s|--server")]
-            [DefaultValue("http://192.168.177.65:9000/")]
+            [DefaultValue("http://192.168.177.65:9000/jsonrpc.js")]
             [Description("The Lyrion Music Server to be used.")]
             public String LmsBaseUrl { get; init; } = "";
 
@@ -40,6 +40,8 @@ namespace LmsClient.cmd
 
         public override int Execute([NotNull] CommandContext context, [NotNull] Settings settings) {
             _lmsClient.BaseUrl = settings.LmsBaseUrl;
+
+
 
             IEnumerable<LmsObject> objects = settings.ObjType switch {
                 LmsType.LmsRadio => _lmsClient.GetRadiosAsync().Result,

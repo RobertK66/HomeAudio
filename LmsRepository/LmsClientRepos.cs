@@ -1,6 +1,7 @@
 ﻿using AudioCollectionApi.api;
 using AudioCollectionApi.model;
 using LmsRepository;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -11,7 +12,10 @@ using System.Threading.Tasks;
 
 namespace LmsRepositiory {
     public class LmsClientRepos : IMediaRepository, IPlayerRepository {
-        HttpClient client = new HttpClient();
+        private static int instanceCount = 0;
+        private int instanceid = 0;
+        private ILogger? _log;
+        private HttpClient _client = new HttpClient();
 
         private ObservableCollection<MediaCategory> mediaCategories = new ObservableCollection<MediaCategory>() {
             new MediaCategory("Radios"){ Name="Radios" },
@@ -26,13 +30,18 @@ namespace LmsRepositiory {
         public event EventHandler<IPlayerProxy>? PlayerFound;
 
         public string BaseUrl { get; set; } = "http://192.168.177.65:9000/jsonrpc.js";
+         
+
 
         private ObservableCollection<IPlayerProxy> _knownPlayer = new ObservableCollection<IPlayerProxy>();
         public ObservableCollection<IPlayerProxy> KnownPlayer { get { return _knownPlayer; } }
 
-        public LmsClientRepos() {
+        public LmsClientRepos(ILogger<LmsClientRepos>? log = null) {
             mediaRepositories.Add("Radios", radioList);
             mediaRepositories.Add("CDs", albumList);
+            _log = log;
+            _log?.LogDebug($"Constructor [{++instanceCount}] finished.");
+            instanceid = instanceCount;
         }
 
         public async Task<IEnumerable<LmsPlayer>> GetPlayersAsync() {
@@ -56,12 +65,8 @@ namespace LmsRepositiory {
             List<T> retVal = new List<T>();
             bool isCollection = nameprop.Equals("album");
 
-            var response = await client.PostAsync(BaseUrl, request.GetStringContent());
-            var res = response.Content.ReadAsStringAsync().Result;
+            JsonElement r = await GetLmsResponseAsync(request);
 
-            JsonDocument jdoc = JsonDocument.Parse(res);
-
-            var r = jdoc.RootElement.GetProperty("result");
             var p = r.GetProperty(loopname);
             foreach (var x in p.EnumerateArray()) {
                 try {
@@ -77,10 +82,35 @@ namespace LmsRepositiory {
             return retVal;
         }
 
+        private async Task<JsonElement> GetLmsResponseAsync(LmsJsonRequest request) {
+            JsonElement r = new JsonElement();
+            var req = request.GetStringContent();
+
+            _log?.LogTrace($"Send[{instanceid}]: '{req.ReadAsStringAsync().Result}' to {BaseUrl}");
+
+            try {
+                var response = await _client.PostAsync(BaseUrl, req);
+                if (response.StatusCode == System.Net.HttpStatusCode.OK) {
+                    var res = response.Content.ReadAsStringAsync().Result;
+                    _log?.LogTrace($"Recv[{instanceid}]: '{res}'");
+                    JsonDocument jdoc = JsonDocument.Parse(res);
+                    r = jdoc.RootElement.GetProperty("result");
+                } else {
+                    _log?.LogTrace($"Status code on Lms Request: '{response.StatusCode}'");
+                }
+            } catch (Exception ex) {
+                _log?.LogTrace($"Error on Lms Request: '{ex.Message}'");
+            }
+            
+            return r;
+        }
+
         public void PlayRadio(string playerid, string? id) {
             //Request: "6e:ef:54:e9:02:b0 favorites playlist play item_id:1.1<LF>"
             var request = new LmsJsonRequest(playerid, new object[] { "favorites", "playlist", "play", $"item_id:{id}" });
-            var response = client.PostAsync(BaseUrl, request.GetStringContent()).Result;
+
+
+            _ = GetLmsResponseAsync(request);
 
             // no usefull content in result....
             //var res = response.Content.ReadAsStringAsync().Result;
@@ -90,15 +120,12 @@ namespace LmsRepositiory {
 
         }
 
-        public int PlayAlbum(string playerid, string? id) {
+        public async Task<int> PlayAlbum(string playerid, string? id) {
             //Request: "a5:41:d2:cd:cd:05 playlistcontrol cmd:load album_id:22<LF>"
             var request = new LmsJsonRequest(playerid, new object[] { "playlistcontrol", "cmd:load", $"album_id:{id}" });
-            var response = client.PostAsync(BaseUrl, request.GetStringContent()).Result;
+            var response = _client.PostAsync(BaseUrl, request.GetStringContent()).Result;
 
-            var res = response.Content.ReadAsStringAsync().Result;
-
-            JsonDocument jdoc = JsonDocument.Parse(res);
-            var r = jdoc.RootElement.GetProperty("result");
+            var r = await GetLmsResponseAsync(request); 
             int cnt = r.GetProperty("count").GetInt32();
             return cnt;
         }
@@ -130,13 +157,17 @@ namespace LmsRepositiory {
         }
 
         // This should go private - is only needed because assets are not listable by directory in Avolon impl....
-        public Task LoadReposAsync(string context, Stream streamReader) {
-            throw new NotImplementedException();
+        bool loadAllTriggered = false;
+        public async Task LoadReposAsync(string context, Stream streamReader) {
+            if (!loadAllTriggered) {
+                loadAllTriggered = true;
+                await LoadAllAsync(context);
+            }
         }
 
         #endregion
         public void PlayCd(IMedia cd) {
-            PlayAlbum(CurrentActive.Id, (cd as LmsObject).Id);
+            _ = PlayAlbum(CurrentActive.Id, (cd as LmsObject).Id);
         }
 
         public void PlayRadio(IMedia radio) {
@@ -160,8 +191,10 @@ namespace LmsRepositiory {
 
         public async Task TryConnectAsync(IPlayerProxy ccw) {
             CurrentActive = ccw;
+            // var request = new LmsJsonRequest(ccw.Id, new object[] { "status", "-", "5", "subscribe:10" });  //n.i if and how a long http would work here ....????
+            // TODO: figure out how to subscribe and/or make polling in background here.....
             var request = new LmsJsonRequest(ccw.Id, new object[] { "status", "-", "5", "tags:" });
-            var response = await client.PostAsync(BaseUrl, request.GetStringContent());
+            var response = await _client.PostAsync(BaseUrl, request.GetStringContent());
 
             var res = response.Content.ReadAsStringAsync().Result;
             JsonDocument jdoc = JsonDocument.Parse(res);
@@ -189,7 +222,7 @@ namespace LmsRepositiory {
             //Response: "04:20:00:12:23:45 mixer volume +10<LF>"
 
             var request = new LmsJsonRequest(playerId, new object[] { "mixer", "volume", "?" });
-            var response = client.PostAsync(BaseUrl, request.GetStringContent()).Result;
+            var response = _client.PostAsync(BaseUrl, request.GetStringContent()).Result;
 
             var res = response.Content.ReadAsStringAsync().Result;
             JsonDocument jdoc = JsonDocument.Parse(res);
@@ -204,7 +237,7 @@ namespace LmsRepositiory {
                 p = 100;
             }
             request = new LmsJsonRequest(playerId, new object[] { "mixer", "volume", p.ToString() });
-            response = client.PostAsync(BaseUrl, request.GetStringContent()).Result;
+            response = _client.PostAsync(BaseUrl, request.GetStringContent()).Result;
             res = response.Content.ReadAsStringAsync().Result;
 
             return p;
@@ -215,7 +248,7 @@ namespace LmsRepositiory {
 
         internal int VolumeDown(string playerId) {
             var request = new LmsJsonRequest(playerId, new object[] { "mixer", "volume", "?" });
-            var response = client.PostAsync(BaseUrl, request.GetStringContent()).Result;
+            var response = _client.PostAsync(BaseUrl, request.GetStringContent()).Result;
 
             var res = response.Content.ReadAsStringAsync().Result;
             JsonDocument jdoc = JsonDocument.Parse(res);
@@ -230,12 +263,19 @@ namespace LmsRepositiory {
                 p = 0;
             }
             request = new LmsJsonRequest(playerId, new object[] { "mixer", "volume", p.ToString() });
-            response = client.PostAsync(BaseUrl, request.GetStringContent()).Result;
+            response = _client.PostAsync(BaseUrl, request.GetStringContent()).Result;
             res = response.Content.ReadAsStringAsync().Result;
 
             return p;
         }
 
+        public void VolumeUp() {
+            CurrentActive?.VolumeUp();
+        }
+
+        public void VolumeDown() {
+            CurrentActive?.VolumeDown();
+        }
     }
 
 }
