@@ -96,10 +96,11 @@ namespace WinUiHomeAudio {
                 ContentFrame.Navigate(typeof(SettingsPage));
             } else {
                 var tag = args.InvokedItemContainer.Tag.ToString() ?? "??";
+                NavContext ctx = new NavContext() { category = tag, player = _SelectedChromecast };
                 if (tag.Equals("Logger")) {
                     ContentFrame.Navigate(typeof(LoggerPage));
                 } else {
-                    ContentFrame.Navigate(typeof(MediaPage), tag);
+                    ContentFrame.Navigate(typeof(MediaPage), ctx);
                 }
             }
         }
@@ -135,10 +136,18 @@ namespace WinUiHomeAudio {
             }
         }
 
-        private async void Stop_Click(object sender, RoutedEventArgs e) {
+        private void Stop_Click(object sender, RoutedEventArgs e) {
             if (sender is FrameworkElement p) {
-                if (p.DataContext is ChromeCastClientWrapper ccw) {
-                    await ccw.StopMediaPlay();
+                if (p.DataContext is IPlayerProxy ccw) {
+                    ccw.Stop();
+                }
+            }
+        }
+
+        private void Play_Click(object sender, RoutedEventArgs e) {
+            if (sender is FrameworkElement p) {
+                if (p.DataContext is IPlayerProxy ccw) {
+                    ccw.Play();
                 }
             }
         }

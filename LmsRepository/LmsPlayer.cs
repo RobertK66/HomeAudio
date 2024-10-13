@@ -41,11 +41,11 @@ namespace LmsRepository
         }
 
         public void VolumeUp() {
-            Volume =  _client.VolumeUp(Id);
+            _client.VolumeUp(Id);
         }
 
         public void VolumeDown() {
-            Volume = _client.VolumeDown(Id);
+            _client.VolumeDown(Id);
         }
 
         public async Task<bool> TryConnectAsync(string appId) {
@@ -55,6 +55,21 @@ namespace LmsRepository
 
         public void Disconnect() {
             IsConnected = false;
+        }
+
+        public void PlayCd(IMedia cd) {
+            _client.PlayCd(cd);
+        }
+
+        public void PlayRadio(IMedia radio) {
+            _client.PlayRadio(radio);
+        }
+
+        public void Stop() {
+            _ = _client.StopPlayAsync(Id);
+        }
+        public void Play() {
+            _ = _client.PlayAsync(Id);
         }
     }
 }

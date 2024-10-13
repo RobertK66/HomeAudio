@@ -242,7 +242,7 @@ namespace WinUiHomeAudio.model {
 
 
 
-        public async Task StopMediaPlay() {
+        public async Task StopMediaPlayAsync() {
             await semaphoreSlim.WaitAsync();    // Only one Play at once is routet to LoadAsync!
             try {
                 if (ConnectedClient != null) {
@@ -258,6 +258,26 @@ namespace WinUiHomeAudio.model {
             } finally {
                 semaphoreSlim?.Release();
             }
+        }
+
+        public void PlayCd(IMedia cd) {
+            if (cd is Cd c) {
+                _ = PlayCdAsync(c);
+            }
+        }
+
+        public void PlayRadio(IMedia radio) {
+            if (radio is NamedUrl u) {
+                _ = PlayRadioAsync(u);
+            }
+        }
+
+        public void Stop() {
+            throw new NotImplementedException();
+        }
+
+        public void Play() {
+            throw new NotImplementedException();
         }
     }
 }

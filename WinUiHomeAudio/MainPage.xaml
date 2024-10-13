@@ -64,6 +64,12 @@
                                                       OnContent="Connected"
                                                       OffContent="Offline"
                                                       IsOn="{Binding Path=IsOn, Mode=OneWay}" />
+                                        
+                                        <TextBox IsEnabled="False" Text="{Binding Name, Mode=OneWay}"/>
+                                        <TextBox IsEnabled="False" Text="{Binding Status, Mode=OneWay }"/>
+                                        <Button x:Name="Stop" Content="Stop" VerticalAlignment="Top"  Click="Stop_Click" />
+                                        <Button x:Name="Play" Content="Play" VerticalAlignment="Top"  Click="Play_Click" />
+                                        <TextBox IsEnabled="False" Text="{Binding Volume, Mode=TwoWay }"/>
                                         <Button x:Name="VolDown" Content="vol-" VerticalAlignment="Top"  Click="CcPlayer_VolumeDown" >
                                             <Button.KeyboardAccelerators>
                                                 <KeyboardAccelerator Modifiers="None" Key="Subtract" />
@@ -74,13 +80,7 @@
                                                 <KeyboardAccelerator Modifiers="None" Key="Add" />
                                             </Button.KeyboardAccelerators>
                                         </Button>
-                                        <TextBox IsEnabled="False" Text="{Binding Name, Mode=OneWay}"/>
-                                        <TextBox IsEnabled="False" Text="{Binding Status, Mode=OneWay }"/>
-                                        <TextBox IsEnabled="False" Text="{Binding Volume, Mode=TwoWay }"/>
-                                        <TextBox IsEnabled="False" Text="{Binding AppId, Mode=OneWay  }"/>
                                         <TextBox IsEnabled="False" Text="{Binding MediaStatus, Mode=OneWay }"/>
-                                        <Button x:Name="Stop" Content="Stop" VerticalAlignment="Top"  Click="Stop_Click" >
-                                        </Button>
                                     </StackPanel>
                                 </Border>
                             </ItemContainer>

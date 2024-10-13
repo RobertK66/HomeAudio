@@ -14,12 +14,12 @@ namespace AudioCollectionApi.api {
         ObservableCollection<IPlayerProxy> KnownPlayer { get; }
         
 
-        void PlayCd(IMedia cd);
-        void PlayRadio(IMedia radio);
+        //void PlayCd(IMedia cd);
+        //void PlayRadio(IMedia radio);
         void SetActiveClient(IPlayerProxy? value);
         Task LoadAllAsync();
         Task TryConnectAsync(IPlayerProxy ccw);
-        void VolumeUp();
-        void VolumeDown();
+        //void VolumeUp();
+        //void VolumeDown();
     }
 }

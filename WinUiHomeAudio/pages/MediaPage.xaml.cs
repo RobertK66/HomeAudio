@@ -25,21 +25,23 @@ namespace WinUiHomeAudio.pages {
         private ObservableCollection<IMedia> _ListOfMedia = new ObservableCollection<IMedia>();
         public ObservableCollection<IMedia> ListOfMedia { get { return _ListOfMedia; } set { if (_ListOfMedia != value) { _ListOfMedia = value; RaisePropertyChanged(); } } }
 
+        private IPlayerProxy? Player;
+
         public MediaPage() {
             this.InitializeComponent();
         }
 
         protected override void OnNavigatedTo(NavigationEventArgs e) {
-            string? cat = e?.Parameter?.ToString();
-            if (cat != null) {
-                ListOfMedia = App.Host.Services.GetRequiredService<IMediaRepository>().GetMediaRepository(cat);
-                if (!IsSorted.Contains(cat)) {
+            if (e.Parameter is NavContext ctx) {
+                ListOfMedia = App.Host.Services.GetRequiredService<IMediaRepository>().GetMediaRepository(ctx.category);
+                if (!IsSorted.Contains(ctx.category)) {
                     var sorted = ListOfMedia.OrderBy(x => x.Name).ToList();
                     for (int i = 0; i < sorted.Count(); i++) {
                         ListOfMedia.Move(ListOfMedia.IndexOf(sorted[i]), i);
                     }
-                    IsSorted.Add(cat);
+                    IsSorted.Add(ctx.category);
                 }
+                Player = ctx.player;
             }
             base.OnNavigatedTo(e);
         }
@@ -49,14 +51,14 @@ namespace WinUiHomeAudio.pages {
             if (item != null) {
                 Debug.WriteLine(item.Name);
                 if ((item.IsCollection) && (item is Cd cd)) {
-                    App.Host.Services.GetRequiredService<IPlayerRepository>().PlayCd(cd);
+                    Player?.PlayCd(cd);
                 } else if (item is NamedUrl radio) {
-                    App.Host.Services.GetRequiredService<IPlayerRepository>().PlayRadio(radio);
+                    Player?.PlayRadio(radio);
                 } else if (item is LmsObject lmsObj) {
                     if (lmsObj.IsCollection) {
-                        App.Host.Services.GetRequiredService<IPlayerRepository>().PlayCd(lmsObj);
+                        Player?.PlayCd(lmsObj);
                     } else {
-                        App.Host.Services.GetRequiredService<IPlayerRepository>().PlayRadio(lmsObj);
+                        Player?.PlayRadio(lmsObj);
                     }
                 }
             }

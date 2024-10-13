@@ -109,8 +109,9 @@ namespace LmsRepositiory {
             //Request: "6e:ef:54:e9:02:b0 favorites playlist play item_id:1.1<LF>"
             var request = new LmsJsonRequest(playerid, new object[] { "favorites", "playlist", "play", $"item_id:{id}" });
 
-
             _ = GetLmsResponseAsync(request);
+
+            _ = GetPlayerStatusAsync(playerid);
 
             // no usefull content in result....
             //var res = response.Content.ReadAsStringAsync().Result;
@@ -122,11 +123,16 @@ namespace LmsRepositiory {
 
         public async Task<int> PlayAlbum(string playerid, string? id) {
             //Request: "a5:41:d2:cd:cd:05 playlistcontrol cmd:load album_id:22<LF>"
+
+            // Dieses Load ist nachdem der JBL Chromecast LS abgeschaltet wurde zu wenig - es startet das Play nicht - ON/OFF !? mit radio scheit es zu funkrtionieren....????
             var request = new LmsJsonRequest(playerid, new object[] { "playlistcontrol", "cmd:load", $"album_id:{id}" });
-            var response = _client.PostAsync(BaseUrl, request.GetStringContent()).Result;
+            //var response = _client.PostAsync(BaseUrl, request.GetStringContent()).Result;
 
             var r = await GetLmsResponseAsync(request); 
             int cnt = r.GetProperty("count").GetInt32();
+
+            _ = GetPlayerStatusAsync(playerid);
+
             return cnt;
         }
 
@@ -191,27 +197,35 @@ namespace LmsRepositiory {
 
         public async Task TryConnectAsync(IPlayerProxy ccw) {
             CurrentActive = ccw;
-            // var request = new LmsJsonRequest(ccw.Id, new object[] { "status", "-", "5", "subscribe:10" });  //n.i if and how a long http would work here ....????
-            // TODO: figure out how to subscribe and/or make polling in background here.....
-            var request = new LmsJsonRequest(ccw.Id, new object[] { "status", "-", "5", "tags:" });
-            var response = await _client.PostAsync(BaseUrl, request.GetStringContent());
 
-            var res = response.Content.ReadAsStringAsync().Result;
-            JsonDocument jdoc = JsonDocument.Parse(res);
-            var r = jdoc.RootElement.GetProperty("result");
+            await GetPlayerStatusAsync(ccw.Id);
 
-            try {
-                ccw.Status = r.GetProperty("mode").GetString() ?? "";
-                var playlist = r.GetProperty("playlist_loop").EnumerateArray();
-                var first = playlist.FirstOrDefault().GetProperty("title").GetString();
-                ccw.MediaStatus = first;
-                ccw.IsConnected = true;
-            } catch (Exception) {
 
-            }
+            ccw.IsConnected = true;
+
+
+
+            //// var request = new LmsJsonRequest(ccw.Id, new object[] { "status", "-", "5", "subscribe:10" });  //n.i if and how a long http would work here ....????
+            //// TODO: figure out how to subscribe and/or make polling in background here.....
+            //var request = new LmsJsonRequest(ccw.Id, new object[] { "status", "-", "5", "tags:" });
+            //var response = await _client.PostAsync(BaseUrl, request.GetStringContent());
+
+            //var res = response.Content.ReadAsStringAsync().Result;
+            //JsonDocument jdoc = JsonDocument.Parse(res);
+            //var r = jdoc.RootElement.GetProperty("result");
+
+            //try {
+            //    ccw.Status = r.GetProperty("mode").GetString() ?? "";
+            //    var playlist = r.GetProperty("playlist_loop").EnumerateArray();
+            //    var first = playlist.FirstOrDefault().GetProperty("title").GetString();
+            //    ccw.MediaStatus = first;
+            //    ccw.IsConnected = true;
+            //} catch (Exception) {
+
+            //}
         }
 
-        internal int VolumeUp(string playerId) {
+        internal void VolumeUp(string playerId) {
             //Request: "04:20:00:12:23:45 mixer volume ?<LF>"
             //Response: "04:20:00:12:23:45 mixer volume 98<LF>"
             //
@@ -221,61 +235,86 @@ namespace LmsRepositiory {
             //Request: "04:20:00:12:23:45 mixer volume +10<LF>"
             //Response: "04:20:00:12:23:45 mixer volume +10<LF>"
 
-            var request = new LmsJsonRequest(playerId, new object[] { "mixer", "volume", "?" });
-            var response = _client.PostAsync(BaseUrl, request.GetStringContent()).Result;
+            var request = new LmsJsonRequest(playerId, new object[] { "mixer", "volume", "+3" });
+            _ = GetLmsResponseAsync(request);
+            _ = GetPlayerStatusAsync(playerId);
 
-            var res = response.Content.ReadAsStringAsync().Result;
-            JsonDocument jdoc = JsonDocument.Parse(res);
-            var r = jdoc.RootElement.GetProperty("result");
 
-            int p = 50;
-            string value = r.GetProperty("_volume").ToString();
-            if (Int32.TryParse(value, out p)) {
-                p += 3;
-            }
-            if (p > 100) {
-                p = 100;
-            }
-            request = new LmsJsonRequest(playerId, new object[] { "mixer", "volume", p.ToString() });
-            response = _client.PostAsync(BaseUrl, request.GetStringContent()).Result;
-            res = response.Content.ReadAsStringAsync().Result;
+            //var response = _client.PostAsync(BaseUrl, request.GetStringContent()).Result;
 
-            return p;
+            //var res = response.Content.ReadAsStringAsync().Result;
+            //JsonDocument jdoc = JsonDocument.Parse(res);
+            //var r =  jdoc.RootElement.GetProperty("result");
+
+            //int p = 50;
+            //string value = r.GetProperty("_volume").ToString();
+            //if (Int32.TryParse(value, out p)) {
+            //    p += 3;
+            //}
+            //if (p > 100) {
+            //    p = 100;
+            //}
+            //request = new LmsJsonRequest(playerId, new object[] { "mixer", "volume", p.ToString() });
+            //_ = GetLmsResponseAsync(request);
+            ////response = _client.PostAsync(BaseUrl, request.GetStringContent()).Result;
+            ////res = response.Content.ReadAsStringAsync().Result;
+
+            //return p;
         }
 
 
 
 
-        internal int VolumeDown(string playerId) {
-            var request = new LmsJsonRequest(playerId, new object[] { "mixer", "volume", "?" });
-            var response = _client.PostAsync(BaseUrl, request.GetStringContent()).Result;
+        internal void VolumeDown(string playerId) {
+            var request = new LmsJsonRequest(playerId, new object[] { "mixer", "volume", "-3" });
+            _ = GetLmsResponseAsync(request);
+            _ = GetPlayerStatusAsync(playerId);
+        }
 
-            var res = response.Content.ReadAsStringAsync().Result;
-            JsonDocument jdoc = JsonDocument.Parse(res);
-            var r = jdoc.RootElement.GetProperty("result");
+        public async Task<String> GetPlayerStatusAsync(string playerId) {
 
-            int p = 50;
-            string value = r.GetProperty("_volume").ToString();
-            if (Int32.TryParse(value, out p)) {
-                p -= 3;
+            var request = new LmsJsonRequest(playerId, new object[] { "status", "-", "50" });
+
+            var r = await GetLmsResponseAsync(request);
+            //var response = await _client.PostAsync(BaseUrl, request.GetStringContent());
+            //var res = response.Content.ReadAsStringAsync().Result;
+            //JsonDocument jdoc = JsonDocument.Parse(res);
+            //var r = jdoc.RootElement.GetProperty("result");
+
+            var player = KnownPlayer.Where(p => p.Id == playerId).FirstOrDefault();
+            if (player != null) {
+                player.Volume = r.GetProperty("mixer volume").GetInt32();
+                player.Status = r.GetProperty("mode").ToString();
+
+                if (player.Status == "stop") {
+                    player.MediaStatus = "";
+                } else { 
+                    var playlist = r.GetProperty("playlist_loop").EnumerateArray();
+                    var first = playlist.FirstOrDefault().GetProperty("title").GetString();
+                    player.MediaStatus = first;
+                }
+
             }
-            if (p < 0) {
-                p = 0;
-            }
-            request = new LmsJsonRequest(playerId, new object[] { "mixer", "volume", p.ToString() });
-            response = _client.PostAsync(BaseUrl, request.GetStringContent()).Result;
-            res = response.Content.ReadAsStringAsync().Result;
 
-            return p;
+            return JsonSerializer.Serialize(r, new JsonSerializerOptions { WriteIndented = true });
         }
 
-        public void VolumeUp() {
-            CurrentActive?.VolumeUp();
+        public async Task StopPlayAsync(string playerId) {
+            //Request: "04:20:00:12:23:45 stop<LF>"
+            //Response: "04:20:00:12:23:45 stop<LF>"
+            var request = new LmsJsonRequest(playerId, new object[] { "stop" });
+            var r = await GetLmsResponseAsync(request);
+            await GetPlayerStatusAsync(playerId);
         }
 
-        public void VolumeDown() {
-            CurrentActive?.VolumeDown();
+        public async Task PlayAsync(string playerId) {
+            //Request: "04:20:00:12:23:45 stop<LF>"
+            //Response: "04:20:00:12:23:45 stop<LF>"
+            var request = new LmsJsonRequest(playerId, new object[] { "play" });
+            await GetLmsResponseAsync(request);
+            await GetPlayerStatusAsync(playerId);
         }
+
     }
 
 }

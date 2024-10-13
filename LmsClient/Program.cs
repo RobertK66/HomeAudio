@@ -28,6 +28,7 @@ namespace LmsClient {
             app.Configure(config => {
                 config.AddCommand<ListCmd>("list");
                 config.AddCommand<PlayCmd>("play");
+                config.AddCommand<StatusCmd>("status");
 #if DEBUG
                 config.PropagateExceptions();
                 config.ValidateExamples();

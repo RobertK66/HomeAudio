@@ -58,13 +58,13 @@ namespace WinUiHomeAudio.model {
             }
         }
 
-        public void PlayCd(IMedia cd) {
-            _activeClient?.PlayCdAsync(cd as Cd);
-        }
+        //public void PlayCd(IMedia cd) {
+        //    _activeClient?.PlayCdAsync(cd as Cd);
+        //}
 
-        public void PlayRadio(IMedia url) {
-            _activeClient?.PlayRadioAsync(url as NamedUrl);
-        }
+        //public void PlayRadio(IMedia url) {
+        //    _activeClient?.PlayRadioAsync(url as NamedUrl);
+        //}
 
         public void SetActiveClient(IPlayerProxy? selectedCcc) {
             _activeClient = selectedCcc as ChromeCastClientWrapper;

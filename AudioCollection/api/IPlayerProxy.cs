@@ -15,7 +15,7 @@ namespace AudioCollectionApi.api {
         String Status { get; set; }
         int Volume { get; set; }
         String? MediaStatus { get; set; }
-        String? AppId { get; set; }
+        //String? AppId { get; set; }
         bool IsConnected { get; set; }
         bool IsOn { get; set; }
 
@@ -24,7 +24,10 @@ namespace AudioCollectionApi.api {
         Task<bool> TryConnectAsync(string appId);
         void VolumeDown();
         void VolumeUp();
+        void PlayCd(IMedia cd);
+        void PlayRadio(IMedia radio);
+        void Stop();
+        void Play();
 
-        
     }
 }

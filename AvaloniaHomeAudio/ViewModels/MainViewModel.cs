@@ -130,9 +130,9 @@ public partial class MainViewModel : ViewModelBase
     internal void PlayMedia(IMedia media) {
         //Player?.Play(media);
         if (media.IsCollection) {
-            _playerRepos.PlayCd(media);
+            Player?.PlayCd(media);
         } else {
-            _playerRepos.PlayRadio(media);
+            Player?.PlayRadio(media);
         }
     }
 

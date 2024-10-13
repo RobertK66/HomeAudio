@@ -47,6 +47,11 @@
 				</ListBox.ItemTemplate>
 			</ListBox>
 		</Grid>
-		<TextBlock Grid.Row="2" Text="{Binding Player.Status}" Margin="5"/>
+		<StackPanel Grid.Row="2" Orientation="Horizontal">
+			<TextBlock Text="{Binding Player.Volume}" Margin="5"/>
+			<TextBlock Text="{Binding Player.Status}" Margin="5"/>
+			<TextBlock Text="{Binding Player.MediaStatus}" Margin="5"/>
+		</StackPanel>
+		
 	</Grid>
 </UserControl>
