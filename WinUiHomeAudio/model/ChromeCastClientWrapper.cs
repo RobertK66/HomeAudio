@@ -251,7 +251,7 @@ namespace WinUiHomeAudio.model {
 
                     if (currentMediaStatus != null) {
                         //Log.LogDebug("Load Media.");
-                        await mediaChannel.StopAsync();
+                        await mediaChannel.PauseAsync();
                     }
 
                 }
@@ -273,11 +273,20 @@ namespace WinUiHomeAudio.model {
         }
 
         public void Stop() {
-            throw new NotImplementedException();
+            _ = StopMediaPlayAsync();
         }
 
         public void Play() {
-            throw new NotImplementedException();
+            if (ConnectedClient != null) {
+                var mediaChannel = ConnectedClient.GetChannel<MediaChannel>();
+                currentMediaStatus = mediaChannel.Status.FirstOrDefault();
+
+                if (currentMediaStatus != null) {
+                    //Log.LogDebug("Load Media.");
+                    _ = mediaChannel.PlayAsync();
+                }
+
+            }
         }
     }
 }
