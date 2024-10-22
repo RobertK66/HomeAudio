@@ -53,12 +53,12 @@ namespace WinUiHomeAudio {
                        //}).
                        ConfigureServices((context, services) => {
                            services.AddSingleton(logVm);
-                           //services.AddSingleton<IMediaRepository, LmsClientRepos>();
-                           services.AddSingleton<IMediaRepository, JsonMediaRepository>();
+                           services.AddSingleton<IMediaRepository, LmsClientRepos>();
+                           //services.AddSingleton<IMediaRepository, JsonMediaRepository>();
                            //services.AddSingleton<IMediaRepository, DLNAAlbumRepository>();
                            services.AddSingleton<AppSettings>();
-                           //services.AddSingleton<IPlayerRepository, LmsClientRepos>();
-                           services.AddSingleton<IPlayerRepository, ChromeCastRepository>();
+                           services.AddSingleton<IPlayerRepository, LmsClientRepos>();
+                           //services.AddSingleton<IPlayerRepository, ChromeCastRepository>();
                            // TODO: read log levels from config ...
                            services.AddLogging(logging => {
                                logging.AddFilter(level => level >= LogLevel.Trace)

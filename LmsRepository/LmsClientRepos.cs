@@ -285,6 +285,12 @@ namespace LmsRepositiory {
             if (player != null) {
                 player.Volume = r.GetProperty("mixer volume").GetInt32();
                 player.Status = r.GetProperty("mode").ToString();
+                if (r.GetProperty("player_connected").GetInt32() == 0) {
+                    player.IsConnected = false;
+                } else {
+                    player.IsConnected = true;
+                }
+                
 
                 if (player.Status == "stop") {
                     player.MediaStatus = "";
