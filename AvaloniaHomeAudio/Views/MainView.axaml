@@ -4,14 +4,9 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:AvaloniaHomeAudio.ViewModels"             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="AvaloniaHomeAudio.Views.MainView"
-			 d:DataContext="{x:Static vm:TestData.TestInstance}"
+			 d:DataContext="vm:DtMainViewModel"
              x:DataType="vm:MainViewModel"
 			 Loaded="UserControl_Loaded_1">
-  <!--<Design.DataContext>
-    --><!-- This only sets the DataContext for the previewer in an IDE,
-         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) --><!--
-    <vm:TestInstance/>
-  </Design.DataContext>>-->
 	<Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="Auto"/>

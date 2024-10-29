@@ -195,14 +195,25 @@ namespace LmsRepositiory {
         }
 
 
+        private async Task HandleTimerAsync(IPlayerProxy ccw) {
+            if (ccw != null) {
+                if (ccw.IsConnected) {
+                    await GetPlayerStatusAsync(ccw.Id);
+                    
+                }
+            }
+        }
+
+
         public async Task TryConnectAsync(IPlayerProxy ccw) {
             CurrentActive = ccw;
-
             await GetPlayerStatusAsync(ccw.Id);
 
+            System.Timers.Timer timer = new(interval: 3000);
+            timer.Elapsed += async (sender, e) => await HandleTimerAsync(ccw);
+            timer.Start();
 
             ccw.IsConnected = true;
-
 
 
             //// var request = new LmsJsonRequest(ccw.Id, new object[] { "status", "-", "5", "subscribe:10" });  //n.i if and how a long http would work here ....????
@@ -224,6 +235,8 @@ namespace LmsRepositiory {
 
             //}
         }
+
+    
 
         internal void VolumeUp(string playerId) {
             //Request: "04:20:00:12:23:45 mixer volume ?<LF>"
@@ -283,6 +296,7 @@ namespace LmsRepositiory {
 
             var player = KnownPlayer.Where(p => p.Id == playerId).FirstOrDefault();
             if (player != null) {
+                
                 player.Volume = r.GetProperty("mixer volume").GetInt32();
                 player.Status = r.GetProperty("mode").ToString();
                 if (r.GetProperty("player_connected").GetInt32() == 0) {

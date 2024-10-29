@@ -20,10 +20,13 @@ namespace LmsRepository
         private bool _isConnected = false;
         private bool _isOn = false;
 
+        private IObservableContext<IPlayerProxy>? _myPropChangedContext;
+
         public event PropertyChangedEventHandler? PropertyChanged;
         public void RaisePropertyChanged([CallerMemberName] string propertyName = "") {
             if (PropertyChanged != null) {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+                _myPropChangedContext?.InvokePropChanged(PropertyChanged, this, new PropertyChangedEventArgs(propertyName));
+                //PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
             }
         }
 
@@ -38,6 +41,10 @@ namespace LmsRepository
 
         public LmsPlayer(String id, String name, LmsClientRepos client) : base(id, name, false) {
             _client = client;
+        }
+
+        public void SetContext<IPlayerProxy>(IObservableContext<IPlayerProxy> myContext) {
+            _myPropChangedContext = (IObservableContext<AudioCollectionApi.api.IPlayerProxy>?)(myContext);
         }
 
         public void VolumeUp() {
@@ -71,5 +78,7 @@ namespace LmsRepository
         public void Play() {
             _ = _client.PlayAsync(Id);
         }
+
+     
     }
 }

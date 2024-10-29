@@ -39,8 +39,8 @@ namespace WinUiHomeAudio.model {
 
         public ChromeCastClientWrapper Add(ChromecastReceiver e) {
             Log.LogInformation("Receiver '{CcrName}' found at {CcrUri} {tostr}", e.Name, e.DeviceUri, e.Port);
-            var dq = DispatcherQueue.GetForCurrentThread();
-            var ccc = new ChromeCastClientWrapper(e, dq, _loggerFactory);
+            //var dq = DispatcherQueue.GetForCurrentThread();
+            var ccc = new ChromeCastClientWrapper(e, _loggerFactory);
             KnownPlayer.Add(ccc);
             return ccc;
 

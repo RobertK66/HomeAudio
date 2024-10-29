@@ -29,5 +29,7 @@ namespace AudioCollectionApi.api {
         void Stop();
         void Play();
 
+        
+        void SetContext<IPlayerProxy>(IObservableContext<IPlayerProxy> myContext);
     }
 }

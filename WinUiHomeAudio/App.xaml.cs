@@ -53,12 +53,12 @@ namespace WinUiHomeAudio {
                        //}).
                        ConfigureServices((context, services) => {
                            services.AddSingleton(logVm);
-                           services.AddSingleton<IMediaRepository, LmsClientRepos>();
-                           //services.AddSingleton<IMediaRepository, JsonMediaRepository>();
+                           //services.AddSingleton<IMediaRepository, LmsClientRepos>();
+                           services.AddSingleton<IMediaRepository, JsonMediaRepository>();
                            //services.AddSingleton<IMediaRepository, DLNAAlbumRepository>();
                            services.AddSingleton<AppSettings>();
-                           services.AddSingleton<IPlayerRepository, LmsClientRepos>();
-                           //services.AddSingleton<IPlayerRepository, ChromeCastRepository>();
+                           //services.AddSingleton<IPlayerRepository, LmsClientRepos>();
+                           services.AddSingleton<IPlayerRepository, ChromeCastRepository>();
                            // TODO: read log levels from config ...
                            services.AddLogging(logging => {
                                logging.AddFilter(level => level >= LogLevel.Trace)
@@ -115,9 +115,13 @@ namespace WinUiHomeAudio {
         private void Repos_PlayerFound(object? sender, IPlayerProxy pp) {
             IPlayerRepository playerRepos = MyHost.Services.GetRequiredService<IPlayerRepository>();
             var appSettings = MyHost.Services.GetRequiredService<AppSettings>();
+            var myContext = new MyUiContext() { dq = DispatcherQueue.GetForCurrentThread() };
+            
             if (pp != null) {
+                pp.SetContext(myContext);
                 if (!String.IsNullOrEmpty(appSettings.AutoConnectName) && pp.Name.StartsWith(appSettings.AutoConnectName)) {
                     Log.LogInformation("Initiate AutoConnect for Receiver '{CcrName}'", pp.Name);
+                    //DispatcherQueue.GetForCurrentThread();
                     _ = playerRepos.TryConnectAsync(pp);
 
                     if (m_window != null) {

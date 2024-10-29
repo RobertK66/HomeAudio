@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Numerics;
 using System.Threading.Tasks;
 
@@ -17,10 +18,20 @@ namespace AvaloniaHomeAudio.ViewModels;
 
 
 public static class TestData {
-    private class DummyPlayer : IChromeCastPlayer {
+    private class DummyPlayer : IPlayerProxy {
 
         private string _playerstatus;
         public string PlayerStatus { get { return _playerstatus; } }
+
+        public string Name => throw new NotImplementedException();
+
+        public string Id => throw new NotImplementedException();
+
+        public string Status { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public int Volume { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string? MediaStatus { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public bool IsConnected { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public bool IsOn { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         public void Play(IMedia media) {
         }
@@ -33,13 +44,71 @@ public static class TestData {
             //throw new NotImplementedException();
         }
 
+        public void Disconnect() {
+            throw new NotImplementedException();
+        }
+
+        public Task<bool> TryConnectAsync(string appId) {
+            throw new NotImplementedException();
+        }
+
+        public void PlayCd(IMedia cd) {
+            throw new NotImplementedException();
+        }
+
+        public void PlayRadio(IMedia radio) {
+            throw new NotImplementedException();
+        }
+
+        public void Stop() {
+            throw new NotImplementedException();
+        }
+
+        public void Play() {
+            throw new NotImplementedException();
+        }
+
+        public void SetContext<Object>(IObservableContext<Object> myContext) {
+            throw new NotImplementedException();
+        }
+
         public DummyPlayer(string text) {
             _playerstatus = text;
         }
     }
 
+    private class DummyPlayerRepos : IPlayerRepository {
 
-    public static MainViewModel TestInstance = new MainViewModel(null, null, null); // new DummyPlayer("Design Time Player"));
+        ObservableCollection<IPlayerProxy> IPlayerRepository.KnownPlayer => getKnownPlayer();
+
+
+        private ObservableCollection<IPlayerProxy> DesignPlayer = new ObservableCollection<IPlayerProxy>();
+        private ObservableCollection<IPlayerProxy> getKnownPlayer() {
+            if (DesignPlayer.Count == 0) {
+                DesignPlayer.Add(new DummyPlayer("First TestPlayer"));
+                DesignPlayer.Add(new DummyPlayer("2nd TestPlayer"));
+            }
+
+            return DesignPlayer;            
+        }
+
+        public event EventHandler<IPlayerProxy> PlayerFound;
+
+        public Task LoadAllAsync() {
+            throw new NotImplementedException();
+        }
+
+        public void SetActiveClient(IPlayerProxy? value) {
+            throw new NotImplementedException();
+        }
+
+        public Task TryConnectAsync(IPlayerProxy ccw) {
+            throw new NotImplementedException();
+        }
+    }
+
+
+    public static MainViewModel TestInstance = new MainViewModel(null, null, new DummyPlayerRepos()); // new DummyPlayer("Design Time Player"));
 }
 
 
@@ -70,9 +139,9 @@ public partial class MainViewModel : ViewModelBase
         _playerRepos = playerRepos;
     }
 
-    public async Task LoadReposAsync() {
-        _logger?.LogInformation("************************************* LoadRepos called *****************************************");
+    public virtual async Task LoadReposAsync() {
         if (_repos != null) {
+            _logger?.LogInformation("************************************* LoadRepos called *****************************************");
             int i = 0;
             //await Task.Delay(5000);
             await _repos.LoadAllAsync("");
