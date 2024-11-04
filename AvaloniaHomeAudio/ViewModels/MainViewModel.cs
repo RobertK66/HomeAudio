@@ -112,8 +112,7 @@ public static class TestData {
 }
 
 
-public partial class MainViewModel : ViewModelBase
-{
+public partial class MainViewModel : ViewModelBase {
     private readonly ILogger? _logger;
     private readonly IMediaRepository? _repos;
     private readonly IPlayerRepository _playerRepos;

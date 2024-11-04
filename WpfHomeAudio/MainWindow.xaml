@@ -1,0 +1,45 @@
+﻿<Window x:Class="WpfHomeAudio.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WpfHomeAudio"
+        xmlns:homeaudioviewmodel="clr-namespace:HomeAudioViewModel;assembly=HomeAudioViewModel" 
+        xmlns:api="using:AudioCollectionApi.api"
+        d:DataContext="{d:DesignInstance Type=homeaudioviewmodel:ViewModelBase}"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="450" Width="800">
+    <DockPanel>
+        <ComboBox DockPanel.Dock="Top" ItemsSource="{Binding Path=KnownPlayers}" SelectedItem="{Binding Path=SelectedPlayer, Mode=TwoWay}" >
+            <ComboBox.ItemTemplate>
+                <DataTemplate DataType="api:IPlayerProxy">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBox IsEnabled="False" Text="{Binding Name, Mode=OneWay}"/>
+                        <TextBox IsEnabled="False" Text="{Binding Volume, Mode=OneWay}"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+        <TreeView DockPanel.Dock="Left" ItemsSource="{Binding Path=Categories}" SelectedItemChanged="TreeView_SelectedItemChanged">
+            <TreeView.ItemTemplate>
+                <DataTemplate DataType="api:MediaCategory">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBox  IsEnabled="False" Text="{Binding Name, Mode=OneWay}" />
+                    </StackPanel>
+                </DataTemplate>
+            </TreeView.ItemTemplate>
+        </TreeView>
+
+        <Grid>
+            <ListView ItemsSource="{Binding MediaList}" MouseDoubleClick="ListView_MouseDoubleClick">
+                <ListView.ItemTemplate>
+                    <DataTemplate DataType="api:iMedia">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBox  IsEnabled="False" Text="{Binding Name, Mode=OneWay}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+        </Grid>
+    </DockPanel>
+</Window>
