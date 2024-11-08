@@ -36,7 +36,7 @@ namespace AvaloniaHomeAudio {
             throw new NotImplementedException();
         }
 
-        public void SetContext<Object>(IObservableContext<Object> myContext) {
+        public void SetContext(IObservableContext myContext) {
             throw new NotImplementedException();
         }
 

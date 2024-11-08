@@ -35,7 +35,7 @@ namespace WinUiHomeAudio.model {
         private String _connectionAppId = "";
         private ChromecastClient? ConnectedClient = null;
 
-        private IObservableContext<IPlayerProxy>? observableContext;
+        private IObservableContext? observableContext;
 
 
         private ChromecastReceiver cr;
@@ -296,8 +296,8 @@ namespace WinUiHomeAudio.model {
             }
         }
 
-        public void SetContext<IPlayerProxy>(IObservableContext<IPlayerProxy> myContext) {
-            observableContext = (IObservableContext<AudioCollectionApi.api.IPlayerProxy>?)myContext;
+        public void SetContext(IObservableContext myContext) {
+            observableContext = myContext;
         }
     }
 }

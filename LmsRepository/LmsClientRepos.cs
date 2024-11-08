@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
@@ -96,10 +97,10 @@ namespace LmsRepositiory {
                     JsonDocument jdoc = JsonDocument.Parse(res);
                     r = jdoc.RootElement.GetProperty("result");
                 } else {
-                    _log?.LogTrace($"Status code on Lms Request: '{response.StatusCode}'");
+                    _log?.LogError($"Status code on Lms Request: '{response.StatusCode}'");
                 }
             } catch (Exception ex) {
-                _log?.LogTrace($"Error on Lms Request: '{ex.Message}'");
+                _log?.LogError($"Error on Lms Request: '{ex.Message}'");
             }
             
             return r;
@@ -135,6 +136,16 @@ namespace LmsRepositiory {
 
             return cnt;
         }
+
+        public void PlayCd(string playerId, IMedia cd) {
+            _ = PlayAlbum(playerId, (cd as LmsObject).Id);
+        }
+
+        public void PlayRadio(string playerId, IMedia radio) {
+            PlayRadio(playerId, (radio as LmsObject).Id);
+        }
+
+
 
         #region *************** Impl of IMediaRepository
 
@@ -172,19 +183,12 @@ namespace LmsRepositiory {
         }
 
         #endregion
-        public void PlayCd(IMedia cd) {
-            _ = PlayAlbum(CurrentActive.Id, (cd as LmsObject).Id);
-        }
+      
+        //private IPlayerProxy? CurrentActive;
 
-        public void PlayRadio(IMedia radio) {
-            PlayRadio(CurrentActive.Id, (radio as LmsObject).Id);
-        }
-
-        private IPlayerProxy? CurrentActive;
-
-        public void SetActiveClient(IPlayerProxy? value) {
-            CurrentActive = value;
-        }
+        //public void SetActiveClient(IPlayerProxy? value) {
+        //    CurrentActive = value;
+        //}
 
         public async Task LoadAllAsync() {
             var players = await GetPlayersAsync();
@@ -199,23 +203,33 @@ namespace LmsRepositiory {
             if (ccw != null) {
                 if (ccw.IsConnected) {
                     await GetPlayerStatusAsync(ccw.Id);
-                    
                 }
             }
         }
 
 
+        private Dictionary<string, System.Timers.Timer> Timers = new Dictionary<string, System.Timers.Timer>();
+
+        public void Disconnect(IPlayerProxy p) {
+            System.Timers.Timer? timer;
+            if (Timers.TryGetValue(p.Id, out timer)) {
+                timer.Stop();
+            }
+        }
+
         public async Task TryConnectAsync(IPlayerProxy ccw) {
-            CurrentActive = ccw;
+            //CurrentActive = ccw;
             await GetPlayerStatusAsync(ccw.Id);
 
-            System.Timers.Timer timer = new(interval: 3000);
-            timer.Elapsed += async (sender, e) => await HandleTimerAsync(ccw);
+            System.Timers.Timer? timer;
+            if (!Timers.TryGetValue(ccw.Id, out timer)) {
+                timer = new(interval: 3000);
+                Timers.Add(ccw.Id, timer);
+                timer.Elapsed += async (sender, e) => await HandleTimerAsync(ccw).ConfigureAwait(true);
+            } 
             timer.Start();
-
+            
             ccw.IsConnected = true;
-
-
             //// var request = new LmsJsonRequest(ccw.Id, new object[] { "status", "-", "5", "subscribe:10" });  //n.i if and how a long http would work here ....????
             //// TODO: figure out how to subscribe and/or make polling in background here.....
             //var request = new LmsJsonRequest(ccw.Id, new object[] { "status", "-", "5", "tags:" });
@@ -296,24 +310,39 @@ namespace LmsRepositiory {
 
             var player = KnownPlayer.Where(p => p.Id == playerId).FirstOrDefault();
             if (player != null) {
-                
-                player.Volume = r.GetProperty("mixer volume").GetInt32();
-                player.Status = r.GetProperty("mode").ToString();
-                if (r.GetProperty("player_connected").GetInt32() == 0) {
-                    player.IsConnected = false;
-                } else {
-                    player.IsConnected = true;
-                }
-                
+                try {
+                    JsonElement val;
+                    if (r.TryGetProperty("mixer volume", out val)) {
+                        player.Volume = val.GetInt32();
+                    }
+                    if (r.TryGetProperty("mode", out val)) {
+                        player.Status = val.ToString();
+                    }
+                    // If the LMS has a connection to the player we model this as IsOn -> IPlayerProxy.IsConnected shows that we (the controller) have a connection moniotoring the player
+                    //  FormatException LMS this means we do have polling on and should get the changed status once LMS reestablishes connection to the real player...
+                    if (r.TryGetProperty("player_connected", out val)) {
+                        if (val.GetInt32() == 0) {
+                            player.IsOn = false;
+                        } else {
+                            player.IsOn = true;
+                        }
+                    }
 
-                if (player.Status == "stop") {
-                    player.MediaStatus = "";
-                } else { 
-                    var playlist = r.GetProperty("playlist_loop").EnumerateArray();
-                    var first = playlist.FirstOrDefault().GetProperty("title").GetString();
-                    player.MediaStatus = first;
-                }
+                    if (player.Status == "stop") {
+                        player.MediaStatus = "";
+                    } else {
 
+                        if (r.TryGetProperty("playlist_loop", out val)) {
+                            var playlist = val.EnumerateArray();
+                            if (playlist.FirstOrDefault().TryGetProperty("title", out val)) {
+                                var first = val.GetString();
+                                player.MediaStatus = first;
+                            }
+                        }
+                    }
+                } catch (Exception ex) {
+                    _log?.LogError(ex, "Fehler beim deserialize");
+                }
             }
 
             return JsonSerializer.Serialize(r, new JsonSerializerOptions { WriteIndented = true });

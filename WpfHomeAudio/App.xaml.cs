@@ -16,38 +16,35 @@ namespace WpfHomeAudio {
     public partial class App : Application {
 
         private readonly IHost MyHost;
-#pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
-        public static IServiceProvider ServiceProvider { get; private set; }
-#pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
+        public static IServiceProvider? ServiceProvider { get; private set; }
 
         public App() {
+
+            // No need for this in WPF if you use BindingOperations.EnableCollectionSynchronization on all observableCollections....
+            // IObservableContext uiContext = new MyUiContext(Dispatcher);
+
             MyHost = Host.CreateDefaultBuilder().
-                     //ConfigureHttpJsonOptions(options => {
-                     //    options.SerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower;
-                     //}).
                      ConfigureServices((context, services) => {
-                         //services.AddSingleton(logVm);
+                         //services.AddSingleton(uiContext);
                          services.AddSingleton<IMediaRepository, LmsClientRepos>();
                          //services.AddSingleton<IMediaRepository, JsonMediaRepository>();
                          //services.AddSingleton<IMediaRepository, DLNAAlbumRepository>();
+
                          //services.AddSingleton<AppSettings>();
                          services.AddSingleton<IPlayerRepository, LmsClientRepos>();
                          //services.AddSingleton<IPlayerRepository, ChromeCastRepository>();
+
                          // TODO: read log levels from config ...
-                         //services.AddLogging(logging => {
-                         //    logging.AddFilter(level => level >= LogLevel.Trace)
-                         //           .AddWinUiLogger((con) => {
-                         //               // This adds our LogPanel as possible target (configure in appsettings.json)
-                         //               con.LoggerVm = logVm;
-                         //           });
-                         //});
+                         services.AddLogging(
+                            logging => {
+                                logging.AddFilter(level => level >= LogLevel.Trace);
+                            });
 
                          // Register all ViewModels.
                          services.AddSingleton<MainViewModel>();
 
                          // Register all the Windows of the applications.
                          services.AddTransient<MainWindow>();
-
 
                      }).
                      Build();

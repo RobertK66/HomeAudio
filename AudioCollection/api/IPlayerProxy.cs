@@ -16,7 +16,7 @@ namespace AudioCollectionApi.api {
         int Volume { get; set; }
         String? MediaStatus { get; set; }
         //String? AppId { get; set; }
-        bool IsConnected { get; set; }
+        bool IsConnected { get; set; }          
         bool IsOn { get; set; }
 
 
@@ -30,6 +30,6 @@ namespace AudioCollectionApi.api {
         void Play();
 
         
-        void SetContext<IPlayerProxy>(IObservableContext<IPlayerProxy> myContext);
+        void SetContext(IObservableContext myContext);
     }
 }

@@ -3,12 +3,14 @@ using AudioCollectionApi.model;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using WinUiHomeAudio.model;
 using WinUiHomeAudio.pages;
+using Microsoft.UI.Dispatching;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -40,7 +42,7 @@ namespace WinUiHomeAudio {
                 if (_SelectedChromecast != value) {
                     _SelectedChromecast = value;
                     RaisePropertyChanged();
-                    CcRepos.SetActiveClient(value);
+                    //CcRepos.SetActiveClient(value);
                 }
             }
         }
@@ -48,12 +50,16 @@ namespace WinUiHomeAudio {
         public NavigationView MainNavPane { get => this.MainNavView; }
 
 
+
+        private MyUiContext _uiContext;
+
         public MainPage() {
             this.InitializeComponent();
 
             _ccRepos = App.Host.Services.GetRequiredService<IPlayerRepository>();
             FooterCategories.Add(new Category() { Name = "Live Logger", Tag = "Logger" });
 
+            _uiContext = new MyUiContext() { dq = DispatcherQueue.GetForCurrentThread() };
 
             var settings = App.Host.Services.GetRequiredService<AppSettings>();
             IEnumerable<IMediaRepository> mrs = App.Host.Services.GetServices<IMediaRepository>();
@@ -75,11 +81,34 @@ namespace WinUiHomeAudio {
                     }
                 };
 
+                
                 _ = mr.LoadAllAsync(settings.ReposPath);
 
+                CcRepos.PlayerFound += Repos_PlayerFound;
+                _ = CcRepos.LoadAllAsync();
+
+             
 
             }
         }
+
+
+        private void Repos_PlayerFound(object? sender, IPlayerProxy pp) {
+            
+            var appSettings = (App.Current as App).MyHost.Services.GetRequiredService<AppSettings>();
+          
+             if (pp != null) {
+                pp.SetContext(_uiContext);
+                if (!String.IsNullOrEmpty(appSettings.AutoConnectName) && pp.Name.StartsWith(appSettings.AutoConnectName)) {
+                    //Log.LogInformation("Initiate AutoConnect for Receiver '{CcrName}'", pp.Name);
+                    //DispatcherQueue.GetForCurrentThread();
+                    _ = CcRepos.TryConnectAsync(pp);
+                    SelectedChromecast = pp as IPlayerProxy;
+
+                }
+            }
+        }
+
 
 
         public void ReconfigureMediaFolder(string reposRootPath) {

@@ -20,13 +20,16 @@ namespace LmsRepository
         private bool _isConnected = false;
         private bool _isOn = false;
 
-        private IObservableContext<IPlayerProxy>? _myPropChangedContext;
+        private IObservableContext? _myPropChangedContext;
 
         public event PropertyChangedEventHandler? PropertyChanged;
         public void RaisePropertyChanged([CallerMemberName] string propertyName = "") {
             if (PropertyChanged != null) {
-                _myPropChangedContext?.InvokePropChanged(PropertyChanged, this, new PropertyChangedEventArgs(propertyName));
-                //PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+                if (_myPropChangedContext != null) {
+                    _myPropChangedContext?.InvokePropChanged(PropertyChanged, this, new PropertyChangedEventArgs(propertyName));
+                } else {
+                    PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+                }
             }
         }
 
@@ -43,9 +46,9 @@ namespace LmsRepository
             _client = client;
         }
 
-        public void SetContext<IPlayerProxy>(IObservableContext<IPlayerProxy> myContext) {
-            _myPropChangedContext = (IObservableContext<AudioCollectionApi.api.IPlayerProxy>?)(myContext);
-        }
+        //public void SetContext(IObservableContext myContext) {
+        //    _myPropChangedContext = (myContext);
+        //}
 
         public void VolumeUp() {
             _client.VolumeUp(Id);
@@ -61,15 +64,16 @@ namespace LmsRepository
         }
 
         public void Disconnect() {
-            IsConnected = false;
+            _client.Disconnect(this);
+            //IsConnected = false;
         }
 
         public void PlayCd(IMedia cd) {
-            _client.PlayCd(cd);
+            _client.PlayCd(Id, cd);
         }
 
         public void PlayRadio(IMedia radio) {
-            _client.PlayRadio(radio);
+            _client.PlayRadio(Id, radio);
         }
 
         public void Stop() {
@@ -79,6 +83,8 @@ namespace LmsRepository
             _ = _client.PlayAsync(Id);
         }
 
-     
+        public void SetContext(IObservableContext myContext) {
+            _myPropChangedContext = myContext;
+        }
     }
 }

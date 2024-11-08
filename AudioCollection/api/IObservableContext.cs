@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace AudioCollectionApi.api {
-    public interface IObservableContext<T> {
-        void InvokePropChanged(PropertyChangedEventHandler propertyChanged, T record, EventArgs changedEventArgs);
+    public interface IObservableContext {
+        void InvokePropChanged<T>(PropertyChangedEventHandler propertyChanged, T record, PropertyChangedEventArgs changedEventArgs);
     }
 }

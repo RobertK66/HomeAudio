@@ -16,7 +16,7 @@ namespace AudioCollectionApi.api {
 
         //void PlayCd(IMedia cd);
         //void PlayRadio(IMedia radio);
-        void SetActiveClient(IPlayerProxy? value);
+        //void SetActiveClient(IPlayerProxy? value);
         Task LoadAllAsync();
         Task TryConnectAsync(IPlayerProxy ccw);
         //void VolumeUp();

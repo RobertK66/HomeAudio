@@ -9,17 +9,46 @@
         d:DataContext="{d:DesignInstance Type=homeaudioviewmodel:ViewModelBase}"
         mc:Ignorable="d"
         Title="MainWindow" Height="450" Width="800">
+    <Window.Resources>
+        <local:BorderColorConverter x:Key="myconv" />
+    </Window.Resources>
     <DockPanel>
-        <ComboBox DockPanel.Dock="Top" ItemsSource="{Binding Path=KnownPlayers}" SelectedItem="{Binding Path=SelectedPlayer, Mode=TwoWay}" >
-            <ComboBox.ItemTemplate>
-                <DataTemplate DataType="api:IPlayerProxy">
-                    <StackPanel Orientation="Horizontal">
-                        <TextBox IsEnabled="False" Text="{Binding Name, Mode=OneWay}"/>
-                        <TextBox IsEnabled="False" Text="{Binding Volume, Mode=OneWay}"/>
-                    </StackPanel>
-                </DataTemplate>
-            </ComboBox.ItemTemplate>
-        </ComboBox>
+        <Grid  DockPanel.Dock="Top">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+        
+            <CheckBox  Grid.Column="0" Margin="0,5,0,0" IsChecked="{Binding SelectedPlayer.IsConnected}" Content="Connect"  Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked" />
+            <ComboBox  Grid.Column="1" DockPanel.Dock="Top" ItemsSource="{Binding Path=KnownPlayers}" SelectedItem="{Binding Path=SelectedPlayer, Mode=TwoWay}"  >
+                <ComboBox.ItemTemplate>
+                    <DataTemplate DataType="api:IPlayerProxy">
+                        <Border BorderThickness="2" >
+                            <Border.BorderBrush>
+                                <MultiBinding Converter="{StaticResource myconv}">
+                                    <Binding Path="IsConnected" />
+                                    <Binding Path="IsOn" />
+                                </MultiBinding>
+                            </Border.BorderBrush>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox IsEnabled="False" Text="{Binding Name, Mode=OneWay}"/>
+                                <TextBox IsEnabled="False" Text="{Binding Volume, Mode=OneWay}"/>
+                                <TextBox IsEnabled="False" Text="{Binding Status, Mode=OneWay}"/>
+                                <TextBox IsEnabled="False" Text="{Binding MediaStatus, Mode=OneWay}"/>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <StackPanel Grid.Column="2" Orientation="Horizontal">
+                <Button Margin="3" Content="Vol-" Click="Button_Click_1"/>
+                <Button Margin="3" Content="Vol+" Click="Button_Click"/>
+                <Button Margin="3" Content="Stop" Click="Button_Click_2"/>
+                <Button Margin="3" Content="Play" Click="Button_Click_3"/>
+
+            </StackPanel>
+        </Grid>
         <TreeView DockPanel.Dock="Left" ItemsSource="{Binding Path=Categories}" SelectedItemChanged="TreeView_SelectedItemChanged">
             <TreeView.ItemTemplate>
                 <DataTemplate DataType="api:MediaCategory">
