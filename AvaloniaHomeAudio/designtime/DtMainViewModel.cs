@@ -24,6 +24,10 @@ namespace AvaloniaHomeAudio {
             throw new NotImplementedException();
         }
 
+        public Task DisconnectAsync() {
+            throw new NotImplementedException();
+        }
+
         public void Play() {
             throw new NotImplementedException();
         }

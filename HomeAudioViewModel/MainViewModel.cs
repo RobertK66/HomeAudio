@@ -1,8 +1,10 @@
 ﻿using AudioCollectionApi.api;
 using AudioCollectionApi.model;
 using CommunityToolkit.Mvvm.ComponentModel;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Numerics;
@@ -10,21 +12,15 @@ using System.Threading.Tasks;
 
 namespace HomeAudioViewModel;
 
-public partial class MainViewModel : ViewModelBase {
+public partial class MainViewModel : ViewModelBase, IHostedService  {
     private readonly ILogger? _logger;
     private readonly IObservableContext? _context;
     private readonly IMediaRepository? _repos;
     private readonly IPlayerRepository _playerRepos;
 
-    //[ObservableProperty]
-    private IPlayerProxy? _selectedPlayer;
-    public IPlayerProxy? SelectedPlayer {
-        get { return _selectedPlayer; }
-        set { SetProperty(ref _selectedPlayer, value);
-              //_playerRepos?.SetActiveClient(value);
-        }
-    }
-
+    [ObservableProperty]
+    public IPlayerProxy? _selectedPlayer;
+    
     [ObservableProperty]
     public ObservableCollection<IPlayerProxy> _knownPlayers = new ObservableCollection<IPlayerProxy>();
 
@@ -72,18 +68,24 @@ public partial class MainViewModel : ViewModelBase {
 
     }
 
+    private void addAndConnect(IPlayerProxy pp) {
+        KnownPlayers.Add(pp);
+        if (pp.Name.ToLower().StartsWith("loud")) {
+            _ = pp.TryConnectAsync("");
+            SelectedPlayer = pp;
+        }
+    }
+
+
     private void _playerRepos_PlayerFound(object? sender, IPlayerProxy pp) {
         if (pp != null) {
-            if (_context != null) {
+            if (_context == null) {
+                addAndConnect(pp);
+            } else {
                 pp.SetContext(_context);
+                _context.Execute(() => { addAndConnect(pp); });
             }
-            KnownPlayers.Add(pp);
-            if (pp.Name.ToLower().StartsWith("loud")) {
-                _logger?.LogInformation("Initiate AutoConnect for Receiver '{CcrName}'", pp.Name);
-
-                pp.TryConnectAsync("");
-                SelectedPlayer = pp;
-            }
+            
         }
     }
 
@@ -92,6 +94,20 @@ public partial class MainViewModel : ViewModelBase {
             MediaList = _repos.GetMediaRepository(cat);
         }
     }
-    
+
+    public async Task StartAsync(CancellationToken cancellationToken) {
+        await LoadReposAsync();
+    }
+
+    public async Task StopAsync(CancellationToken cancellationToken) {
+        _logger?.LogInformation("******************** Stopping ...");
+        foreach (var player in KnownPlayers) {
+            if (player.IsConnected) {
+                _logger?.LogInformation("Disconnecting player " + player.Name);
+                await player.DisconnectAsync(); ;
+            }
+        }
+        _logger?.LogInformation("******************** Stopped !!!!!");
+    }
 }
 

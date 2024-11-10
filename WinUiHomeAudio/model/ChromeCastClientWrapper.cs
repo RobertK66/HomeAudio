@@ -299,5 +299,13 @@ namespace WinUiHomeAudio.model {
         public void SetContext(IObservableContext myContext) {
             observableContext = myContext;
         }
+
+        public async Task DisconnectAsync() {
+            if (ConnectedClient != null) {
+                IsConnected = false;
+                IsOn = false;
+                await ConnectedClient.DisconnectAsync();
+            }
+        }
     }
 }

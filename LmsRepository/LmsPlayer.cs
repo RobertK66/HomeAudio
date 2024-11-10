@@ -86,5 +86,10 @@ namespace LmsRepository
         public void SetContext(IObservableContext myContext) {
             _myPropChangedContext = myContext;
         }
+
+        public Task DisconnectAsync() {
+            Disconnect();
+            return Task.CompletedTask;
+        }
     }
 }

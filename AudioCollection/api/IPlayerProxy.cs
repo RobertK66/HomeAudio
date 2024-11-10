@@ -31,5 +31,6 @@ namespace AudioCollectionApi.api {
 
         
         void SetContext(IObservableContext myContext);
+        Task DisconnectAsync();
     }
 }

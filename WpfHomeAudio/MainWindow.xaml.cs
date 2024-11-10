@@ -2,6 +2,7 @@
 using AudioCollectionApi.model;
 using HomeAudioViewModel;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using System.Text;
 using System.Windows;
@@ -19,7 +20,7 @@ namespace WpfHomeAudio {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window {
+    public partial class MainWindow : Window, IHostedService {
 
         //private IObservableContext? _context;
         private object _lock = new();
@@ -33,7 +34,7 @@ namespace WpfHomeAudio {
             BindingOperations.EnableCollectionSynchronization(vm.KnownPlayers, _lock);
 
             // Make a real background thread for this to check async property/Collection Change events are synchronized.
-            new Thread(() => _ = vm.LoadReposAsync()) { IsBackground = true }.Start();
+            //new Thread(() => _ = vm.LoadReposAsync()) { IsBackground = true }.Start();
             //_ = vm.LoadReposAsync();
         }
 
@@ -86,6 +87,14 @@ namespace WpfHomeAudio {
 
         private void CheckBox_Unchecked(object sender, RoutedEventArgs e) {
             _vm.SelectedPlayer?.Disconnect();
+        }
+
+        public Task StartAsync(CancellationToken cancellationToken) {
+            return Task.CompletedTask;
+        }
+
+        public Task StopAsync(CancellationToken cancellationToken) {
+            return Task.CompletedTask;
         }
     }
 }

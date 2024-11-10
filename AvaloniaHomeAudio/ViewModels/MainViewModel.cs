@@ -72,6 +72,10 @@ public static class TestData {
             throw new NotImplementedException();
         }
 
+        public Task DisconnectAsync() {
+            throw new NotImplementedException();
+        }
+
         public DummyPlayer(string text) {
             _playerstatus = text;
         }
