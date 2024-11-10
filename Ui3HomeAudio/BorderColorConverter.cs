@@ -21,7 +21,7 @@ namespace Ui3HomeAudio {
     public class BorderColorConverter : IValueConverter {
 
         public object Convert(object value, Type targetType, object parameter, string language) {
-            IPlayerProxy? record = (value as IPlayerProxy);
+            IPlayerProxy? record = (parameter as TextBox)?.DataContext as IPlayerProxy;
             if (record != null) {
                 return ConvertFromIPlayerProxy(record);
             }
@@ -32,7 +32,6 @@ namespace Ui3HomeAudio {
             throw new NotImplementedException("nicht in diese richtung :-)");
         }
 
-
         private SolidColorBrush ConvertFromIPlayerProxy(IPlayerProxy value) {
             var c = App.Current.Resources["SystemControlErrorTextForegroundBrush"];
             SolidColorBrush scb = (App.Current.Resources["SystemErrorTextColor"] as SolidColorBrush)??new SolidColorBrush(Colors.Red);
@@ -41,8 +40,6 @@ namespace Ui3HomeAudio {
             }
             return scb;
         }
-
-
 
 
     }
