@@ -20,7 +20,7 @@ namespace WpfHomeAudio {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class MainWindow : Window, IHostedService {
+    public partial class MainWindow : Window {
 
         //private IObservableContext? _context;
         private object _lock = new();
@@ -88,13 +88,6 @@ namespace WpfHomeAudio {
         private void CheckBox_Unchecked(object sender, RoutedEventArgs e) {
             _vm.SelectedPlayer?.Disconnect();
         }
-
-        public Task StartAsync(CancellationToken cancellationToken) {
-            return Task.CompletedTask;
-        }
-
-        public Task StopAsync(CancellationToken cancellationToken) {
-            return Task.CompletedTask;
-        }
+     
     }
 }

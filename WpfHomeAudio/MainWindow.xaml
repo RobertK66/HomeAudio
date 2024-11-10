@@ -25,6 +25,11 @@
                 <ComboBox.ItemTemplate>
                     <DataTemplate DataType="api:IPlayerProxy">
                         <Border BorderThickness="2" >
+                            <!--  so bekommt man leider kein 'changed' wenn nur das IsOn (oder IsConnected geändert wied !!!!! -->
+                            <!--<Border.BorderBrush>
+                                <Binding Path="DataContext" Converter="{StaticResource myconv}" 
+                                         Mode="TwoWay" RelativeSource="{RelativeSource Mode=TemplatedParent}"/>
+                            </Border.BorderBrush>-->
                             <Border.BorderBrush>
                                 <MultiBinding Converter="{StaticResource myconv}">
                                     <Binding Path="IsConnected" />

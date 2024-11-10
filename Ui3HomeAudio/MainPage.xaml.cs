@@ -1,3 +1,5 @@
+using AudioCollectionApi.api;
+using AudioCollectionApi.model;
 using HomeAudioViewModel;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Xaml;
@@ -27,13 +29,54 @@ namespace Ui3HomeAudio {
 
         private MainViewModel _vm { get { return (MainViewModel)DataContext; } }
 
+   
         public MainPage(ILogger<MainPage> _log, MainViewModel vm) {
             this.DataContext = vm;
             this.InitializeComponent();
+        }
 
-            //new Thread(() => _ = vm.LoadReposAsync()) { IsBackground = true }.Start();
-            //_ = vm.LoadReposAsync();
+        private void CheckBox_Checked(object sender, RoutedEventArgs e) {
+            _ = _vm.SelectedPlayer?.TryConnectAsync("");
+        }
 
+        private void CheckBox_Unchecked(object sender, RoutedEventArgs e) {
+            _ = _vm.SelectedPlayer?.DisconnectAsync();
+        }
+
+        private void ListBox_SelectionChanged(object sender, SelectionChangedEventArgs e) {
+            var menuItem = e.AddedItems[0] as MediaCategory;
+
+            if (menuItem != null) {
+                _vm.SelectCategory(menuItem.Id);
+            }
+        }
+
+        private void ListBox_DoubleTapped(object sender, DoubleTappedRoutedEventArgs e) {
+            var item = (sender as ListBox)?.SelectedItem as IMedia;
+
+            if (item != null) {
+                if (item.IsCollection) {
+                    _vm.SelectedPlayer?.PlayCd(item);
+                } else {
+                    _vm.SelectedPlayer?.PlayRadio(item);
+                }
+            }
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e) {
+            _vm.SelectedPlayer?.VolumeDown();
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e) {
+            _vm.SelectedPlayer?.VolumeUp();
+        }
+
+        private void Button_Click_2(object sender, RoutedEventArgs e) {
+            _vm.SelectedPlayer?.Stop();
+        }
+
+        private void Button_Click_3(object sender, RoutedEventArgs e) {
+            _vm.SelectedPlayer?.Play();
         }
     }
 }

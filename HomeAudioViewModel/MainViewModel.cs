@@ -13,9 +13,9 @@ using System.Threading.Tasks;
 namespace HomeAudioViewModel;
 
 public partial class MainViewModel : ViewModelBase, IHostedService  {
-    private readonly ILogger? _logger;
+    private readonly ILogger _logger;
     private readonly IObservableContext? _context;
-    private readonly IMediaRepository? _repos;
+    private readonly IMediaRepository _repos;
     private readonly IPlayerRepository _playerRepos;
 
     [ObservableProperty]
@@ -35,29 +35,26 @@ public partial class MainViewModel : ViewModelBase, IHostedService  {
 
 
     // Constructor Option without IObservableContext for GUI frameworks that can handle/synchronize the IPropertyChanged on their own.
-    public MainViewModel(ILogger<MainViewModel>? logger, IMediaRepository? repos, IPlayerRepository playerRepos) {
+    public MainViewModel(ILogger<MainViewModel> logger, IMediaRepository repos, IPlayerRepository playerRepos) {
         _logger = logger;
         _repos = repos;
         _playerRepos = playerRepos;
     }
 
     // Environments which needs to post the IPropertyChanged/ICollectionChanged events on a different thread need an abstract Context for that!
-    public MainViewModel(ILogger<MainViewModel>? logger, IMediaRepository? repos, IPlayerRepository playerRepos, IObservableContext uiContext) {
+    public MainViewModel(ILogger<MainViewModel> logger, IMediaRepository repos, IPlayerRepository playerRepos, IObservableContext uiContext) {
         _logger = logger;
         _repos = repos;
         _context = uiContext;   
         _playerRepos = playerRepos;
     }
 
-    public virtual async Task LoadReposAsync() {
+    private async Task LoadReposAsync() {
         if (_repos != null) {
-            _logger?.LogInformation("************************************* LoadRepos called *****************************************");
-         
-            int i = 0;
+            _logger.LogInformation("************************************* LoadRepos called *****************************************");
             //await Task.Delay(5000);
             await _repos.LoadAllAsync("");
-
-            _logger?.LogInformation("************************************* LoadRepos ready *****************************************");
+            _logger.LogInformation("************************************* LoadRepos ready *****************************************");
             Categories = _repos.GetCategories();
         }
 
@@ -100,14 +97,14 @@ public partial class MainViewModel : ViewModelBase, IHostedService  {
     }
 
     public async Task StopAsync(CancellationToken cancellationToken) {
-        _logger?.LogInformation("******************** Stopping ...");
+        _logger.LogInformation("******************** Stopping ...");
         foreach (var player in KnownPlayers) {
             if (player.IsConnected) {
-                _logger?.LogInformation("Disconnecting player " + player.Name);
+                _logger.LogInformation("Disconnecting player " + player.Name);
                 await player.DisconnectAsync(); ;
             }
         }
-        _logger?.LogInformation("******************** Stopped !!!!!");
+        _logger.LogInformation("******************** Stopped !!!");
     }
 }
 

@@ -18,10 +18,7 @@ namespace WinUiHomeAudio {
         }
 
         public void InvokePropChanged<T>(PropertyChangedEventHandler propertyChanged, T player, PropertyChangedEventArgs eventArgs) {
-            //PropertyChangedEventArgs? eventArgs = propertyChangedEventArgs as PropertyChangedEventArgs;
-            //if (eventArgs != null) {
-                _ = dq?.TryEnqueue(() => propertyChanged(this, eventArgs));
-            //}
+           _ = dq?.TryEnqueue(() => propertyChanged(this, eventArgs));
         }
 
     }

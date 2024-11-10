@@ -30,11 +30,6 @@ namespace Ui3HomeAudio {
         public MainWindow(ILogger<MainWindow> log) {
             _logger = log;
             this.InitializeComponent();
-            //this.mainPage.DataContext = vm;
-
-            //new Thread(() => _ = vm.LoadReposAsync()) { IsBackground = true }.Start();
-            ////_ = vm.LoadReposAsync();
-
             _logger.LogDebug("Main window constructor finished....");
         }
 
