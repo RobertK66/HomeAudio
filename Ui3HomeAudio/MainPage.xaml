@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Page
+    x:Class="Ui3HomeAudio.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:Ui3HomeAudio"
+    xmlns:api="using:AudioCollectionApi.api"
+    xmlns:apim="using:AudioCollectionApi.model"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+
+    <Page.Resources>
+        <local:BorderColorConverter x:Key="myconv" />
+    </Page.Resources>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <CheckBox Grid.Column="0" Margin="0,5,0,0" IsChecked="{Binding SelectedPlayer.IsConnected, Mode=TwoWay}" Content="Connect"  Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked"  />
+            <ComboBox Grid.Column="1" ItemsSource="{Binding KnownPlayers}" SelectedItem="{Binding SelectedPlayer, Mode=TwoWay}">
+                <ComboBox.ItemTemplate >
+                    <DataTemplate x:DataType="api:IPlayerProxy">
+                        <!--<Border BorderThickness="3" BorderBrush="{ThemeResource SystemErrorTextColor}">-->
+                        <Border BorderThickness="2">
+                            <Border.BorderBrush>
+                                <!-- "MultiBinding" with a Converter behind the IsConnected of a IPlayerProxy -->
+                                <!-- A IValueConverter gets called when the bound Value fires its PropertyChenged event -->
+                                <!-- Other values can be passed with the 'single Object' ConverterParameter, We pass in our record. -->
+                                <Binding Path="IsConnected" Converter="{StaticResource myconv}" Mode="TwoWay">
+                                    <Binding.ConverterParameter>
+                                        <!-- Workaround: As you can not have a Binding direct in the ConverterParameter we enter some FrameworkElement in order to get ... -->
+                                        <TextBox>
+                                            <TextBox.DataContext>
+                                                <!-- ... the possibility to bind to our record (TemplatedParent is the ContentPresenter of the ItemsList). -->
+                                                <Binding RelativeSource="{RelativeSource Mode=TemplatedParent}" Path="DataContext" />
+                                            </TextBox.DataContext>
+                                        </TextBox>
+                                    </Binding.ConverterParameter>
+                                </Binding>
+                            </Border.BorderBrush>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox IsEnabled="False" Text="{Binding Name, Mode=OneWay}"/>
+                                <TextBox IsEnabled="False" Text="{Binding Volume, Mode=OneWay}"/>
+                                <TextBox IsEnabled="False" Text="{Binding Status, Mode=OneWay}"/>
+                                <TextBox IsEnabled="False" Text="{Binding MediaStatus, Mode=OneWay}"/>
+                            </StackPanel>
+                        </Border>
+                    </DataTemplate>
+                </ComboBox.ItemTemplate>
+            </ComboBox>
+            <StackPanel Grid.Column="2" Orientation="Horizontal">
+                <Button Margin="3" Content="Vol-" Click="Button_Click"/>
+                <Button Margin="3" Content="Vol+" Click="Button_Click_1"/>
+                <Button Margin="3" Content="Stop" Click="Button_Click_2"/>
+                <Button Margin="3" Content="Play" Click="Button_Click_3"/>
+            </StackPanel>
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <ListBox Grid.Column="0" ItemsSource="{Binding Categories}" SelectionChanged="ListBox_SelectionChanged">
+                <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="apim:MediaCategory">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBox  IsEnabled="False" Text="{Binding Name, Mode=OneWay}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+            <ListBox Grid.Column="1" ItemsSource="{Binding MediaList}" DoubleTapped="ListBox_DoubleTapped">
+                <ListBox.ItemTemplate>
+                    <DataTemplate x:DataType="api:IMedia">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBox  IsEnabled="False" Text="{Binding Name, Mode=OneWay}" />
+                        </StackPanel>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+        </Grid>
+    </Grid>
+</Page>

@@ -2,24 +2,26 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:vm="clr-namespace:AvaloniaHomeAudio.ViewModels"             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:vm="clr-namespace:AvaloniaHomeAudio.ViewModels"			 xmlns:vmb="clr-namespace:HomeAudioViewModel;assembly=HomeAudioViewModel"             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="AvaloniaHomeAudio.Views.MainView"
-			 d:DataContext="{x:Static vm:TestData.TestInstance}"
-             x:DataType="vm:MainViewModel"
+			 d:DataContext="vm:DtMainViewModel"
+             x:DataType="vmb:MainViewModel"
 			 Loaded="UserControl_Loaded_1">
-  <!--<Design.DataContext>
-    --><!-- This only sets the DataContext for the previewer in an IDE,
-         to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) --><!--
-    <vm:TestInstance/>
-  </Design.DataContext>>-->
 	<Grid>
 		<Grid.RowDefinitions>
+			<RowDefinition Height="Auto"/>
 			<RowDefinition Height="*"/>
 			<RowDefinition Height="Auto"/>
 		</Grid.RowDefinitions>
-		<Grid Grid.Row="0">
+		<StackPanel Orientation="Horizontal">
+			<Button Click="Button_Click_Down">Volume Down</Button>
+			<Button Click="Button_Click_Up">Volume Up</Button>
+			<Button Click="Button_Click_Stop">Stop</Button>
+			<Button Click="Button_Click_Play">Play</Button>
+		</StackPanel>
+		<Grid Grid.Row="1">
 			<Grid.ColumnDefinitions>
-				<ColumnDefinition/>
+				<ColumnDefinition Width="Auto"/>
 				<ColumnDefinition/>
 			</Grid.ColumnDefinitions>
 			<!--<TextBlock Grid.Column="0" Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>-->
@@ -42,6 +44,11 @@
 				</ListBox.ItemTemplate>
 			</ListBox>
 		</Grid>
-		<TextBlock Grid.Row="1" Text="{Binding Player.PlayerStatus}" Margin="5"/>
+		<StackPanel Grid.Row="2" Orientation="Horizontal">
+			<TextBlock Text="{Binding SelectedPlayer.Volume}" Margin="5"/>
+			<TextBlock Text="{Binding SelectedPlayer.Status}" Margin="5"/>
+			<TextBlock Text="{Binding SelectedPlayer.MediaStatus}" Margin="5"/>
+		</StackPanel>
+		
 	</Grid>
 </UserControl>

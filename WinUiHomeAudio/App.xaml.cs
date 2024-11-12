@@ -1,5 +1,6 @@
 ﻿using AudioCollectionApi.api;
 using AudioCollectionImpl;
+using LmsRepositiory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -8,6 +9,7 @@ using Microsoft.UI.Xaml;
 using Sharpcaster;
 using System;
 using System.IO;
+using System.Runtime.ConstrainedExecution;
 using System.Threading;
 using Windows.Storage;
 using WinUiHomeAudio.logger;
@@ -51,17 +53,19 @@ namespace WinUiHomeAudio {
                        //}).
                        ConfigureServices((context, services) => {
                            services.AddSingleton(logVm);
-                           services.AddSingleton<IMediaRepository, JsonMediaRepository>();
+                           services.AddSingleton<IMediaRepository, LmsClientRepos>();
+                           //services.AddSingleton<IMediaRepository, JsonMediaRepository>();
                            //services.AddSingleton<IMediaRepository, DLNAAlbumRepository>();
                            services.AddSingleton<AppSettings>();
-                           services.AddSingleton<ChromeCastRepository>();
+                           services.AddSingleton<IPlayerRepository, LmsClientRepos>();
+                           //services.AddSingleton<IPlayerRepository, ChromeCastRepository>();
                            // TODO: read log levels from config ...
                            services.AddLogging(logging => {
-                                               logging.AddFilter(level => level >= LogLevel.Trace)
-                                                      .AddWinUiLogger((con) => {    
-                                                          // This adds our LogPanel as possible target (configure in appsettings.json)
-                                                          con.LoggerVm = logVm;
-                                                      });
+                               logging.AddFilter(level => level >= LogLevel.Trace)
+                                      .AddWinUiLogger((con) => {
+                                          // This adds our LogPanel as possible target (configure in appsettings.json)
+                                          con.LoggerVm = logVm;
+                                      });
                            });
                        }).
                        Build();
@@ -88,11 +92,11 @@ namespace WinUiHomeAudio {
                     System.IO.File.Copy(path + "\\WebRadios.json", ApplicationData.Current.LocalFolder.Path + "\\WebRadios.json", true);
                 }
 
-                // start the search for CC Receivers in local network
-                MdnsChromecastLocator locator = new();
-                locator.ChromecastReceivedFound += Locator_ChromecastReceivedFound;
-                CancellationTokenSource tokenSource = new CancellationTokenSource(10000);
-                _ = locator.FindReceiversAsync(tokenSource.Token);          // Fire the search process and allow 10 seconds for receiver found events to call the handler.
+                // Lets start to find the available players ...
+                //var playerRepos = MyHost.Services.GetRequiredService<IPlayerRepository>();
+                //playerRepos.PlayerFound += Repos_PlayerFound;
+                //_ = playerRepos.LoadAllAsync();
+
             } catch (Exception ex) {
                 Log.LogError("Exception on Loading: {ex} ", ex);
             }
@@ -108,25 +112,23 @@ namespace WinUiHomeAudio {
             MyHost.Dispose();
         }
 
-        private void Locator_ChromecastReceivedFound(object? sender, Sharpcaster.Models.ChromecastReceiver e) {
-            var ccr = MyHost.Services.GetRequiredService<ChromeCastRepository>();
-            var appSettings = MyHost.Services.GetRequiredService<AppSettings>();
+        //private void Repos_PlayerFound(object? sender, IPlayerProxy pp) {
+        //    IPlayerRepository playerRepos = MyHost.Services.GetRequiredService<IPlayerRepository>();
+        //    var appSettings = MyHost.Services.GetRequiredService<AppSettings>();
+        //    var myContext = new MyUiContext() { dq = DispatcherQueue.GetForCurrentThread() };
+            
+        //    if (pp != null) {
+        //        //pp.SetContext(myContext);
+        //        if (!String.IsNullOrEmpty(appSettings.AutoConnectName) && pp.Name.StartsWith(appSettings.AutoConnectName)) {
+        //            Log.LogInformation("Initiate AutoConnect for Receiver '{CcrName}'", pp.Name);
+        //            //DispatcherQueue.GetForCurrentThread();
+        //            _ = playerRepos.TryConnectAsync(pp);
 
-            var ccc = ccr.Add(e);
-
-            if (!String.IsNullOrEmpty(appSettings.AutoConnectName) && e.Name.StartsWith(appSettings.AutoConnectName)) {
-                Log.LogInformation("Initiate AutoConnect for Receiver '{CcrName}'", e.Name);
-                _ = ccr.TryConnectAsync(ccc);
-
-                if (m_window != null) {
-                    m_window.MainPage.SelectedChromecast = ccc;
-                }
-
-            }
-
-        }
-
-        
-
+        //            if (m_window != null) {
+        //                m_window.MainPage.SelectedChromecast = pp as IPlayerProxy;
+        //            }
+        //        }
+        //    }
+        //}
     }
 }

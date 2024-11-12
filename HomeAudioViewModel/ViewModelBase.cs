@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 
-namespace AvaloniaHomeAudio.ViewModels;
+namespace HomeAudioViewModel;
 
 public class ViewModelBase : ObservableObject
 {
