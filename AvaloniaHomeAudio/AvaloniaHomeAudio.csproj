@@ -25,7 +25,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\AudioCollectionImpl\AudioCollectionImpl.csproj" />
     <ProjectReference Include="..\AudioCollection\AudioCollectionApi.csproj" />
     <ProjectReference Include="..\HomeAudioViewModel\HomeAudioViewModel.csproj" />
     <ProjectReference Include="..\LmsRepository\LmsRepository.csproj" />
