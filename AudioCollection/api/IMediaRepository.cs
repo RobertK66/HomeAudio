@@ -1,4 +1,6 @@
-﻿using System;
+﻿using AudioCollectionApi.model;
+
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -7,19 +9,13 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace AudioCollectionApi
+namespace AudioCollectionApi.api
 {
-    public interface IMediaRepository
-    {
-        //void AddCdRepos(string collectionid, string path);
-        //void AddRadioRepos(string collectionid, string path);
-
-        //void LoadAll(object PersitenceContext);
+    public interface IMediaRepository {
         Task LoadAllAsync(object PersitenceContext);
-
-        ObservableCollection<Cd> GetCdRepository(string collectionid);
-        ObservableCollection<NamedUrl> GetRadioRepository(string collectionid);
-        ObservableCollection<MediaCategory> GetRadioCategories();
-        ObservableCollection<MediaCategory> GetCdCategories();
+        ObservableCollection<MediaCategory> GetCategories();
+        ObservableCollection<IMedia> GetMediaRepository(string categoryId);
+        Task LoadReposAsync(string context, Stream streamReader);
     }
+
 }

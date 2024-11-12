@@ -1,37 +1,41 @@
-﻿
-using AudioCollectionApi;
+﻿using AudioCollectionApi.api;
+using AudioCollectionApi.model;
 using Microsoft.Extensions.Logging;
 using Microsoft.UI.Dispatching;
+using Sharpcaster;
+using Sharpcaster.Channels;
+using Sharpcaster.Models;
+using Sharpcaster.Models.Media;
+using Sharpcaster.Models.Queue;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using Windows.Devices.Radios;
-using Windows.Media.Protection.PlayReady;
-using Sharpcaster;
-using Sharpcaster.Models.Media;
-using Sharpcaster.Models.Queue;
-using Sharpcaster.Models;
-using Sharpcaster.Channels;
 
 namespace WinUiHomeAudio.model {
-    public class ChromeCastClientWrapper : INotifyPropertyChanged {
+    public class ChromeCastClientWrapper : INotifyPropertyChanged, IPlayerProxy {
         private readonly SemaphoreSlim semaphoreSlim = new(1, 1);
 
         public event PropertyChangedEventHandler? PropertyChanged;
         public void RaisePropertyChanged([CallerMemberName] string propertyName = "") {
             if (PropertyChanged != null) {
-                PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+                var e = new PropertyChangedEventArgs(propertyName);
+                if (observableContext != null) {
+                    observableContext.InvokePropChanged(PropertyChanged, this, e);
+                } else {
+                    PropertyChanged(this, e);
+                }
             }
         }
 
-        private readonly DispatcherQueue _dispatcherQueue;
+        //private readonly DispatcherQueue _dispatcherQueue;
         private String _connectionAppId = "";
         private ChromecastClient? ConnectedClient = null;
+
+        private IObservableContext? observableContext;
 
 
         private ChromecastReceiver cr;
@@ -50,11 +54,11 @@ namespace WinUiHomeAudio.model {
 
         private int _volume;
 
-        public ChromeCastClientWrapper(ChromecastReceiver cr, DispatcherQueue dc, ILoggerFactory lf) {
+        public ChromeCastClientWrapper(ChromecastReceiver cr,  ILoggerFactory lf) {
             this.cr = cr;
             _name = cr.Name;
             _status = cr.Status;
-            _dispatcherQueue = dc;
+            //_dispatcherQueue = dc;
             _loggerFactory = lf;
             _isOn = false;
             Log = lf.CreateLogger<ChromeCastClientWrapper>();
@@ -65,9 +69,11 @@ namespace WinUiHomeAudio.model {
         public int Volume { get { return _volume; } set { _volume = value; RaisePropertyChanged(); } }
         public String? MediaStatus { get { return _mediaStatus; } set { _mediaStatus = value; RaisePropertyChanged(); } }
         public String? AppId { get { return _appId; } set { _appId = value; RaisePropertyChanged(); } }
-        public bool IsConnected { get { return _isConnected; } set {  _isConnected = value; RaisePropertyChanged(); } }
+        public bool IsConnected { get { return _isConnected; } set { _isConnected = value; RaisePropertyChanged(); } }
 
         public bool IsOn { get { return _isOn; } set { _isOn = value; RaisePropertyChanged(); } }
+
+        public string Id => "none";
 
         public async Task<bool> TryConnectAsync(string appId) {
             //bool connected = false;
@@ -78,8 +84,6 @@ namespace WinUiHomeAudio.model {
                 _connectionAppId = appId;
 
                 ConnectedClient = new ChromecastClient(loggerFactory: _loggerFactory);
-
-                //cr.DeviceUri = new System.Uri("http://localhost:123/base");
                 var st = await ConnectedClient.ConnectChromecast(cr);
 
                 string? oldAppid = null;
@@ -100,7 +104,7 @@ namespace WinUiHomeAudio.model {
 
                     ConnectedClient.Disconnected += ConnectedClient_Disconnected;
                     IsConnected = true;
-                    IsOn=true;
+                    IsOn = true;
                 }
             } catch (Exception ex) {
                 Log.LogError("Exception while trying to connect chromecast: {ex}", ex);
@@ -121,13 +125,13 @@ namespace WinUiHomeAudio.model {
 
         private void ConnectedClient_Disconnected(object? sender, EventArgs e) {
             // This client is done now -> reconnect a new one.
-            _dispatcherQueue.TryEnqueue(async () => {
+            //_dispatcherQueue.TryEnqueue(async () => {
                 IsConnected = false;
                 IsOn = false;
                 ConnectedClient = null;
-                await Task.Delay(3000);
+                //await Task.Delay(3000);
                 //_ = TryConnectAsync(_connectionAppId);
-            });
+            //});
         }
 
 
@@ -138,13 +142,13 @@ namespace WinUiHomeAudio.model {
             if (sender is ReceiverChannel sc) {
                 //Log.LogTrace("Status changed: " + sc.Status.Volume.Level.ToString());
 
-                _dispatcherQueue.TryEnqueue(() => {
+                //_dispatcherQueue.TryEnqueue(() => {
                     if (sc.Status?.Volume?.Level != null) {
                         Volume = (int)(sc.Status.Volume.Level * 200);
                     }
                     Status = sc.Status?.Applications?.FirstOrDefault()?.StatusText ?? "<no status>";
                     AppId = sc.Status?.Applications?.FirstOrDefault()?.AppId + "/" + sc.Status?.Applications?.FirstOrDefault()?.DisplayName;
-                });
+                //});
 
 
             }
@@ -152,9 +156,9 @@ namespace WinUiHomeAudio.model {
 
         private void MediaChannel_QueueMediaStatusChanged(object? sender, EventArgs e) {
             if (sender is MediaChannel mc) {
-                _dispatcherQueue.TryEnqueue(() => {
+                //_dispatcherQueue.TryEnqueue(() => {
                     MediaStatus = mc.Status.FirstOrDefault()?.PlayerState.ToString() ?? "<leer>";
-                });
+                //});
 
                 //Log.LogTrace("MediaChanel Status changed: " + e.Status.FirstOrDefault()?.CurrentTime.ToString() ?? "<->");
             }
@@ -202,14 +206,15 @@ namespace WinUiHomeAudio.model {
                         //Log.LogDebug("Load Cd with " + media.Count + " tracks.");
                         await mediaChannel.QueueLoadAsync(media.ToArray());
                     }
-
                 }
+            } catch (Exception e) {
+                Log.LogError("Exception when loading media: " + e.Message);
             } finally {
                 semaphoreSlim?.Release();
             }
         }
 
-        internal void VolumeUp() {
+        public void VolumeUp() {
             var rcChannel = ConnectedClient?.GetChannel<ReceiverChannel>();
             if (rcChannel != null) {
                 Volume = (Volume) + 3;
@@ -221,7 +226,7 @@ namespace WinUiHomeAudio.model {
             }
         }
 
-        internal void VolumeDown() {
+        public void VolumeDown() {
             var rcChannel = ConnectedClient?.GetChannel<ReceiverChannel>();
             if (rcChannel != null) {
                 Volume = (Volume) - 3;
@@ -236,15 +241,15 @@ namespace WinUiHomeAudio.model {
         public void Disconnect() {
             if (ConnectedClient != null) {
                 IsConnected = false;
-                IsOn=false;
+                IsOn = false;
                 _ = ConnectedClient.DisconnectAsync();
             }
         }
 
- 
- 
 
-        public async Task StopMediaPlay() {
+
+
+        public async Task StopMediaPlayAsync() {
             await semaphoreSlim.WaitAsync();    // Only one Play at once is routet to LoadAsync!
             try {
                 if (ConnectedClient != null) {
@@ -253,12 +258,53 @@ namespace WinUiHomeAudio.model {
 
                     if (currentMediaStatus != null) {
                         //Log.LogDebug("Load Media.");
-                        await mediaChannel.StopAsync();
+                        await mediaChannel.PauseAsync();
                     }
-                    
+
                 }
             } finally {
                 semaphoreSlim?.Release();
+            }
+        }
+
+        public void PlayCd(IMedia cd) {
+            if (cd is Cd c) {
+                _ = PlayCdAsync(c);
+            }
+        }
+
+        public void PlayRadio(IMedia radio) {
+            if (radio is NamedUrl u) {
+                _ = PlayRadioAsync(u);
+            }
+        }
+
+        public void Stop() {
+            _ = StopMediaPlayAsync();
+        }
+
+        public void Play() {
+            if (ConnectedClient != null) {
+                var mediaChannel = ConnectedClient.GetChannel<MediaChannel>();
+                currentMediaStatus = mediaChannel.Status.FirstOrDefault();
+
+                if (currentMediaStatus != null) {
+                    //Log.LogDebug("Load Media.");
+                    _ = mediaChannel.PlayAsync();
+                }
+
+            }
+        }
+
+        public void SetContext(IObservableContext myContext) {
+            observableContext = myContext;
+        }
+
+        public async Task DisconnectAsync() {
+            if (ConnectedClient != null) {
+                IsConnected = false;
+                IsOn = false;
+                await ConnectedClient.DisconnectAsync();
             }
         }
     }

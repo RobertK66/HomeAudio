@@ -1,4 +1,5 @@
 ﻿using AudioCollectionApi;
+using AudioCollectionApi.model;
 using Sharpcaster;
 using Sharpcaster.Channels;
 using Sharpcaster.Interfaces;
@@ -86,20 +87,20 @@ namespace Cli {
 
         public async Task<MediaStatus?> PlayNext() {
             if (mediaChannel != null) {
-                var st1 = mediaChannel.Status?.FirstOrDefault();
-                if (st1 != null) {
-                    return await mediaChannel.QueueNextAsync(st1.MediaSessionId);
-                }
+                //var st1 = mediaChannel.Status?.FirstOrDefault();
+                //if (st1 != null) {
+                    return await mediaChannel.QueueNextAsync();
+                //}
             }
             return null;
         }
 
         public async Task<MediaStatus?> PlayPrev() {
             if (mediaChannel != null) {
-                var st1 = mediaChannel.Status?.FirstOrDefault();
-                if (st1 != null) {
-                    return await mediaChannel.QueuePrevAsync(st1.MediaSessionId);
-                }
+                //var st1 = mediaChannel.Status?.FirstOrDefault();
+                //if (st1 != null) {
+                    return await mediaChannel.QueuePrevAsync();
+                //}
             }
             return null;
         }

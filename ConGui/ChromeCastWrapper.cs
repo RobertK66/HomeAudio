@@ -1,5 +1,4 @@
-﻿using Google.Protobuf.WellKnownTypes;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -22,7 +21,7 @@ using System.Threading;
 using System.Threading.Channels;
 using System.Threading.Tasks;
 using System.Xml.Linq;
-using static Google.Protobuf.Reflection.SourceCodeInfo.Types;
+
 
 namespace ConGui {
     public class CCWStatusEventArgs : EventArgs {
@@ -70,7 +69,7 @@ namespace ConGui {
     public class ChromeCastWrapper : IHostedService, IChromeCastWrapper {
         private readonly ILoggerFactory loggerFactory;
         private readonly ILogger Log;
-        private readonly List<ChromecastReceiver> Receivers = new();
+        private readonly List<ChromecastReceiver> Receivers = [];
         private readonly String ccName;
         private readonly String appId;
 
@@ -85,8 +84,8 @@ namespace ConGui {
 
         public event EventHandler? StatusChanged;
 
-        private CancellationTokenSource CancelReceiversTask;
-        private IChromecastLocator locator;
+        private readonly CancellationTokenSource CancelReceiversTask = new();
+        private readonly MdnsChromecastLocator locator = new();
    
         public ChromeCastWrapper(IConfiguration conf, ILoggerFactory logFactory) { 
             this.loggerFactory = logFactory;
@@ -102,11 +101,7 @@ namespace ConGui {
 
         public Task StartAsync(CancellationToken cancellationToken) {
             Log.LogDebug("StartAsync called");
-
-            locator = new Sharpcaster.MdnsChromecastLocator();
             locator.ChromecastReceivedFound += Locator_ChromecastReceivedFound;
-
-            CancelReceiversTask = new CancellationTokenSource();
             _ = locator.FindReceiversAsync(CancelReceiversTask.Token);      // Fire the search process and wait for receiver found events!
 
             //Receivers = (await locator.FindReceiversAsync()).ToList();    // This blocks for 2000ms here!
@@ -181,7 +176,7 @@ namespace ConGui {
             //    Log.LogTrace("{cnt} changed event(s):", msm.Status.Count);      // I never got more than one here.
             IEnumerable<MediaStatus>? status = mediaChannel?.Status;  
             if (status != null) { 
-                if (status.Count() > 0) {
+                if (status.Any()) {
                     int idx = 0;
                     foreach (var item in status) {
                         currentMediaStatus = item;
@@ -248,20 +243,20 @@ namespace ConGui {
         public async Task PlayNext() {
             if (mediaChannel != null) {
                 Log?.LogDebug("Play Next");
-                currentMediaStatus ??= mediaChannel.Status.FirstOrDefault();  
-                if (currentMediaStatus != null) {
-                    await mediaChannel.QueueNextAsync(currentMediaStatus.MediaSessionId);
-                }
+                //currentMediaStatus ??= mediaChannel.Status.FirstOrDefault();  
+                //if (currentMediaStatus != null) {
+                    await mediaChannel.QueueNextAsync();
+                //}
             }
         }
 
         public async Task PlayPrev() {
             if (mediaChannel != null) {
                 Log?.LogDebug("Play Prev");
-                currentMediaStatus ??= mediaChannel.Status.FirstOrDefault();
-                if (currentMediaStatus != null) {
-                    await mediaChannel.QueuePrevAsync(currentMediaStatus.MediaSessionId);
-                }
+                //currentMediaStatus ??= mediaChannel.Status.FirstOrDefault();
+                //if (currentMediaStatus != null) {
+                    await mediaChannel.QueuePrevAsync();
+                //}
             }
         }
 

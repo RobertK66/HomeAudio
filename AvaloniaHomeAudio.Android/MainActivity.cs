@@ -5,7 +5,6 @@ using Avalonia;
 using Avalonia.Android;
 
 namespace AvaloniaHomeAudio.Android;
-
 [Activity(
     Label = "AvaloniaHomeAudio.Android",
     Theme = "@style/MyTheme.NoActionBar",
@@ -18,5 +17,6 @@ public class MainActivity : AvaloniaMainActivity<App>
     {
         return base.CustomizeAppBuilder(builder)
             .WithInterFont();
+        
     }
 }

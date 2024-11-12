@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Ui3HomeAudio (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "Ui3HomeAudio (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

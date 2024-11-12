@@ -19,6 +19,10 @@
     "Cli Write Cds": {
       "commandName": "Project",
       "commandLineArgs": "--qcCmd writeCd --out ./WebCd.json"
+    },
+    "Cli Write Radios": {
+      "commandName": "Project",
+      "commandLineArgs": "--qcCmd writeRadio --out ./WebRadio"
     }
   }
 }

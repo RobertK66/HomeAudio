@@ -1,26 +1,16 @@
-using AudioCollectionApi;
+using AudioCollectionApi.api;
+using AudioCollectionApi.model;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Data;
-using Microsoft.UI.Xaml.Input;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.ComponentModel.Design.Serialization;
-using System.IO;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices.WindowsRuntime;
-using Windows.Foundation;
-using Windows.Foundation.Collections;
-using Windows.Storage;
 using WinUiHomeAudio.model;
 using WinUiHomeAudio.pages;
+using Microsoft.UI.Dispatching;
 
 // To learn more about WinUI, the WinUI project structure,
 // and more about our project templates, see: http://aka.ms/winui-project-info.
@@ -31,107 +21,145 @@ namespace WinUiHomeAudio {
     /// </summary>
     public sealed partial class MainPage : Page, INotifyPropertyChanged {
 
+        private string ConfiguredAppId;
+
         public event PropertyChangedEventHandler? PropertyChanged;
         public void RaisePropertyChanged([CallerMemberName] string propertyName = "") {
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
-        public ObservableCollection<Category> Categories = new();
-        public ObservableCollection<Category> FooterCategories = new();
+        public ObservableCollection<Category> Categories = [];
+        public ObservableCollection<Category> FooterCategories = [];
 
-        private ChromeCastRepository _ccRepos;
-        public ChromeCastRepository ccRepos { get { return _ccRepos; } set { if (_ccRepos != value) { _ccRepos = value; RaisePropertyChanged(); } } }
+        private IPlayerRepository _ccRepos;
+        public IPlayerRepository CcRepos { get { return _ccRepos; } set { if (_ccRepos != value) { _ccRepos = value; RaisePropertyChanged(); } } }
 
 
-        private ChromeCastClientWrapper? _SelectedChromecast;
-        public ChromeCastClientWrapper? SelectedChromecast { get { return _SelectedChromecast; } 
-                                                             set { if (_SelectedChromecast != value) {
-                                                                       _SelectedChromecast = value;
-                                                                       RaisePropertyChanged();
-                                                                       ccRepos.SetActiveClient(value);
-                                                                   } 
-                                                             } }
+        private IPlayerProxy? _SelectedChromecast;
+        public IPlayerProxy? SelectedChromecast {
+            get { return _SelectedChromecast; }
+            set {
+                if (_SelectedChromecast != value) {
+                    _SelectedChromecast = value;
+                    RaisePropertyChanged();
+                    //CcRepos.SetActiveClient(value);
+                }
+            }
+        }
+
+        public NavigationView MainNavPane { get => this.MainNavView; }
+
+
+
+        private MyUiContext _uiContext;
 
         public MainPage() {
             this.InitializeComponent();
 
-            _ccRepos = App.Host.Services.GetRequiredService<ChromeCastRepository>();
+            _ccRepos = App.Host.Services.GetRequiredService<IPlayerRepository>();
+            FooterCategories.Add(new Category() { Name = "Live Logger", Tag = "Logger" });
 
+            _uiContext = new MyUiContext() { dq = DispatcherQueue.GetForCurrentThread() };
+
+            var settings = App.Host.Services.GetRequiredService<AppSettings>();
             IEnumerable<IMediaRepository> mrs = App.Host.Services.GetServices<IMediaRepository>();
+
+            ConfiguredAppId = settings.AppId;
+
             foreach (IMediaRepository mr in mrs) {
-
-                //            IMediaRepository mr = App.Host.Services.GetServices<IMediaRepository>();
-
-                mr.GetCdCategories().CollectionChanged += (s, e) => {
+                var cats = mr.GetCategories();
+                foreach (var c in cats) {
+                    Categories.Add(new Category() { Glyph = Symbol.Target, Name = c.Name, Tag = c.Id });
+                }
+                cats.CollectionChanged += (s, e) => {
                     if (e.NewItems != null) {
                         foreach (var ni in e.NewItems) {
                             if (ni is MediaCategory mc) {
-                                Categories.Add(new Category() { Glyph = Symbol.Target, Name = mc.Name + "-Cds", Tag = mc.Id });
+                                Categories.Add(new Category() { Glyph = Symbol.Target, Name = mc.Name, Tag = mc.Id });
                             }
                         }
                     }
                 };
 
-                mr.GetRadioCategories().CollectionChanged += (s, e) => {
-                    if (e.NewItems != null) {
-                        foreach (var ni in e.NewItems) {
-                            if (ni is MediaCategory mc) {
-                                Categories.Add(new Category() { Glyph = Symbol.Account, Name = mc.Name ?? "unknown", Tag = mc.Id });
-                            }
-                        }
-                    }
-                };
+                
+                _ = mr.LoadAllAsync(settings.ReposPath);
 
-                _ = mr.LoadAllAsync(ApplicationData.Current.LocalFolder.Path);
+                CcRepos.PlayerFound += Repos_PlayerFound;
+                _ = CcRepos.LoadAllAsync();
+
+             
+
             }
         }
 
 
+        private void Repos_PlayerFound(object? sender, IPlayerProxy pp) {
+            
+            var appSettings = (App.Current as App).MyHost.Services.GetRequiredService<AppSettings>();
+          
+             if (pp != null) {
+                pp.SetContext(_uiContext);
+                if (!String.IsNullOrEmpty(appSettings.AutoConnectName) && pp.Name.StartsWith(appSettings.AutoConnectName)) {
+                    //Log.LogInformation("Initiate AutoConnect for Receiver '{CcrName}'", pp.Name);
+                    //DispatcherQueue.GetForCurrentThread();
+                    _ = CcRepos.TryConnectAsync(pp);
+                    SelectedChromecast = pp as IPlayerProxy;
+
+                }
+            }
+        }
+
+
+
+        public void ReconfigureMediaFolder(string reposRootPath) {
+            Categories.Clear();
+            IEnumerable<IMediaRepository> mrs = App.Host.Services.GetServices<IMediaRepository>();
+            foreach (IMediaRepository mr in mrs) {
+                _ = mr.LoadAllAsync(reposRootPath);
+            }
+        }
+
         private void NavigationView_ItemInvoked(NavigationView sender, NavigationViewItemInvokedEventArgs args) {
             if (args.IsSettingsInvoked) {
                 //this.ccPlayer.Visibility = Visibility.Collapsed;
-                //ContentFrame.Navigate(typeof(SettingsPage));
+                ContentFrame.Navigate(typeof(SettingsPage));
             } else {
-                //this.ccPlayer.Visibility = Visibility.Visible;
-                string selectedItem = (String)args.InvokedItem;
-                if (selectedItem.Equals("ChromeCast")) {
-                    //ContentFrame.Navigate(typeof(ChromecastPage));
-                } else if (selectedItem.Contains("Cd")) {
-                    ContentFrame.Navigate(typeof(CdPage), args.InvokedItemContainer.Tag.ToString());
+                var tag = args.InvokedItemContainer.Tag.ToString() ?? "??";
+                NavContext ctx = new NavContext() { category = tag, player = _SelectedChromecast };
+                if (tag.Equals("Logger")) {
+                    ContentFrame.Navigate(typeof(LoggerPage));
                 } else {
-                    ContentFrame.Navigate(typeof(RadioPage), args.InvokedItemContainer.Tag.ToString());
+                    ContentFrame.Navigate(typeof(MediaPage), ctx);
                 }
             }
         }
 
         public void CcPlayer_VolumeUp(object sender, RoutedEventArgs e) {
             if (sender is FrameworkElement p) {
-                if (p.DataContext is ChromeCastClientWrapper ccw) {
+                if (p.DataContext is IPlayerProxy ccw) {
                     ccw.VolumeUp();
                 }
             }
-
         }
 
         public void CcPlayer_VolumeDown(object sender, RoutedEventArgs e) {
             if (sender is FrameworkElement p) {
-                if (p.DataContext is ChromeCastClientWrapper ccw) {
+                if (p.DataContext is IPlayerProxy ccw) {
                     ccw.VolumeDown();
                 }
             }
         }
 
-        public void ccPlayer_ConnectToggeled(object sender, RoutedEventArgs e) {
+        public void CcPlayer_ConnectToggeled(object sender, RoutedEventArgs e) {
             if (sender is FrameworkElement p) {
-                if (p.DataContext is ChromeCastClientWrapper ccw) {
+                if (p.DataContext is IPlayerProxy ccw) {
                     if (ccw.IsConnected != (e.OriginalSource as ToggleSwitch)?.IsOn) {
                         // This was because of user  toggle click
                         if (ccw.IsConnected) {
                             ccw.Disconnect();
                         } else {
-                            _ = ccw.TryConnectAsync(ccRepos._appId);
+                            _ = ccw.TryConnectAsync(ConfiguredAppId);
                         }
-
                     }
                 }
             }
@@ -139,9 +167,16 @@ namespace WinUiHomeAudio {
 
         private void Stop_Click(object sender, RoutedEventArgs e) {
             if (sender is FrameworkElement p) {
-                if (p.DataContext is ChromeCastClientWrapper ccw) {
-                    ccw.StopMediaPlay();
+                if (p.DataContext is IPlayerProxy ccw) {
+                    ccw.Stop();
+                }
+            }
+        }
 
+        private void Play_Click(object sender, RoutedEventArgs e) {
+            if (sender is FrameworkElement p) {
+                if (p.DataContext is IPlayerProxy ccw) {
+                    ccw.Play();
                 }
             }
         }

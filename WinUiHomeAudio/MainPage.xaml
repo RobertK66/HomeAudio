@@ -5,6 +5,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:WinUiHomeAudio"
     xmlns:mod="using:WinUiHomeAudio.model"
+    xmlns:api="using:AudioCollectionApi.api"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:converters="using:CommunityToolkit.WinUI.Converters"
@@ -46,23 +47,29 @@
                     <RowDefinition  Height="*"/>
                 </Grid.RowDefinitions>
 
-                <ComboBox ItemsSource="{x:Bind Path=ccRepos.KnownChromecasts}"
+                <ComboBox ItemsSource="{x:Bind Path=CcRepos.KnownPlayer}"
                           SelectedItem="{x:Bind Path=SelectedChromecast , Mode=TwoWay}"
                           >
                     <ComboBox.ItemTemplate>
-                        <DataTemplate x:DataType="mod:ChromeCastClientWrapper">
+                        <DataTemplate x:DataType="api:IPlayerProxy">
                             <ItemContainer HorizontalAlignment="Left" Margin="4">
-                                <Border BorderBrush="{x:Bind Path=IsConnected, Mode=OneWay, Converter={StaticResource BoolToColorConverter}}"
+                                <Border BorderBrush="{Binding Path=IsConnected, Mode=OneWay, Converter={StaticResource BoolToColorConverter}}"
                                         Visibility="Visible" 
                                         BorderThickness="2">
-                                    <StackPanel Orientation="Horizontal" Padding="4,0,4,0">
+                                    <StackPanel Orientation="Horizontal" Padding="4,0,5,0">
                                         <ToggleSwitch x:Name="ConnectToggle"
-                                                      Toggled="ccPlayer_ConnectToggeled"
+                                                      Toggled="CcPlayer_ConnectToggeled"
                                                       Width="120"
                                                       MinWidth="0"
                                                       OnContent="Connected"
                                                       OffContent="Offline"
-                                                      IsOn="{x:Bind Path=IsOn, Mode=OneWay}" />
+                                                      IsOn="{Binding Path=IsOn, Mode=OneWay}" />
+                                        
+                                        <TextBox IsEnabled="False" Text="{Binding Name, Mode=OneWay}"/>
+                                        <TextBox IsEnabled="False" Text="{Binding Status, Mode=OneWay }"/>
+                                        <Button x:Name="Stop" Content="Stop" VerticalAlignment="Top"  Click="Stop_Click" />
+                                        <Button x:Name="Play" Content="Play" VerticalAlignment="Top"  Click="Play_Click" />
+                                        <TextBox IsEnabled="False" Text="{Binding Volume, Mode=TwoWay }"/>
                                         <Button x:Name="VolDown" Content="vol-" VerticalAlignment="Top"  Click="CcPlayer_VolumeDown" >
                                             <Button.KeyboardAccelerators>
                                                 <KeyboardAccelerator Modifiers="None" Key="Subtract" />
@@ -73,13 +80,7 @@
                                                 <KeyboardAccelerator Modifiers="None" Key="Add" />
                                             </Button.KeyboardAccelerators>
                                         </Button>
-                                        <TextBox IsEnabled="False" Text="{x:Bind Name, Mode=OneWay}"/>
-                                        <TextBox IsEnabled="False" Text="{x:Bind Status, Mode=OneWay }"/>
-                                        <TextBox IsEnabled="False" Text="{x:Bind Volume, Mode=OneWay }"/>
-                                        <TextBox IsEnabled="False" Text="{x:Bind AppId, Mode=OneWay  }"/>
-                                        <TextBox IsEnabled="False" Text="{x:Bind MediaStatus, Mode=OneWay }"/>
-                                        <Button x:Name="Stop" Content="Stop" VerticalAlignment="Top"  Click="Stop_Click" >
-                                        </Button>
+                                        <TextBox IsEnabled="False" Text="{Binding MediaStatus, Mode=OneWay }"/>
                                     </StackPanel>
                                 </Border>
                             </ItemContainer>
