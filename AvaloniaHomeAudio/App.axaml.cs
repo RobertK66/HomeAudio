@@ -9,8 +9,6 @@ using AvaloniaHomeAudio.Views;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using LmsRepositiory;
-using Sharpcaster.Interfaces;
-using Sharpcaster;
 using HomeAudioViewModel;
 
 namespace AvaloniaHomeAudio;
