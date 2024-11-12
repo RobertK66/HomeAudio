@@ -2,10 +2,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:vm="clr-namespace:AvaloniaHomeAudio.ViewModels"             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             xmlns:vm="clr-namespace:AvaloniaHomeAudio.ViewModels"			 xmlns:vmb="clr-namespace:HomeAudioViewModel;assembly=HomeAudioViewModel"             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="AvaloniaHomeAudio.Views.MainView"
 			 d:DataContext="vm:DtMainViewModel"
-             x:DataType="vm:MainViewModel"
+             x:DataType="vmb:MainViewModel"
 			 Loaded="UserControl_Loaded_1">
 	<Grid>
 		<Grid.RowDefinitions>
@@ -16,6 +16,8 @@
 		<StackPanel Orientation="Horizontal">
 			<Button Click="Button_Click_Down">Volume Down</Button>
 			<Button Click="Button_Click_Up">Volume Up</Button>
+			<Button Click="Button_Click_Stop">Stop</Button>
+			<Button Click="Button_Click_Play">Play</Button>
 		</StackPanel>
 		<Grid Grid.Row="1">
 			<Grid.ColumnDefinitions>
@@ -43,9 +45,9 @@
 			</ListBox>
 		</Grid>
 		<StackPanel Grid.Row="2" Orientation="Horizontal">
-			<TextBlock Text="{Binding Player.Volume}" Margin="5"/>
-			<TextBlock Text="{Binding Player.Status}" Margin="5"/>
-			<TextBlock Text="{Binding Player.MediaStatus}" Margin="5"/>
+			<TextBlock Text="{Binding SelectedPlayer.Volume}" Margin="5"/>
+			<TextBlock Text="{Binding SelectedPlayer.Status}" Margin="5"/>
+			<TextBlock Text="{Binding SelectedPlayer.MediaStatus}" Margin="5"/>
 		</StackPanel>
 		
 	</Grid>

@@ -33,11 +33,15 @@
                         <!--<Border BorderThickness="3" BorderBrush="{ThemeResource SystemErrorTextColor}">-->
                         <Border BorderThickness="2">
                             <Border.BorderBrush>
-                                <Binding Path="IsConnected" Converter="{StaticResource myconv}" 
-                                         Mode="TwoWay">
+                                <!-- "MultiBinding" with a Converter behind the IsConnected of a IPlayerProxy -->
+                                <!-- A IValueConverter gets called when the bound Value fires its PropertyChenged event -->
+                                <!-- Other values can be passed with the 'single Object' ConverterParameter, We pass in our record. -->
+                                <Binding Path="IsConnected" Converter="{StaticResource myconv}" Mode="TwoWay">
                                     <Binding.ConverterParameter>
+                                        <!-- Workaround: As you can not have a Binding direct in the ConverterParameter we enter some FrameworkElement in order to get ... -->
                                         <TextBox>
                                             <TextBox.DataContext>
+                                                <!-- ... the possibility to bind to our record (TemplatedParent is the ContentPresenter of the ItemsList). -->
                                                 <Binding RelativeSource="{RelativeSource Mode=TemplatedParent}" Path="DataContext" />
                                             </TextBox.DataContext>
                                         </TextBox>

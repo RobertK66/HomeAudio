@@ -1,6 +1,7 @@
 ﻿using AudioCollectionApi.api;
 using Avalonia.Controls;
-using AvaloniaHomeAudio.ViewModels;
+
+using HomeAudioViewModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Xml.Serialization;
@@ -22,7 +23,7 @@ public partial class MainView : UserControl
     //}
 
     private void UserControl_Loaded_1(object? sender, Avalonia.Interactivity.RoutedEventArgs e) {
-        _ = vm.LoadReposAsync();
+       //_ = vm.StartAsync(new System.Threading.CancellationToken());
     }
 
     private void Button_Click_2(object? sender, Avalonia.Interactivity.RoutedEventArgs e) {
@@ -34,15 +35,27 @@ public partial class MainView : UserControl
     private void Button_Click_3(object? sender, Avalonia.Interactivity.RoutedEventArgs e) {
         IMedia? media = (sender as Button)?.Tag as IMedia;
         if (media != null) {
-            vm.PlayMedia(media);
+            if (media.IsCollection) {
+                vm.SelectedPlayer?.PlayCd(media);
+            } else {
+                vm.SelectedPlayer?.PlayRadio(media);
+            }
         }
     }
 
     private void Button_Click_Up(object? sender, Avalonia.Interactivity.RoutedEventArgs e) {
-        vm.VolumeUp();
+        vm.SelectedPlayer?.VolumeUp();
     }
 
     private void Button_Click_Down(object? sender, Avalonia.Interactivity.RoutedEventArgs e) {
-        vm.VolumeDown();
+        vm.SelectedPlayer?.VolumeDown();
     }
+
+    private void Button_Click_Stop(object? sender, Avalonia.Interactivity.RoutedEventArgs e) {
+        vm.SelectedPlayer?.Stop();
+    }
+    private void Button_Click_Play(object? sender, Avalonia.Interactivity.RoutedEventArgs e) {
+        vm.SelectedPlayer?.Play();
+    }
+    
 }

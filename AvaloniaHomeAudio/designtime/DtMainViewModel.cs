@@ -1,10 +1,12 @@
 ﻿using AudioCollectionApi.api;
-using AvaloniaHomeAudio.ViewModels;
+
+using HomeAudioViewModel;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace AvaloniaHomeAudio {
@@ -63,11 +65,15 @@ namespace AvaloniaHomeAudio {
 
     public class DtMainViewModel : MainViewModel {
         public DtMainViewModel(ILogger<MainViewModel>? logger, IMediaRepository? repos, IPlayerRepository playerRepos) : base(null, null, null) {
-            Player = new DummyPlayer();
+            SelectedPlayer = new DummyPlayer();
         }
 
-        public override Task LoadReposAsync() {
+        new public Task StartAsync(CancellationToken token) {
             return Task.CompletedTask;
         }
+
+        //public override Task LoadReposAsync() {
+        //    return Task.CompletedTask;
+        //}
     }
 }

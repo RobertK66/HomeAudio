@@ -5,14 +5,13 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Data.Core.Plugins;
 using Avalonia.Markup.Xaml;
 
-using AvaloniaHomeAudio.ViewModels;
 using AvaloniaHomeAudio.Views;
-using AvaloniaHomeAudio.player;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using LmsRepositiory;
 using Sharpcaster.Interfaces;
 using Sharpcaster;
+using HomeAudioViewModel;
 
 namespace AvaloniaHomeAudio;
 
@@ -33,15 +32,11 @@ public partial class App : Application
 
         // Register all the services needed for the application to run
         var collection = new ServiceCollection();
-        //collection.AddSingleton<IRepository, Repository>();
-        //collection.AddTransient<BusinessService>();
-        collection.AddTransient<MainViewModel>();
 
-        //collection.AddSingleton<IMediaRepository, JsonMediaRepository>();
+        collection.AddSingleton<MainViewModel>();                                                 
+        //collection.AddHostedService<MainViewModel>(p => p.GetRequiredService<MainViewModel>());  // The hosted Service is constructed by using the Singelton
+
         collection.AddSingleton<IMediaRepository, LmsClientRepos>();
-
-        //collection.AddSingleton<IChromeCastPlayer, ChromeCastPlayer>();
-        //collection.AddSingleton<IChromecastLocator, MdnsChromecastLocator>();
         collection.AddSingleton<IPlayerRepository, LmsClientRepos>();
 
         collection.AddLogging(logging => {
@@ -53,6 +48,8 @@ public partial class App : Application
         var services = collection.BuildServiceProvider();
 
         var vm = services.GetRequiredService<MainViewModel>();
+        _ = vm.StartAsync(new System.Threading.CancellationToken());
+
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
             desktop.MainWindow = new MainWindow
