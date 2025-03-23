@@ -12,7 +12,7 @@ namespace WebRadioImpl {
             var optionsBuilder = new DbContextOptionsBuilder<MyDataContext>();
             optionsBuilder.UseSqlServer("Server=THINKP-15\\DEVSERVER;Database=HomeAudio;Trusted_Connection=True;TrustServerCertificate=true;");
 
-            return new MyDataContext(optionsBuilder.Options);
+            return new MyDataContext(optionsBuilder.Options, null);
         }
     }
 

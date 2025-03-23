@@ -42,12 +42,13 @@ public class Program : IHostedService {
 
     public async Task StartAsync(CancellationToken cancellationToken) {
         Console.WriteLine("Program.StartAsync() called.");
-        var rec = new WebRadio() { Name = DateTime.Now.ToString(), Description = "Dummy Startup record", StreamingUrl = "" };
-        MyDc.WebRadios.Add(rec);
-        await MyDc.SaveChangesAsync();
+
+        //var rec = new WebRadio() { Name = DateTime.Now.ToString(), Description = "Dummy Startup record", StreamingUrl = "" };
+        //MyDc.WebRadios.Add(rec);
+        var rec = MyDc.WebRadios.OrderByDescending(r => r.Name).FirstOrDefault();
 
 
-        Console.WriteLine("Program.StartAsync() finished." + rec.Id );
+        Console.WriteLine("Program.StartAsync() finished." + rec?.Id ?? "?" );
     }
 
     public Task StopAsync(CancellationToken cancellationToken) {

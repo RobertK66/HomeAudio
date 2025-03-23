@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Spectre.Console;
 using Spectre.Console.Cli;
 using System;
+using TextPromptWithHistory;
 
 
 
@@ -48,11 +49,12 @@ namespace LmsClient {
             // Enter the "shell" CL loop
             string prompt = "lms>";
             while (true) {
-                var line = GetLine(prompt);         //AnsiConsole.Prompt(new TextPrompt<string>(prompt).AllowEmpty());
+                var line = AnsiConsole.Prompt(new TextPromptWithHistory<String>(prompt).AllowEmpty().AddHistory(lineBuffer));
                 if (!String.IsNullOrEmpty(line)) {
                     if (line.Trim().ToLower().StartsWith("exit")) {
                         break;
                     }
+                    lineBuffer.Add(line);
                     if ((new List<string>() { "-?", "?", "help", "-help", "--help" }).Contains(line.Trim().ToLower())) {
                         line = "-h";
                     }
