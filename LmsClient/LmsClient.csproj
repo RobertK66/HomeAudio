@@ -15,7 +15,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\TextPromptWithHistory\src\TextPromptWithHistory\TextPromptWithHistory.csproj" />
     <ProjectReference Include="..\LmsRepository\LmsRepository.csproj" />
   </ItemGroup>
 

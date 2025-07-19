@@ -12,6 +12,9 @@ namespace HaService {
         public string Id { get; set; }
         public string Name { get; set; }
         public decimal Speed { get; set; }
+
+        public double someFloat { get; set; }
+        public int someInt { get; set; }
     }
 
     public class ShipType : ObjectGraphType<Ship> {
@@ -20,6 +23,8 @@ namespace HaService {
             Field(x => x.Id).Description("The Id of the ship");
             Field(x => x.Name).Description("The name of the ship.");
             Field(x => x.Speed).Description("Speed in parsecs per second ;-).");
+            Field(x => x.someFloat);
+            Field(x => x.someInt);
         }
     }
 
@@ -53,8 +58,8 @@ namespace HaService {
         }
     }
 
-    public class StarWarsQuery : ObjectGraphType {
-        public StarWarsQuery() {
+    public class StarWarsRootQuery : ObjectGraphType {
+        public StarWarsRootQuery() {
             Field<DroidType>("hero").Resolve(context => NewMethod(context));
             Field<ListGraphType<ShipType>>("ships_slower_than").Argument<DecimalGraphType>("maxspeed").Resolve(GetShips);
         }
@@ -65,14 +70,14 @@ namespace HaService {
             List<Ship> retVal = new List<Ship>();
 
             if (maxspeed > 0.166M) {
-                retVal.Add(new Ship() { Id = "3", Name = "Orion III", Speed = 1M/6 });
+                retVal.Add(new Ship() { Id = "3", Name = "Orion III", Speed = 1M/6, someFloat = 1.0/6, someInt = 42});
             }
 
             if (maxspeed > 0.34567M) {
-                retVal.Add(new Ship() { Id = "1", Name = "Todesstern", Speed = 0.34567M });
+                retVal.Add(new Ship() { Id = "1", Name = "Todesstern", Speed = 0.34567M, someFloat = 1.0 / 6, someInt = 42 });
             }
             if (maxspeed > 16.2M) {
-                retVal.Add(new Ship() { Id = "2", Name = "Starkreuzer", Speed = 16.22234M });
+                retVal.Add(new Ship() { Id = "2", Name = "Starkreuzer", Speed = 16.22234M, someFloat = 1.0 / 6, someInt = 42 });
             }
             return retVal;
         }
@@ -93,7 +98,7 @@ namespace HaService {
 
     public class StarWarsSchema : Schema {
         public StarWarsSchema() {
-            Query = new StarWarsQuery();  
+            Query = new StarWarsRootQuery();  
         }
     }
 
@@ -116,7 +121,7 @@ namespace HaService {
             {
                 options.AddSystemTextJson(options => {
                     // This is needed to get decimals with complete precision length....
-                    options.NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.WriteAsString | System.Text.Json.Serialization.JsonNumberHandling.AllowReadingFromString;
+                    // options.NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.WriteAsString | System.Text.Json.Serialization.JsonNumberHandling.AllowReadingFromString;
                 });
                 options.AddSchema<StarWarsSchema>();
             });
